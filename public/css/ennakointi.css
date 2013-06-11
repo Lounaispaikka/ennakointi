@@ -1,0 +1,348 @@
+/**
+ * Aluetietopalvelu Lounaispaikka styles
+ * Ennakointiverkoston e-alusta specific styles
+ * @author Ville Glad <ville at lounaispaikka . fi>
+ */
+/*@import url(http://fonts.googleapis.com/css?family=Maven+Pro:400,700);*/
+/*
+/*
+Värit
+   
+        VIHREÄ: #8fbb42
+        Vaalea ORANSSI: #eed333
+        Tumma ORANSSI: #efaf0d
+        Tumma HARMAA: #818286
+        Vaalea HARMAA: #e7e7e8
+        linkki SININEN: #0374B4
+		
+		Lounaispaikka:
+		Yläpalkki: rgb(25, 65, 120)
+		Nappulat: rgb(133, 180, 213)
+		
+		E-verkosto:
+		Oranssi-vaalea: #f0a500 rgb(240, 165, 0)
+		-tumma: #f08500 rgb(240, 133, 0)
+		Harmaa-vaalea: #6f6e6d rgb(111, 110, 109)
+		-tumma: #5e5d5b rgb(94, 93, 91)
+*/
+body, .x-body {
+    /* IE10 Consumer Preview */ 
+	background-image: -ms-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%);
+
+	/* Mozilla Firefox */ 
+	background-image: -moz-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%);
+
+	/* Opera */ 
+	background-image: -o-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%);
+
+	/* Webkit (Safari/Chrome 10) */ 
+	background-image: -webkit-gradient(linear, left top, right bottom, color-stop(0, #FFFFFF), color-stop(1, #E7E7E8));
+
+	/* Webkit (Chrome 11+) */ 
+	background-image: -webkit-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%);
+
+	/* W3C Markup, IE10 Release Preview */ 
+	background-image: linear-gradient(to bottom right, #FFFFFF 0%, #E7E7E8 100%);
+}
+
+#site #middle #rightCol #rightColGrey {
+	
+/*	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;*/
+	padding: 0 5px 5px 5px;
+    background-color: #e7e7e8;
+
+}
+#topNav {
+    background-color: #fff;	
+}
+#topNav ul li a {
+	background-color: rgb(255, 255, 255);
+	background-image:linear-gradient(-90deg, rgb(129,130,134), rgb(94, 93, 91));
+	background-image:-webkit-gradient(linear, 50% 0%, 50% 100%, from(rgb(129,130,134)), to(rgb(94, 93, 91)));
+	background-image:-moz-linear-gradient(-90deg, rgb(129,130,134), rgb(94, 93, 91));
+    filter:  progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#6f6e6d', endColorstr='#5e5d5b'); /* IE6 & IE7 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#6f6e6d', endColorstr='#5e5d5b')"; /* IE8 */
+}
+#topNav ul li a.active {
+	/*sivustokohtainen*/
+background-color: rgb(255, 255, 255);
+	background-image:linear-gradient(-90deg, rgb(239, 175, 13), rgb(255, 134, 0));
+	background-image:-webkit-gradient(linear, 50% 0%, 50% 100%, from(rgb(239, 175, 13)), to(rgb(255, 134, 0)));
+	background-image:-moz-linear-gradient(-90deg, rgb(239, 175, 13), rgb(255, 134, 0));
+    filter:  progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#efaf0d', endColorstr='#ff8600'); /* IE6 & IE7 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#efaf0d', endColorstr='#ff8600')"; /* IE8 */
+}
+#topNav ul li a:hover {
+	/*sivustokohtainen*/
+    background-color: rgb(255, 255, 255);
+	background-image:linear-gradient(-90deg, rgb(120, 120, 120), rgb(94, 93, 91));
+	background-image:-webkit-gradient(linear, 50% 0%, 50% 100%, from(rgb(120, 120, 120)), to(rgb(94, 93, 91)));
+	background-image:-moz-linear-gradient(-90deg, rgb(120, 120, 120), rgb(94, 93, 91));
+    filter:  progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#6f6e6d', endColorstr='#5e5d5b'); /* IE6 & IE7 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#6f6e6d', endColorstr='#5e5d5b')"; /* IE8 */
+}
+.ext_window {
+	text-align:left !important;
+}
+.ext_clearBtns {
+	display: block;
+	width: 300px;
+	height: 70px;
+	margin: 50px;
+}
+.x-btn-default-large .x-btn-inner {
+    font-size: 14px;
+}*/
+
+/*Teema-sivun layout */
+div#teema_container {
+	display:block;
+	width:550px;
+	height:300px;
+}
+div.clear {
+	display:block;
+	clear:both;
+}
+
+div#teema_paivitykset {
+	clear:both;
+	width:500px;
+}
+div#teema_keskustelut {
+	clear:both;
+	width:500px;
+}
+div#teema_linkit {
+	clear:both;
+	width:500px;
+}
+div#teema_uutiset {
+	clear:both;
+	width:500px;
+}
+#teema_container ul li {
+	list-style: none outside none;
+	padding: 0;
+	margin: 5px 0 5px -15px;
+	font-size: 11px;
+}
+#teema_container ul li a {
+	list-style:none;
+	padding-left: 0px;
+	margin: 5px 0 5px 5px;
+	font-size: 11px;
+}
+/*Aineiston lisäys */
+
+div#addPageFormDialog, div#editPageInfoDialog, div#editPageContentDialog {
+	text-align:left !important;
+}
+
+div#addContentDialog button {
+	display:block;
+	clear:both;
+	padding: 5px;
+}
+
+div#addPageFormDialog form label , div#editPageFormDialog form label {
+	display:block;
+}
+
+div#addPageFormDialog  form input, div#editPageFormDialog form input {
+	display:block;
+}
+div#addPageFormDialog form input.text, div#editPageFormDialog form input.text {
+	margin-bottom:12px; 
+	width:95%;
+	padding: .4em;
+}
+
+div#addPageFormDialog form fieldset, div#editPageFormDialog form fieldset { 
+	padding:0; 
+	border:0; 
+	margin-top:25px; 
+}
+
+
+#cmsForm_info input[type="text"], #cmsForm_content input[type="text"], #cmsForm input[type="text"], #cmsForm textarea {
+	margin-bottom:12px; 
+	width:95%;
+	padding: .4em;
+}
+
+#cmsForm_content #cms_content {
+	height: 400px;
+	width: 95%;
+	padding: .4em;
+	margin-bottom:12px; 
+}
+#cmsInfo {
+	padding-bottom: 50px;
+}
+.hide {
+	display:none;
+}
+.show {
+	display:block;
+}
+.next-btn {
+	position: absolute;
+	bottom: 2px;
+	right: 2px;
+}
+.cancel-btn {
+	position: absolute;
+	bottom: 2px;
+	left: 2px;
+}
+#formResponse {
+	display: none;
+	width: 80%;
+	height: 100px;
+	background-color: #818286;
+	color: #fff;
+	font-weight: bold;
+	padding: 10px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	text-align: center;
+	position:absolute;
+	left:0px;
+	top:0px;
+	
+}
+#formResponse p {
+	padding-top: 30px;
+}
+
+.linkJs {
+	cursor: pointer;
+	margin-left:15px;
+	clear:both;
+}
+
+.comment_add_link {
+	cursor: pointer;
+	margin-left:15px;
+	color: #0374B4;
+	clear:both;
+}
+
+.ui-dialog .ui-state-error { padding: .3em; }
+.validateTips { border: 1px solid transparent; padding: 0.3em; }
+
+div#comments {
+	margin-top: 2px;
+}
+div#comments #newthread {
+	float:right;
+	cursor: pointer;
+	padding-left:15px;
+}
+
+div#comments .msgform {
+	border: 1px solid #f08500;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding: 0 10px 10px 10px;
+}
+div#comments #closenewmsg {
+	float: right;
+	margin: 10px 5px 0 0;
+	cursor: pointer;
+}
+div#comments #newcomment {
+	opacity: 0;
+	width: 480px;
+}
+div#comments ul#messages {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+#messages li {
+	margin: 0;
+	padding-right: 0;
+	padding-bottom: 10px;
+	width: 100%;
+	list-style: none;
+	border-top: 1px solid #ccc;
+}
+#mesages h2 {
+	padding: 0;
+}
+ul#messages li:first-child {
+	border-top: 0;
+}
+ul#messages span.author {
+	color: #888;
+	font-size: 70%;
+	padding-left:15px;
+}
+ul#messages a.replythread {
+	float: right;
+	cursor: pointer;
+}
+ul#messages a.quotemsg {
+	float: right;
+	cursor: pointer;
+	margin-right: 10px;
+}
+ul#messages img.closereplybox {
+	float: right;
+	margin: 10px 5px 0 0;
+	cursor: pointer;
+}
+ul#messages div.replybox {
+	margin-left: 50px;
+	padding-left: 20px;
+	border-left: 1px solid #ccc;
+}
+ul#messages ul {
+	padding-right: 0;
+	margin: 10px 0 0 50px;
+	border-top: 1px solid #ccc;
+}
+ul#messages div.likebox {
+	float: right;
+	margin: 0 5px 5px 0;
+	padding: 3px 0 5px 0;
+}
+ul#messages div.likebox a {
+	cursor: pointer;
+	padding: 5px 10px 5px 5px;
+}
+ul#messages div.likebox a:hover {
+}
+ul#messages div.likebox a img {
+	margin: 0 5px -3px 0;
+}
+ul#messages div.likebox a.likethumb {
+	/* margin-right: 15px; */
+	color: #51a83c;
+}
+ul#messages div.likebox a.likethumb:hover {
+	background: #c9ffcc;
+}
+ul#messages div.likebox a.dislikethumb {
+	color: red;
+}
+ul#messages div.likebox a.dislikethumb:hover {
+	background: #ffcaca;
+}
+ul#messages div.likebox.clicked {
+	background: #ebebeb;
+}
+ul#messages div.likebox.clicked a {
+	cursor: default;
+}
+ul#messages div.likebox.clicked a.likethumb:hover {
+	background: #ebebeb;
+}
+ul#messages div.likebox.clicked a.dislikethumb:hover {
+	background: #ebebeb;
+}
