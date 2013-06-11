@@ -1,0 +1,495 @@
+/**
+ * Returns Ext.data.store records as an array.
+ * @method
+ * @member Ext
+ * @author Ville Glad
+ */
+Ext.getStoreDataAsArray = function( store ) {
+	var data = [];
+	Ext.each(store.getRange(), function(record) {
+		data.push(record.data);
+	});
+	return data;
+};
+
+Ext.require([
+    'Ext.grid.*',
+    'Ext.data.*',
+    'Ext.util.*',
+    'Ext.state.*',
+    'Ext.form.*',
+    'Ext.ux.CheckColumn',
+    'Ext.selection.CheckboxModel'
+]);
+Ext.define('Lougis.view.Toimialat', {
+    extend: 'Lougis.view.Panel',
+    alias: 'widget.toimialat',
+    id: 'LougisToimialat',
+	anchor: '100% 100%',
+	border: 0,
+    items: [],
+    treeData: [],
+    initComponent: function() {
+    
+		this.callParent();	
+		
+		this.toimialaPanel = Ext.create('Ext.panel.Panel', {
+			//layout: 'border',
+			border: 0,
+			anchor: '100% 100%'
+		});
+		this.add(this.toimialaPanel);
+		this.navStore = this.createNavTreeStore();
+		this.navSidePanel = this.createNavSidePanel();
+		this.toimialaPanel.add(this.navSidePanel);
+		
+		this.toimialaPageInfo = this.createToimialaPageInfoPanel();
+        
+    },
+	
+	//sivupaneeli, listaus jossa kaikki toimialasivut ja painikkeet
+	createNavSidePanel: function() {
+		
+		this.toimialaSaveSortBtn = Ext.create('Ext.Button', {
+			text: 'Tallenna rakenne',
+			icon: '/img/icons/16x16/disk.png',
+		    scope: this
+		    /*handler: function() {
+		    	this.saveToimialaTreeSort();
+		    }*/
+		});
+	
+        this.toimialaNewPageBtn = Ext.create('Ext.Button', {
+			text: 'Uusi sivu',
+			icon: '/img/icons/16x16/page_edit.png',
+			scope: this
+		    /*handler: function() {
+		    	this.createNewPageWin();
+		    }*/
+		});
+		
+		this.navTreePanel = Ext.create('Ext.tree.Panel', {
+			id: 'toimialaNavTreePanel',
+			store: this.navStore,
+            rootVisible: false, 
+			bodyPadding: '0 0 0 0',
+			bodyBorder: false,
+            scroll: 'both',
+			//layout: 'fit',
+			buttonAlign: 'left',
+			border: 0,
+            viewConfig: {
+                plugins: {
+                    ptype: 'treeviewdragdrop'
+                    }
+            },
+            allowContainerDrop: false,
+			listeners: {
+				itemclick: {
+					scope: this,
+					fn: function( view, record, item, index ){
+						if ( record.data.page_id !== null ) {
+							this.currentRecord = record;
+							this.loadPageToEdit( record.data.page_id );
+						}
+					}
+				},
+		        afterrender: {
+		        	scope: this,
+					fn: function( panel ) {
+		        		panel.setHeight( document.body.clientHeight-188 );
+		        	}
+		        }
+			}
+		});
+		
+		this.navSidePanel = Ext.create('Ext.panel.Panel', {
+			title: 'Navigaatio',
+			region:'west',
+			//anchor: '250 100%',
+			border: 0,
+			//layout: 'auto',
+			id: 'toimialaNavSidePanel',
+			width: 250,
+			split: true, //resizable
+			collapsible: true,   // make collapsible
+			buttons: [
+				this.toimialaSaveSortBtn,
+				'->',
+				this.toimialaNewPageBtn
+			],
+			items: [this.navTreePanel]
+		});
+		
+		return this.navSidePanel;
+	
+	},
+	
+	//keskipaneeli toimiala-sivun perustietojen näyttämiseen/muokkaamiseen
+	createToimialaPageInfoPanel: function() {
+	
+		this.savePageInfoBtn = Ext.create('Ext.Button', {
+			text: 'Tallenna sivun tiedot',
+			icon: '/img/icons/16x16/disk.png',
+			width: 150,
+			scope: this/*,
+			handler: function() {
+			
+				var form = this.toimialaPageInfo.getForm();
+				if( form.isValid() ) {
+					//form.findField('toimialaPageInfoExtra1').setValue(CKEDITOR.instances.toimialaPageInfoFieldExtra1.getData());
+					form.submit({
+						scope: this,
+						success: function(form, action) {
+							this.reloadNavTreeStore();
+							
+							this.currentRecord.set('text', form.findField('toimiala_page[nav_name]').value);
+							
+							Ext.Msg.alert('Tallennus onnistui', action.result.msg);
+							this.parentPageStore.load();
+							this.parentPageStore.load();
+						},
+						failure: function(form, action) {
+							Ext.Msg.alert('Virhe!', action.result.msg);
+						}
+					});
+				}
+				else {Ext.Msg.alert("Virhe lomakkeen tiedoissa", "Täytä kaikki lomakkeen kentät kunnollisilla arvoilla.");}
+				
+			}*/
+		});
+		
+		this.deletePageBtn = Ext.create('Ext.Button', {
+			text: 'Poista sivu',
+			icon: '/img/icons/16x16/delete.png',
+			width: 100,
+			scope: this/*,
+			handler: function() {
+				if ( confirm("Haluatko varmasti poistaa tämän sivun? Toimintoa ei voi peruuttaa.") ) {
+					
+					Ext.Ajax.request({
+						url: '/run/lougis/cms/deletePage/',
+						scope: this,
+						params: {
+							page_id: this.toimialaPageInfo.getForm().getFieldValues().page_id
+						},
+						success: function( xhr ){
+							var res = Ext.JSON.decode(xhr.responseText);
+							if ( res.success ) {
+								//this.reloadNavTreeStore();
+								
+								this.currentRecord.remove();
+								this.toimialaTabPanel.disable();
+								Ext.Msg.alert('Sivu poistettu', res.msg);
+								this.parentPageStore.load();
+								this.parentPageStore.load();
+							} else {
+								Ext.Msg.alert('Virhe!', res.msg);
+							}
+						}
+					});
+					
+				}
+				
+			}*/
+		});
+    
+   		this.toimialaPageInfoPanel = Ext.create('Ext.form.Panel', {
+			url: '/run/lougis/cms/savePageInfo/',
+			id: 'cmsPageInfoPanel',
+			itemId: 'cmsPageInfoTab',
+			title: 'Perustiedot',
+			fieldDefaults: {
+				labelWidth: 150
+			},
+			defaultType: 'textfield',
+			collapsible: false,
+			collapsed: false,
+			scope: this,
+			buttonAlign: 'left',
+			items: this.getPageInfoFormItems(),
+			buttons: [
+				this.savePageInfoBtn,
+				'->',
+				this.deletePageBtn
+			],
+    	});
+		
+		return this.toimialaPageInfoPanel;
+    },
+	
+	createNavTreeStore: function() {
+    
+    	var newStore = Ext.create('Ext.data.TreeStore', {
+			fields: [ 'text', 'page_id' ],
+			proxy: {
+				type: 'ajax',
+				url: '/run/lougis/cms/navTreeJson/'
+			},
+			folderSort: false,
+			listeners: {
+				load: {
+					scope: this,
+					fn: function(store, root, records) {
+						this.treeStoreRecords = records;
+					}
+				}
+			}
+		});
+		
+		return newStore;
+    
+    },
+	
+	loadPageToEdit: function( pageId ) {
+    	/*
+    	if ( this.cmsTabPanel.disabled ) {
+    		this.cmsTabPanel.enable();
+    	}
+    	if ( this.cmsColumnEditorPanel.disabled ) {
+    		this.cmsColumnEditorPanel.enable();
+    	}*/
+		Ext.Ajax.request({
+			url: '/run/lougis/cms/getPageJson/',
+			scope: this,
+			params: {
+				page_id: pageId
+			},
+			success: function( xhr ){
+				var res = Ext.JSON.decode(xhr.responseText);
+				if ( res.success ) {
+					this.updateToimialaForms( res.page_id, res.page, res.content, res.content_column );
+					} else {
+					Ext.Msg.alert('Virhe!', res.msg);
+				}
+			}
+		});   	
+    },
+	
+	updateToimialaForms: function( pageId, pageData, contentData, columnData ) {
+    	this.toimialaPageInfo.getForm().setValues( pageData );
+    	/*if ( typeof CKEDITOR.instances.cmsPageInfoFieldExtra1 !== "undefined" ) {
+    		CKEDITOR.instances.cmsPageInfoFieldExtra1.setData( pageData['cms_page[extra1]'] );
+                console.log("3.if");
+  	} else {
+                Ext.getCmp('cmsPageInfoExtra1').setValue( pageData['cms_page[extra1]'] );
+                
+                console.log("3.else");
+    	}*/
+    	
+    	if ( contentData === null ) {contentData = "";}
+    	if ( typeof CKEDITOR.instances.cmsCKEditorField !== "undefined" ) {
+    		CKEDITOR.instances.cmsCKEditorField.setData( contentData );
+                console.log("5.if");
+                this.toimialaPageInfo.updateLayout();
+    	} else {
+    		//Ext.getCmp('cmsCKEditorTextArea').setValue( contentData );
+                this.toimialaPageInfo.updateLayout();
+                console.log("5.else");
+    	}
+    	
+    	if ( typeof CKEDITOR.instances.cmsColumnEditorField !== "undefined" ) {
+    		CKEDITOR.instances.cmsColumnEditorField.setData( columnData );
+                console.log("6.if");
+    		
+	        var iframe = document.getElementById('cke_contents_' + CKEDITOR.instances.cmsColumnEditorField.name).firstChild;
+	        iframe.style.display = 'none';
+	        iframe.style.display = 'block';
+    		
+    	} else {
+    		Ext.getCmp('cmsColumnEditorTextArea').setValue( columnData );
+                console.log("6.else");
+    	}
+	
+    },
+	getPageInfoFormItems: function( pageData ) {
+    	
+    	if ( typeof pageData === 'undefined' ) {
+    	
+    		pageData = {
+    			page_id: null,
+    			title: null,
+    			nav_name: null,
+    			url_name: null,
+    			in_navigation: true,
+    			published: true,
+    			extra1: null
+    		};
+    		
+    	}
+    	
+    	this.parentPageCombo = Ext.create('Ext.form.ComboBox', {
+			fieldLabel: 'Ylempi sivu',
+			scope: this,
+			id: 'cmsParentPageCombo',
+		    name: 'cms_page[parent_id]',
+			store: this.parentPageStore,
+			queryMode: 'local',
+			width: 600,
+			displayField: 'title',
+			valueField: 'page_id'
+		});
+		
+		this.pageTypeCombo = Ext.create('Ext.form.ComboBox', {
+		    fieldLabel: 'Sivun tyyppi',
+		    scope: this,
+		    name: 'cms_page[page_type]',
+		    store: Ext.create('Ext.data.Store', {
+			    fields: ['page_type', 'title'],
+			    data : [
+			        {"page_type": null, "title": "Oletus"},
+			        {"page_type": "strategia", "title":"Strateginen tavoite"},
+			        {"page_type": "ohjelma", "title":"Ohjelmatavoite"},
+			        {"page_type": "toimenpide", "title":"Toimenpide"}
+			    ]
+			}),
+		    queryMode: 'local',
+		    displayField: 'title',
+		    valueField: 'page_type'
+		});
+    	
+		var cmsPageInfoItems = [
+		
+				{
+					xtype: 'fieldset',
+					title: 'Sivun perustiedot',
+					items: [
+				        {
+				            name: 'page_id',
+				            xtype: 'hidden',
+				            value: pageData.page_id
+				        },
+				        {
+				            name: 'cms_page[page_id]',
+				            xtype: 'hidden',
+				            value: pageData.page_id
+				        },
+				        {
+				        	xtype: 'textfield',
+				        	id: 'cmsPageInfoFieldTitle',
+				            fieldLabel: 'Otsikko',
+				            name: 'cms_page[title]',
+				            width: 450,
+				            maxLength: 250,
+				            value: pageData.title,
+				            enableKeyEvents: true
+                        },
+				        {
+				        	xtype: 'textfield',
+				        	id: 'cmsPageInfoFieldNavName',
+				            fieldLabel: 'Nimi navigaatiossa',
+				            name: 'cms_page[nav_name]',
+				            width: 450,
+				            maxLength: 50,
+				            value: pageData.nav_name
+				        },
+				        {
+				        	xtype: 'textfield',
+				        	id: 'cmsPageInfoFieldUrlName',
+				            fieldLabel: 'URL nimi',
+				            name: 'cms_page[url_name]',
+				            width: 450,
+				            maxLength: 50,
+				            value: pageData.url_name
+				        },
+						this.parentPageCombo,
+				        {
+				        	xtype: 'textarea',
+				        	id: 'cmsPageInfoFieldDescription',
+				            fieldLabel: 'Lyhyt kuvaus',
+				            name: 'cms_page[description]',
+				            width: 600,
+				            height: 50,
+				            maxLength: 250,
+				            value: pageData.description
+				        },
+				        {
+				            xtype: 'checkbox',
+				            fieldLabel: 'Navigaatiossa',
+				            name      : 'cms_page[visible]',
+			                inputValue: 'true',
+			                checked	  : pageData.in_navigation
+				        },
+				        {
+				            xtype: 'checkbox',
+				            fieldLabel: 'Julkaistu',
+				            name      : 'cms_page[published]',
+			                inputValue: 'true',
+			                checked	  : pageData.published
+				        }
+					
+					]
+				}
+		];
+		
+		if ( siteId == 'ymparisto' ) {
+		
+			var ymparistoPageInfo = {
+				xtype: 'fieldset',
+				title: 'Ympäristöohjelman tiedot',
+				items: [
+				    this.pageTypeCombo,
+			        {
+			        	xtype: 'textarea',
+			        	id: 'cmsPageInfoExtra1',
+						inputId: 'cmsPageInfoFieldExtra1',
+			            fieldLabel: 'Ympäristöohjelman kuvaus',
+			            name: 'cms_page[extra1]',
+			            width: 600,
+			            value: pageData.extra1,
+			            listeners: {
+			            	afterrender: {
+			            		scope: this,
+			            		fn: function( container, layout ) {
+			            			CKEDITOR.replace( 'cmsPageInfoFieldExtra1', {
+										toolbar: 'LougisCmsExtra',
+										language: 'fi',
+										width: 350,
+										height: 150
+									});
+									CKEDITOR.on('instanceReady', function( evt ){
+										var editor = CKEDITOR.instances.cmsPageInfoFieldExtra1;
+										if (CKEDITOR.env.webkit) {
+									        var iframe = document.getElementById('cke_contents_' + editor.name).firstChild;
+									        iframe.style.display = 'none';
+									        iframe.style.display = 'block';
+									    }
+									});
+			            		} 
+			            	}
+			            }
+			        }
+				] 
+			};
+			cmsPageInfoItems.push( ymparistoPageInfo );
+		
+		}
+		
+		return cmsPageInfoItems;
+    	
+    },
+	
+	createCmsTabPanel: function (){
+    
+    	return Ext.create('Ext.tab.Panel', {
+				id: 'toimialaTabPanel',
+				region: 'center',
+				disabled: true,
+				anchor: '100% 100%',
+				defaults: {
+					bodyStyle: 'padding: 15px'
+				},
+				/*
+				layout: 'accordion',
+				layoutConfig: {
+					titleCollapse: true,
+					animate: true
+				},
+				*/
+				activeItem: 2,
+				items: [ this.toimialaPageInfo ]
+		});
+    
+    },
+	
+});
