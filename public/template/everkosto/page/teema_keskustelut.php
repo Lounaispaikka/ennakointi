@@ -44,7 +44,7 @@ if($ct->id != null) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);
 	<h2>Aiheet</h2>
 <? $CommentTopics = $CmsCom->getTopics($Pg->parent_id); ?>
 <? foreach($CommentTopics as $Topic) { ?>
-	<a href="?tid=<?=$Topic->topicid?>"><? if($Topic->page_id != $Pg->id) {echo $Topic->title;} else { echo $Topic->ctitle; } ?> (viimeisin viesti <?=date('d.m.Y H:i:s', strtotime($Topic->date))?>)</a>
+	<a href="?tid=<?=$Topic->topicid?>"><? if($Topic->page_id != $Pg->id || $Topic->ctitle == null) {echo $Topic->title;} else { echo $Topic->ctitle; } ?> (viimeisin viesti <?=date('d.m.Y H:i:s', strtotime($Topic->date_created))?>)</a>
 	
 	<? }?>
 </div>
@@ -56,6 +56,7 @@ if($ct->id != null) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);
 
 	<h1>Keskustelut</h1>
 	<p class="comment_add_link" onclick="showNewMsg('<?=$Pg->id?>')";>Aloita uusi keskustelu</p>
+	
 	<div id="newcomment" class="replybox" style="display:none;">
 			<img id="closenewmsg" src="/img/close.png" alt="" title="Sulje" onclick="hideNewMsg();" />
 			<h2>Uusi viesti</h2>
@@ -108,10 +109,11 @@ if($ct->id != null) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);
 	<? } ?> 
 	</ul>
 	<? }?>
-	
+	<? if($_GET['tid'] > 0){ ?> 
 	<div id="kirjoita">
 		<a id="newthread" onclick="showNewMsg('<?=$Pg->id?>', null, <?=$_GET['tid']?>);" >Uusi viesti</a>
 	</div>
+	<? } ?> 
 	<? /*<div id="accordion">
 		
 		<h3 class="topic_title" id="<?=$Topic->topicid?>"><?=$Topic->title?> </h3>

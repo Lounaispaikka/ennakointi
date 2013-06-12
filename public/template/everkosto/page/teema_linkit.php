@@ -23,6 +23,7 @@ $tama_uutinen->page_id = $Pg->id;
 $tama_uutinen->find();
 $tama_uutinen->fetch();
 
+
 require_once(PATH_TEMPLATE.'everkosto/include_header.php'); 
 ?>
 <div id="breadcrumb"><? $Cms->outputBreadcrumb() ?></div>
@@ -38,14 +39,18 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 	<? //uutisetusivu ?>
 	<ul>
 	<? foreach($uutiset as $uutinen) { ?>
-		<li id="<?=$uutinen->id?>"><div id="<?=$uutinen->news_id?>"><a href="../<?=$uutinen->id?>/" ><?=$uutinen->title?></a> <button id="delNews">Poista</button></div></li> 
+		<li id="<?=$uutinen->id?>"><div id="<?=$uutinen->news_id?>"><a href="../<?=$uutinen->id?>/" ><?=$uutinen->title?></a> </li> 
 	<? } ?>
 	</ul>
 	<? //uutissivu ?>
-	<a href="<?=$tama_uutinen->source_url?>" class="linkJs" ><?=$tama_uutinen->source_url?></a>
-	<p>L&auml;hde: <?=$tama_uutinen->source?></p>
-	<p><b><?=$tama_uutinen->description?></b></p>
-	
+	<?if ( $tama_uutinen->id != null) { ?>
+	<div id="delNewsDiv" style="float:right"><button id="delNews" style="float:right;">Poista</button></div>
+	<div id="News" style="clear:both">
+		<a href="<?=$tama_uutinen->source_url?>" class="linkJs" ><?=$tama_uutinen->source_url?></a>
+		<p>L&auml;hde: <?=$tama_uutinen->source?></p>
+		<p><b><?=$tama_uutinen->description?></b></p>
+	</div>
+	<? } ?>
 		
 <? if ($tama_uutinen->id !=null ) require_once(PATH_PUBLIC.'comments_frontend/kommentointi.php'); ?>	
 </div>
@@ -54,9 +59,10 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 	$(function() {
 
 		jQuery('#delNews').click(function(){
-			var newsPageId = $("#delNews").closest("li").attr("id");
-			var newsId = $("#delNews").closest("div").attr("id");
-			delNews(newsPageId, newsId); //ennakointi.ui.jquery.js
+			//var newsPageId = $("#delNews").closest("li").attr("id");
+			//var newsId = $("#delNews").closest("div").attr("id");
+			//delNews(newsPageId, newsId); //ennakointi.ui.jquery.js
+			delNews(<?=$Pg->id?>, <?=$Pg->parent_id?>); //page_id, parent_id
 			return false;
 		});
 				

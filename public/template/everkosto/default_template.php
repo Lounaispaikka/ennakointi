@@ -66,30 +66,8 @@ $TavoitteetPrinted = false;
                 //$ColCon = $Pg->getColumnHtml();
                 if ( !empty($ColCon) ) echo $ColCon;
                 ?>
-                 <?
-                if ( $Pg->url_name == 'ymparistoohjelma' ) {
-                        $RecentCharts = $Site->getRecentCharts(4);
-                        $RecentComments = $Site->getRecentComments(3);
-                ?>
-                <div id="recentPubCharts">
-                       <p><strong>Päivitetyt indikaattorit</strong></p>
-                        <dl class="recent_charts">
-                        <? foreach($RecentCharts as $Chart) { ?>
-                                <dt class="recent_charts"><a href="/fi/indikaattorit/?id=<?=$Chart->id?>"><?=$Chart->title?></a></dt>
-                        <? } ?>
-                        </dl>
-                </div>
-             <? /*   <div id="recentComments">
-                       <p><strong>Uusimmat kommentit</strong></p>
-                        <dl class="recent_charts">
-                        <? foreach($RecentComments as $Comment) { ?>
-                                <dt class="recent_charts"><a href="/fi/indikaattorit/"><?=$Comment->title?></a></dt>
-                        <? } ?>
-                        </dl>
-                </div>
-                       */ ?> 
-                <? } ?>
-                </div> 
+  
+
         <? }
 	if ( !$TavoitteetPrinted && ( $Pg->page_type == 'strategia'  ) ) {
                 echo '[AUTOMAATTINEN_YLEMMAT_TAVOITTEET]';
@@ -108,23 +86,45 @@ $TavoitteetPrinted = false;
 }*/
 ?>
 
-<h1><?=$Pg->title?></h1>
-{PAGE_CONTENT}
 
 <?if ( $Pg->page_type == "toimiala") {
-	echo '<h2>Ennakointiteemat</h2>';
-	echo '<a href="http://dev.everkosto.lounaispaikka.fi/fi/33/">Ennakointi2013</a>';
-}
-?>
-<?
+	
+	$teema = new \Lougis_cms_page();
+	$teema->parent_id = $Pg->id;
+	$teema->page_type = "teema";
+	$teema->find();
+	
+	$teemat = array();
+	
+	while ( $teema->fetch() ) {
+		$teemat[] = clone($teema);
+	}
+	
+	?>
+	<h2>Ennakointiteemat</<h2>
+	<ul>
+		<? foreach($teemat as $teema_li) { 
+			//ohjaa suoraan teemasivulle jos vain yksi teema
+			if ( count($teemat) == 1 ) {
+				header("Location: /fi/".$teema_li->id."/");
+			}
+			?>
+			<li><a href="/fi/<?=$teema_li->id?>/"><?=$teema_li->title?></a></li>
+		<? } ?>
+	</ul>
+
+<? }
 //Ennakointisivu
 if ( $Pg->page_type == 'teema' ) {
 	require_once(PATH_TEMPLATE.'everkosto/page/teema_aineisto.php');
 }
 if ( $Pg->page_type == 'teema_aineisto' && $_SESSION['user_id']) {
 ?>
-	<a href="javascript:void(0)" id="editPageInfo" class="linkJs">Muokkaa sivun perustietoja</a>
-	<a href="javascript:void(0)" id="editPageContent" class="linkJs">Muokkaa sivun sis&auml;lt&ouml;&auml;</a>
+	<div id="editTools" style="clear:both; margin-top:10px;">
+		<a href="javascript:void(0)" id="editPageInfo" class="linkJs">Muokkaa sivun perustietoja</a>
+		<a href="javascript:void(0)" id="editPageContent" class="linkJs">Muokkaa sivun sis&auml;lt&ouml;&auml;</a>
+	</div>
+	<div id="pageContent" style="margin-left:15px;margin-top:20px;">{PAGE_CONTENT}</div>
 	<div id="formResponse">
 		<p></p>
 	</div>
@@ -180,8 +180,8 @@ if ( $Pg->page_type == 'teema_aineisto' && $_SESSION['user_id']) {
 	
 </div>
 */ ?>
-<?  
-if ($Pg->page_type != "toimiala" ) require_once(PATH_PUBLIC.'comments_frontend/kommentointi.php'); ?>
+<?  /*
+if ($Pg->page_type != "toimiala" ) require_once(PATH_PUBLIC.'comments_frontend/kommentointi.php'); */?>
 
 </div>
 <? require_once(PATH_TEMPLATE.'everkosto/include_footer.php'); ?>

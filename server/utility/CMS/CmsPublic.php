@@ -290,7 +290,7 @@ class CmsPublic extends \Lougis\abstracts\Utility {
 		foreach($navBranch as $leaf) {
 			if ( $leaf->visible == 't' ) {
 			?>
-			<li><a href="<?=$leaf->getPageUrl()?>" <?=( ( $leaf->id == $Page->id ) ? ' class="active"' : '' )?>><?=$leaf->nav_name?><? if($leaf->restricted_access == 't') echo '_'; ?></a>    
+			<li><a href="<?=$leaf->getPageUrl()?>" <?=( ( $leaf->id == $Page->id ) ? ' class="active"' : '' )?> <? if($leaf->restricted_access == 't') {?>style="color:#a5a79b"<? }?>><?=$leaf->nav_name?></a>    
 			<? 
 			if ( isset($leaf->children) && is_array($leaf->children) && count($leaf->children) > 0 
 					&& ( $Page->id == $leaf->id || $Page->hasParentPage($leaf->id) ) ) { 

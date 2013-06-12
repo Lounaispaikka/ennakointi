@@ -791,13 +791,13 @@ function newNews(parent_id) {
 }
 
 //delete news+page
-function delNews(newsPageId, newsId) {
+function delNews(newsPageId, parentId) {
 	$.ajax({
 		url: "/run/lougis/news/deleteNews/",
 		type: "POST",
 		data: {
 			page_id: newsPageId,
-			news_id: newsId
+			//news_id: newsId
 		}
 	}).done(function(res) {
 		console.log(res.msg, newsPageId);
@@ -806,7 +806,7 @@ function delNews(newsPageId, newsId) {
 		}).fadeIn( 1000 ).delay(1300).fadeOut(1000);	
 		//quick fix sivun lataus, tämän voisi muuttaa ajax lataukseksi
 		setTimeout(function(){
-			window.location.reload();
+			window.location.href="/fi/"+parentId+"/";
 		}, 3300); 
 	});
 }

@@ -54,6 +54,14 @@ body, .x-body {
     background-color: #e7e7e8;
 
 }
+#front-content {
+	clear: both;
+	/*width: 66.6%;*/
+/*        width: 633px;*/
+        width: 100%;
+	padding: 0px 60px 0px 60px;
+	
+}
 #topNav {
     background-color: #fff;	
 }

@@ -35,7 +35,7 @@ $CmsCom = new \Lougis\utility\CmsComment();
                 
 				?>
                 <div id="rightColGrey">
-				<a href="#" class="linkJs">L&auml;het&auml; tiedote muille j&auml;senille</a>
+				
 				<?
                 if ( !empty($ColCon) ) echo $ColCon;
                 ?>
@@ -95,15 +95,7 @@ $CmsCom = new \Lougis\utility\CmsComment();
 <div id="content" class="<?=$Class?>">
 {PAGE_CONTENT}
 	<div id="teema_container">
-		<div id="teema_paivitykset">
-			<h2>Uusimmat aineistot</h2>
-			<ul>
-				<li><a href="http://dev.everkosto.lounaispaikka.fi/fi/37/?id=5">Tilasto: Ty&ouml;llisyys maakunnittain ja toimialoittain <em>(11.3.2013)</em></a></li>
-				<li><a href="#">Uutinen: Arktisen meriteknologian ennakointi <em>(11.3.2013)</em></a></li>
-				<li><a href="#">Uutinen: Meriteollisuus ty&ouml;llist&auml;&auml; Suomessa <em>(11.3.2013)</em></a></li>
-			</ul>
-		</div>
-		
+		<?/*
 		<div id="teema_keskustelut">
 			<h2>Keskustelu</h2>
 			<? $CommentTopics = $CmsCom->getTopics($Pg->id); ?>
@@ -140,6 +132,7 @@ $CmsCom = new \Lougis\utility\CmsComment();
 				<li><a href="http://www.prizz.fi/asiakaskuvat/Meri/Finnish offshore industry 2012.pdf">Suomen offshore-toimiala 2012 -raportti, Prizztech <em>(6.3.2013)</em></a></li>
 			</ul>
 		</div>
+*/ ?>
 	</div>
 
 

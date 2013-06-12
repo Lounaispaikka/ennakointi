@@ -11,9 +11,9 @@ if ( $_SESSION['user_id']) {
 <!--<a href="#" id="addContent" onclick="createWindow(<?=$Pg->parent_id?>);" style="margin-left: 15px;">Lis&auml;&auml; aineisto</a><br />-->
 <!--<a id="addContent" class="linkJs">Lis&auml;&auml; aineisto(ext)</a>-->
 <a href="javascript:void(0)" id="addPage" class="linkJs">Lis&auml;&auml; sivu</a>
-<a href="javascript:void(0)" id="addChart" class="linkJs">Lis&auml;&auml; tilasto</a>
+<!--<a href="javascript:void(0)" id="addChart" class="linkJs">Lis&auml;&auml; tilasto</a>-->
 <a href="javascript:void(0)" id="addLink" class="linkJs">Lis&auml;&auml; linkki</a>
-<a href="javascript:void(0)" id="addFile" class="linkJs">Lis&auml;&auml; tiedosto</a>
+<!--<a href="javascript:void(0)" id="addFile" class="linkJs">Lis&auml;&auml; tiedosto</a>-->
 <a href="javascript:void(0)" id="addNews" class="linkJs">Lis&auml;&auml; uutinen</a>
 <!--
 <div id="addFileDialog" title="Lis&auml;&auml; tiedosto">

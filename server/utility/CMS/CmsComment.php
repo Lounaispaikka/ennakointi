@@ -9,7 +9,7 @@ require_once(PATH_SERVER.'abstracts/Utility.php');
 class CmsComment extends \Lougis\abstracts\Utility {
 
 	public function getTopics ( $parent_id ) {
-		
+		devlog($parent_id, "e_comm");
 		$Topics = array();
 	    $Topic = new \Lougis_comment_topic();
 		$parent = pg_escape_string($parent_id);
@@ -26,17 +26,31 @@ class CmsComment extends \Lougis\abstracts\Utility {
 			FROM lougis.comment_topic, lougis.comment_msg, lougis.cms_page 
 			WHERE (comment_topic."id" = comment_msg.topic_id) AND (cms_page.comments_id = comment_topic.id) AND cms_page.parent_id='.$parent.';
 		');*/
-		$Topic->query(
+		$parent_page = new \Lougis_cms_page($parent_id);
+		$parent_list = array();
+		$parent_list = $parent_page->getEveryChildren();
+		$child_array = array();
+		foreach ($parent_list as $pp ) {
+			$child_array[] = $pp->id;
+		}
+		devlog($child_array, "e_comm");
+		
+		/*$Topic->query(
 		'	SELECT DISTINCT ON (comment_topic.id) comment_topic."id" AS "topicid", comment_topic.page_id, comment_msg.date_created as "date", cms_page.title as "title", comment_topic."title" as "ctitle"
 			FROM lougis.comment_topic, lougis.comment_msg, lougis.cms_page
 			WHERE comment_topic.page_id in(
 			select cms_page."id"
 			from lougis.cms_page
-			where cms_page.parent_id='.$parent_id.')
+			where cms_page.parent_id in ('.implode(",",$child_array).')
 			AND lougis.comment_msg.topic_id = lougis.comment_topic."id"
-			AND lougis.cms_page."id" = lougis.comment_topic.page_id;'
-		);
-		
+			AND lougis.cms_page."id" = lougis.comment_topic.page_id);'
+		);*/
+		$Topic->query(
+		'SELECT DISTINCT ON (comment_topic."id") comment_topic."id" AS "topicid", comment_topic.page_id, comment_topic."title" as "ctitle", cms_page."id" as "page", cms_page.title, comment_msg.date_created
+FROM lougis.comment_topic, lougis.cms_page, lougis.comment_msg
+WHERE cms_page."id" = comment_topic.page_id
+AND comment_msg.topic_id = comment_topic."id"
+AND cms_page."id" in ('.implode(",",$child_array).');');
 		while( $Topic->fetch() ) {
 		    $Topics[] = clone($Topic);
 	    }

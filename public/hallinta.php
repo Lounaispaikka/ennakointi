@@ -13,6 +13,7 @@ $_SESSION['lang_id'] = 'fi';
 $Site = new \Lougis_site( $_SESSION['site_id'] );
 
 if ( !isset($_SESSION['user_id']) ) header('Location: /');
+
 //if ( !isset($_SESSION['user_id']) ) header('Location: /#login-box');
 //$Co = new \Lougis\utility\Compiler("hallinta", "js");
 

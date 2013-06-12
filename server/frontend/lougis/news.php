@@ -170,15 +170,20 @@ class News extends \Lougis\abstracts\Frontend {
 		global $Site, $User;
 		
 		try {
+			devlog($_REQUEST, "e_news");
+			devlog($_REQUEST['news']['parent_id'], "e_news");
+			devlog($_REQUEST['parent_id'], "e_news");
+			
 			
 			if ( strlen($_REQUEST['news']['title']) < 5 || strlen($_REQUEST['news']['title']) > 250 ) throw new \Exception("Tiedotteen otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
 			
 			//hae oikea parent page
 			$parent = new \Lougis_cms_page();
-			$parent->parent_id = $_REQUEST['parent_id'];
+			$parent->parent_id = $_REQUEST['news']['parent_id'];
 			$parent->page_type = "teema_uutiset";
 			$parent->find();
 			$parent->fetch();
+			devlog($parent, "e_news");
 			
 			//luo cms_page
 			$page = new \Lougis_cms_page();
@@ -193,7 +198,7 @@ class News extends \Lougis\abstracts\Frontend {
 			$page->visible = true;
 			$page->restricted_access = true;
 			$page->page_type = 'news';
-			if($parent->id != null) $page->parent_id = $parent->id;
+			$page->parent_id = $parent->id;
 			//if($_REQUEST['news']['parent_id'] > 0) $page->parent_id = $_REQUEST['news']['parent_id'];
 			if($_REQUEST['news']['page_id'] < 1) $page->setNextSeqNum(); //jos uusi niin annettaan seqnum
 			if ( !$page->save() ) throw new \Exception("Sivun tallennus epäonnistui.");
@@ -239,8 +244,8 @@ class News extends \Lougis\abstracts\Frontend {
 			
 			$res = array(
 				"success" => true,
-				"msg" => $msg,
-				"news_id" => $News->id
+				"msg" => "msg",//$msg,
+				"news_id" => "0"//$News->id
 			);
 		
 		} catch(\Exception $e) {
@@ -266,7 +271,7 @@ class News extends \Lougis\abstracts\Frontend {
 			
 			//hae oikea parent page
 			$parent = new \Lougis_cms_page();
-			$parent->parent_id = $_REQUEST['parent_id'];
+			$parent->parent_id = $_REQUEST['news']['parent_id'];
 			$parent->page_type = "teema_linkit";
 			$parent->find();
 			$parent->fetch();
@@ -359,12 +364,13 @@ class News extends \Lougis\abstracts\Frontend {
 				$page = new \Lougis_cms_page($page_id);
 				if ( !$page->delete() ) throw new \Exception('Tiedotesivun poistaminen epäonnistui: '.$page->_lastError);
 			}
-			$News = new \Lougis_news($_REQUEST['news_id']);
-			if ( empty($News->title) ) throw new \Exception('Tiedotteen poistaminen epäonnistui: Tiedotetta ei voitu ladata!');
-			if ( $News->site_id != $Site->id ) throw new \Exception('Tiedotteen poistaminen epäonnistui: Virheellinen sivusto!');
-			
-			if ( !$News->delete() ) throw new \Exception('Tiedotteen poistaminen epäonnistui: '.$News->_lastError);
-			
+			else {
+				$News = new \Lougis_news($_REQUEST['news_id']);
+				if ( empty($News->title) ) throw new \Exception('Tiedotteen poistaminen epäonnistui: Tiedotetta ei voitu ladata!');
+				if ( $News->site_id != $Site->id ) throw new \Exception('Tiedotteen poistaminen epäonnistui: Virheellinen sivusto!');
+				
+				if ( !$News->delete() ) throw new \Exception('Tiedotteen poistaminen epäonnistui: '.$News->_lastError);
+			}
 			$res = array(
 				"success" => true,
 				"msg" => "Tiedote poistettu onnistuneesti!"

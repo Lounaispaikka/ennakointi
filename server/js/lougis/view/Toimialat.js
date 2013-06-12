@@ -353,11 +353,16 @@ Ext.define('Lougis.view.Toimialat', {
 			listeners: {
                 selectionchange: function(model, records) {
                     if (records[0]) {
-                        formPanel.getForm().loadRecord(records[0]);
-						formPanel.enable();
+						console.log("all_rec", records);
 						console.log("this", this);
 						console.log("record", records[0]);
 						console.log("form", formPanel.getForm());
+					    console.log(Ext.getCmp('teemaFormPanel'));
+						console.log(Ext.getCmp('teemaFormPanel').getForm());
+						Ext.getCmp('teemaFormPanel').getForm().loadRecord(records[0]);
+						console.log(Ext.getCmp('teemaFormPanel'));
+						Ext.getCmp('teemaFormPanel').enable();
+						
                     }
                 }
             }
@@ -396,11 +401,12 @@ Ext.define('Lougis.view.Toimialat', {
 		var formPanel = Ext.create('Ext.form.Panel', {
 			url: '/run/lougis/cms/saveTeema/',
 			region: 'center',
+			id: 'teemaFormPanel',
 			title: 'Teeman tiedot',
 			bodyStyle: 'padding: 10px; background-color: #fff',
 			labelWidth: 100,
 			width: 325,
-			disabled: true,
+			disabled:true,
 			margins: '0 0 0 3',
 			items: [	
 				{
@@ -581,6 +587,9 @@ Ext.define('Lougis.view.Toimialat', {
 									Ext.Msg.alert('Tallennus onnistui', action.result.msg);
 									window.close();
 									Ext.getCmp('teemaGrid').getStore().load();
+									Ext.getCmp('teemaFormPanel').disabled = true;
+								
+									console.log('teemaFormPanel', Ext.getCmp('teemaFormPanel'));
 								},
 								failure: function(form, action) {
 									Ext.Msg.alert('Virhe!', action.result.msg);
