@@ -35,18 +35,11 @@ class CmsPublic extends \Lougis\abstracts\Utility {
 		if ( $requested_page ) {
 			//Hae onko sivu kielletty
 			$RestrictedPage = new \Lougis_cms_page();
-		/*	$RestrictedPage->query('SELECT id
-									FROM lougis.cms_page
-									WHERE restricted_access = true
-									AND id = '.$_REQUEST['p'].';'
-			);*/
+		
 			$RestrictedPage->restricted_access = true;
 			$RestrictedPage->id = $requested_page;
 			$RestrictedPage->find();
-			/*while($RestrictedPage->fetch()) {
-				$array[] = clone($RestrictedPage);
-				devlog($array['id']);
-			}*/
+			
 			
 			//jos pääsy on rajoitettu
 			if($RestrictedPage->fetch() ) {
@@ -65,7 +58,7 @@ class CmsPublic extends \Lougis\abstracts\Utility {
 				//jos oikeus sivuun
 				if($UGroups->fetch() ) {
 	
-					$Page = $this->Site->getPageByName($_REQUEST['p'], $this->Lang->id);
+					$Page = $this->Site->getPageByName($requested_page, $this->Lang->id);
 				//jos ei oikeutta, anna error
 				} else {
 					require_once(PATH_404_FILE);
@@ -74,7 +67,7 @@ class CmsPublic extends \Lougis\abstracts\Utility {
 			
 			//jos pääsy on vapaa
 			else {
-				$Page = $this->Site->getPageByName($_REQUEST['p'], $this->Lang->id);
+				$Page = $this->Site->getPageByName($requested_page, $this->Lang->id);
 			}
 		}	
 		else {
