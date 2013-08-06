@@ -19,6 +19,7 @@ class Lougis_group extends \Lougis\DB_DataObject_Wrapper
     public $parent_id;                       // int4(4)  
     public $is_admin;                        // bool(1)  not_null default_false
     public $page_id;                         // int4(4)  
+    public $del_if_no_perm;                  // bool(1)  not_null default_false
 
     /* Static get */
     function staticGet($k,$v=NULL) { return DB_DataObject::staticGet('Lougis_group',$k,$v); }

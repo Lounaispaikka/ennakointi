@@ -15,7 +15,7 @@ if ( $Cms->currentPageHasParent() || $Cms->currentPageHasChildren() ) {
 	$Parent = $Cms->findCurrentPageTopParent( );
 	$LeftCol = true;
 }
-if ( $Cms->hasRightColumn() || $Pg->page_type == 'ohjelma' || $Pg->page_type == 'toimenpide' ) {
+if ( $Cms->hasRightColumn() || $Pg->page_type == 'toimiala' || $Pg->page_type == 'toimenpide'  ) {
 	$RightCol = true;
 }
 /* Tavoitteet content divissä
@@ -43,8 +43,13 @@ $TavoitteetPrinted = false;
 <? } ?>
 <? if ( $RightCol ) { ?>
 <div id="rightCol" class="<?=$Class?>">
-        
-                <? 
+	<? if ( $Pg->page_type == "toimiala" ) {
+		?><h1>Hallintaty&ouml;kalut</h2>
+		<button id="hallinta_toimiala_btn" class="ui-button teema_btn"><img src="/img/icons/16x16/pencil.png" > Toimialan asetukset</button>
+		<button id="hallinta_teema_btn" class="ui-button teema_btn"><img src="/img/icons/16x16/pencil.png" > Ennakointiteemat</button>
+		<? } else {
+	
+                
                 $PageNews = $Pg->getNews();
                 $ColCon = $Pg->getColumnHtml();
                 
@@ -73,12 +78,14 @@ $TavoitteetPrinted = false;
                 echo '[AUTOMAATTINEN_YLEMMAT_TAVOITTEET]';
                 $TavoitteetPrinted = true;
         }
+	}
 	?>
 </div>
 <? } ?>
 
 
 <div id="content" class="<?=$Class?>">
+{PAGE_CONTENT}
 <?
 /*if ( !$TavoitteetPrinted && ( $Pg->page_type == 'strategia'  ) ) {
 	echo '[AUTOMAATTINEN_YLEMMAT_TAVOITTEET]';
@@ -93,21 +100,22 @@ $TavoitteetPrinted = false;
 	$teema->parent_id = $Pg->id;
 	$teema->page_type = "teema";
 	$teema->find();
+
 	
 	$teemat = array();
 	
 	while ( $teema->fetch() ) {
 		$teemat[] = clone($teema);
 	}
-	
+
 	?>
 	<h2>Ennakointiteemat</<h2>
 	<ul>
 		<? foreach($teemat as $teema_li) { 
 			//ohjaa suoraan teemasivulle jos vain yksi teema
-			if ( count($teemat) == 1 ) {
+			/*if ( count($teemat) == 1 ) {
 				header("Location: /fi/".$teema_li->id."/");
-			}
+			}*/
 			?>
 			<li><a href="/fi/<?=$teema_li->id?>/"><?=$teema_li->title?></a></li>
 		<? } ?>
@@ -157,10 +165,34 @@ if ( $Pg->page_type == 'teema_aineisto' && $_SESSION['user_id']) {
 				jQuery('#editPageContentDialog').css("padding-bottom", "40px;");
 				return false;
 			});
+			
 		});
 	</script>
+
 <?
 }
+
+if ( $Pg->page_type == 'toimiala' && isset($_SESSION['user_id'])) {
+?>
+	<script type="text/javascript" src="/js/lougis/lib/teema.ui.jquery.js"></script>
+	<script type="text/javascript">
+		$(function() {	
+			
+			$('#hallinta_toimiala_btn').click(function(){
+				addToimiala(<?=$Pg->id?>);
+				return false;
+			});
+			
+			$('#hallinta_teema_btn').click(function(){
+				teemaDialog(<?=$Pg->id?>);
+				return false;
+			});
+			
+		});
+	</script>
+<? 
+}
+
 ?>
 <? /*
 <div id="social">

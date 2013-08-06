@@ -2,9 +2,9 @@
 require_once(PATH_TEMPLATE.'everkosto/include_header.php'); 
 require_once(PATH_SERVER.'utility/LouGIS/Compiler.php');
 
-require_once(PATH_PUBLIC.'phorum/common.php');
+/*require_once(PATH_PUBLIC.'phorum/common.php');
 require_once(PATH_PUBLIC.'phorum/include/format_functions.php');
-
+*/
 global $Site, $Cms;
 
 $Class = null;
@@ -58,8 +58,7 @@ $CmsCom = new \Lougis\utility\CmsComment();
 							<form id="cmsForm_content" class="ui-widget"></form>
 						</div>
 					</div>
-					<script type="text/javascript" src="/js/jqueryPlugins/jquery.dform-1.0.1.js"></script>
-					<script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script> 
+					
 					<script type="text/javascript" src="/js/lougis/lib/ennakointi.ui.jquery.js"></script>
 					
 					<!--<script type="text/javascript" src="/js/NicEdit/nicEdit.js"></script>-->

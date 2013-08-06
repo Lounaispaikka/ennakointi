@@ -13,7 +13,7 @@ class CMS extends \Lougis\abstracts\Frontend {
 		
 		try {
 		
-			$PageId = $_REQUEST['page_id'];
+			$PageId = $_POST['page_id'];
 			if ( empty($PageId) ) throw new \Exception("Page id required");
 		
 			$Pg = $this->_getPageInfo( $PageId );
@@ -71,12 +71,12 @@ class CMS extends \Lougis\abstracts\Frontend {
 	public function savePageContent() {
 		
 		try {
-		
-			$Pg = $this->_getPageInfo( $_REQUEST['page_id'] );
+			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
+			$Pg = $this->_getPageInfo( $_POST['page_id'] );
 			$Co = $this->_getPageContent( $Pg->id, $Pg->lang_id );
-			$Co->content = pg_escape_string(trim($_REQUEST['new_content']));
+			$Co->content = pg_escape_string(trim($_POST['new_content']));
 			if ( empty($Co->content) ) $Co->content = 'NULL';
-			$Co->content_column = pg_escape_string(trim($_REQUEST['new_column']));
+			$Co->content_column = pg_escape_string(trim($_POST['new_column']));
 			if ( empty($Co->content_column) ) $Co->content_column = 'NULL';
 			if ( empty($Co->date_created) ) {
 				$Co->date_created = date(DATE_W3C);
@@ -107,18 +107,19 @@ class CMS extends \Lougis\abstracts\Frontend {
 		
 		try {
 		
-			//devlog($_REQUEST, 'pyry');
+			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
 			
-			$Pg = new \Lougis_cms_page($_REQUEST['cms_page']['page_id']);
+			$Pg = new \Lougis_cms_page($_POST['cms_page']['page_id']);
 			if ( empty($Pg->created_date) ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: Sivua ei voitu ladata!');
 			if ( $Pg->site_id != $_SESSION['site_id'] ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: Virheellinen sivusto!');
 			
-			$Pg->setFrom($_REQUEST['cms_page']);
-			devlog($_REQUEST['cms_page']);
-			//$Pg->url_name = $_REQUEST['cms_page']['parent_id'].'_'.$_REQUEST['cms_page']['page_id']);
-			if ( !isset($_REQUEST['cms_page']['parent_id']) || empty($_REQUEST['cms_page']['parent_id']) ) $Pg->parent_id = "NULL";
-			if ( !isset($_REQUEST['cms_page']['published']) ) $Pg->published = false;
-			if ( !isset($_REQUEST['cms_page']['visible']) ) $Pg->visible = false;
+			$Pg->setFrom($_POST['cms_page']);
+			devlog($_POST['cms_page']);
+			//$Pg->url_name = $_POST['cms_page']['parent_id'].'_'.$_POST['cms_page']['page_id']);
+			if ( !isset($_POST['cms_page']['parent_id']) || empty($_POST['cms_page']['parent_id']) ) $Pg->parent_id = "NULL";
+			if ( !isset($_POST['cms_page']['published']) ) $Pg->published = false;
+			if ( !isset($_POST['cms_page']['visible']) ) $Pg->visible = false;
+			if ( !isset($_POST['cms_page']['restricted_access']) ) $Pg->restricted_access = true;
 			//devlog($Pg, 'pyry');
 			//$Pg->created_date = date(DATE_W3C);
 			//$Pg->created_by = $_SESSION['user_id'];
@@ -133,8 +134,6 @@ class CMS extends \Lougis\abstracts\Frontend {
 			);
 		
 		} catch(\Exception $e) {
-		
-			devlog($Pg, 'pyry');
 			
 			$res = array(
 				"success" => false,
@@ -150,34 +149,35 @@ class CMS extends \Lougis\abstracts\Frontend {
 	public function saveTeema() {
 		
 		try {
+			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
 		
-			devlog($_REQUEST, 'saveteema');
-			$Pg = new \Lougis_cms_page($_REQUEST['page_id']);
-			$Pg->title = $_REQUEST['title'];
-			$Pg->nav_name = $_REQUEST['title'];
+			devlog($_POST, 'saveteema');
+			$Pg = new \Lougis_cms_page($_POST['page_id']);
+			$Pg->title = $_POST['title'];
+			$Pg->nav_name = $_POST['title'];
 			if ( !$Pg->save() ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: '.$Pg->_lastError);
 			
 			$Co = new \Lougis_cms_content();
-			$Co->page_id = $_REQUEST['page_id'];
-			//$Co->content = $_REQUEST['content'];
+			$Co->page_id = $_POST['page_id'];
+			//$Co->content = $_POST['content'];
 			$Co->find();
 			$Co->fetch();
 			$Cos = new \Lougis_cms_content($Co->id);
-			$Cos->content = $_REQUEST['content'];
+			$Cos->content = $_POST['content'];
 			devlog($Co, 'saveteema');
 			devlog($Cos, 'saveteema');
 			if ( !$Cos->save() ) throw new \Exception('Sivun sisällön tallentaminen epäonnistui: '.$Cos->_lastError);
 			/*
-			$Pg = new \Lougis_cms_page($_REQUEST['cms_page']['page_id']);
+			$Pg = new \Lougis_cms_page($_POST['cms_page']['page_id']);
 			if ( empty($Pg->created_date) ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: Sivua ei voitu ladata!');
 			if ( $Pg->site_id != $_SESSION['site_id'] ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: Virheellinen sivusto!');
 			
-			$Pg->setFrom($_REQUEST['cms_page']);
-			devlog($_REQUEST['cms_page']);
-			//$Pg->url_name = $_REQUEST['cms_page']['parent_id'].'_'.$_REQUEST['cms_page']['page_id']);
-			if ( !isset($_REQUEST['cms_page']['parent_id']) || empty($_REQUEST['cms_page']['parent_id']) ) $Pg->parent_id = "NULL";
-			if ( !isset($_REQUEST['cms_page']['published']) ) $Pg->published = false;
-			if ( !isset($_REQUEST['cms_page']['visible']) ) $Pg->visible = false;
+			$Pg->setFrom($_POST['cms_page']);
+			devlog($_POST['cms_page']);
+			//$Pg->url_name = $_POST['cms_page']['parent_id'].'_'.$_POST['cms_page']['page_id']);
+			if ( !isset($_POST['cms_page']['parent_id']) || empty($_POST['cms_page']['parent_id']) ) $Pg->parent_id = "NULL";
+			if ( !isset($_POST['cms_page']['published']) ) $Pg->published = false;
+			if ( !isset($_POST['cms_page']['visible']) ) $Pg->visible = false;
 			//devlog($Pg, 'pyry');
 			//$Pg->created_date = date(DATE_W3C);
 			//$Pg->created_by = $_SESSION['user_id'];
@@ -209,13 +209,13 @@ class CMS extends \Lougis\abstracts\Frontend {
 	public function createNewTeema() {
 		
 		try {
-		
+			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
 			//sivu cms_page
 			$Pg = new \Lougis_cms_page();
-			$Pg->setFrom($_REQUEST['cms_page']);
+			$Pg->setFrom($_POST['cms_page']);
 			
-			//$Pg->url_name($_REQUEST['cms_page']['parent_id'].'_'.$_REQUEST['cms_page']['page_id']);
-			$Pg->nav_name = $_REQUEST['cms_page']['title'];
+			//$Pg->url_name($_POST['cms_page']['parent_id'].'_'.$_POST['cms_page']['page_id']);
+			$Pg->nav_name = $_POST['cms_page']['title'];
 			$Pg->published = "t";
 			$Pg->visible = "t";
 			$Pg->restricted_access = "t";
@@ -233,7 +233,7 @@ class CMS extends \Lougis\abstracts\Frontend {
 			
 			//sisältö cms_content
 			$Co = $this->_getPageContent( $Pg->id, $Pg->lang_id );
-			$Co->content = pg_escape_string($_REQUEST['cms_page']['content']);
+			$Co->content = pg_escape_string($_POST['cms_page']['content']);
 			if ( empty($Co->date_created) ) {
 				$Co->date_created = date(DATE_W3C);
 				$Co->published = true;
@@ -444,7 +444,7 @@ class CMS extends \Lougis\abstracts\Frontend {
 	public function createNewPage() {
 		
 		try {
-			
+			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
 			//kommentit comment_topic
 			/* $Topic = new \Lougis_comment_topic();
 			$Topic->active = true;
@@ -452,12 +452,12 @@ class CMS extends \Lougis\abstracts\Frontend {
 		
 			//sivu cms_page
 			$Pg = new \Lougis_cms_page();
-			$Pg->setFrom($_REQUEST['cms_page']);
+			$Pg->setFrom($_POST['cms_page']);
 			
-			$Pg->url_name($_REQUEST['cms_page']['parent_id'].'_'.$_REQUEST['cms_page']['page_id']);
-			if ( !isset($_REQUEST['cms_page']['published']) ) $Pg->published = false;
-			if ( !isset($_REQUEST['cms_page']['visible']) ) $Pg->visible = false;
-			if ( !isset($_REQUEST['cms_page']['restricted_access']) && page_type != "tietopankki" ) $Pg->restricted_access = "t";
+			$Pg->url_name($_POST['cms_page']['parent_id'].'_'.$_POST['cms_page']['page_id']);
+			if ( !isset($_POST['cms_page']['published']) ) $Pg->published = false;
+			if ( !isset($_POST['cms_page']['visible']) ) $Pg->visible = false;
+			if ( !isset($_POST['cms_page']['restricted_access']) && page_type != "tietopankki" ) $Pg->restricted_access = "t";
 			$Pg->created_date = date(DATE_W3C);
 			$Pg->created_by = $_SESSION['user_id'];
 			$Pg->site_id = $_SESSION['site_id'];			
@@ -501,7 +501,7 @@ class CMS extends \Lougis\abstracts\Frontend {
 			
 			/*
 			//lisätään ennakointiteemojen vakiosivut
-			if ( $_REQUEST['cms_page']['page_type'] == 'teema' ) {
+			if ( $_POST['cms_page']['page_type'] == 'teema' ) {
 				
 				//linkit
 				$Pg_linkit = new \Lougis_cms_page();
@@ -624,8 +624,8 @@ class CMS extends \Lougis\abstracts\Frontend {
 	public function deletePage() {
 		
 		try {
-		
-			$Pg = new \Lougis_cms_page($_REQUEST['page_id']);
+			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
+			$Pg = new \Lougis_cms_page($_POST['page_id']);
 			if ( empty($Pg->created_date) ) throw new \Exception('Sivun poistaminen epäonnistui: Sivua ei voitu ladata!');
 			if ( $Pg->site_id != $_SESSION['site_id'] ) throw new \Exception('Sivun poistaminen epäonnistui: Virheellinen sivusto!');
 			
@@ -762,7 +762,7 @@ class CMS extends \Lougis\abstracts\Frontend {
 	public function navTreeJson($Page_type = null) {
 		
 		$Site = new \Lougis_site( $_SESSION['site_id'] );
-		$Page_type = $_REQUEST['Page_type'];
+		$Page_type = $_POST['Page_type'];
 		$tree = $this->_navTreeData($Page_type);
 		$visible = $this->_recurseExtPageTree( $tree, false, 0 );
 		$root = array(
@@ -779,7 +779,7 @@ class CMS extends \Lougis\abstracts\Frontend {
 		
 		$Pg = new \Lougis_cms_page();
 		
-		$parent_id = pg_escape_string($_REQUEST['toimiala_id']);
+		$parent_id = pg_escape_string($_POST['toimiala_id']);
 		$sql = 'select cms_page.id as page_id, cms_page.title, cms_content.id as content_id, cms_page.id as content_page_id, cms_page.parent_id, cms_page.page_type, cms_content.content
 				from lougis.cms_page, lougis.cms_content
 				where cms_page."parent_id" = '.$parent_id.'
@@ -790,8 +790,21 @@ class CMS extends \Lougis\abstracts\Frontend {
 		while( $Pg->fetch() ) {
 			$Pages[] = clone($Pg);		
 		}
-		devlog($Pages, "teemat");
 		
+		$this->jsonOut( $Pages );
+		
+	}
+	
+	public function getToimialaPages() {
+		
+		$Pg = new \Lougis_cms_page();
+		$Pg->page_type = "toimiala";
+		$Pg->find();
+		//lisää vielä käyttäjälle sallitut toimialat eli hae permissionit
+		$Pages = array();
+		while( $Pg->fetch() ) {
+			$Pages[] = clone($Pg);		
+		}	
 		$this->jsonOut( $Pages );
 		
 	}
@@ -853,7 +866,7 @@ class CMS extends \Lougis\abstracts\Frontend {
 		
 		try {
 			
-			$treeData = json_decode($_REQUEST['tree_data']);
+			$treeData = json_decode($_POST['tree_data']);
 			
 			$this->_recurseSaveTreeSort( $treeData );
 			

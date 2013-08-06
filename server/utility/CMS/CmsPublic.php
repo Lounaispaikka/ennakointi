@@ -46,11 +46,9 @@ class CmsPublic extends \Lougis\abstracts\Utility {
 			/*while($RestrictedPage->fetch()) {
 				$array[] = clone($RestrictedPage);
 				devlog($array['id']);
-			}*/
-			
+			}*/	
 			//jos pääsy on rajoitettu
 			if($RestrictedPage->fetch() ) {
-		
 				
 				//Tarkista saako käyttäjä mennä sivulle
 				$UGroups = new \Lougis_group_user();
@@ -65,7 +63,7 @@ class CmsPublic extends \Lougis\abstracts\Utility {
 				//jos oikeus sivuun
 				if($UGroups->fetch() ) {
 	
-					$Page = $this->Site->getPageByName($_REQUEST['p'], $this->Lang->id);
+					$Page = $this->Site->getPageByName($requested_page, $this->Lang->id);
 				//jos ei oikeutta, anna error
 				} else {
 					require_once(PATH_404_FILE);
@@ -74,7 +72,7 @@ class CmsPublic extends \Lougis\abstracts\Utility {
 			
 			//jos pääsy on vapaa
 			else {
-				$Page = $this->Site->getPageByName($_REQUEST['p'], $this->Lang->id);
+				$Page = $this->Site->getPageByName($requested_page, $this->Lang->id);
 			}
 		}	
 		else {
@@ -339,35 +337,35 @@ class CmsPublic extends \Lougis\abstracts\Utility {
 		}*/
 		$Pg = new \Lougis_cms_page();
 		if(isset($_SESSION['user_id'])) {
-		$Pg->query('
-			select *
-			from lougis.cms_page
-			left join lougis.group_permission as gp2
-			on gp2.page_id = lougis.cms_page."id"
-			where restricted_access = FALSE
-			union select *
-			from lougis.cms_page as pg
-			join lougis.group_permission as gp
-			on pg."id" = gp.page_id
-			where restricted_access = true
-			and gp.group_id IN (select group_id from lougis.group_user where user_id = '.$_SESSION['user_id'].')
-			order by seqnum asc
-		;');
+			$Pg->query('
+				select *
+				from lougis.cms_page
+				left join lougis.group_permission as gp2
+				on gp2.page_id = lougis.cms_page."id"
+				where restricted_access = FALSE
+				union select *
+				from lougis.cms_page as pg
+				join lougis.group_permission as gp
+				on pg."id" = gp.page_id
+				where restricted_access = true
+				and gp.group_id IN (select group_id from lougis.group_user where user_id = '.$_SESSION['user_id'].')
+				order by seqnum asc
+			;');
 		}
 		else {
-		$Pg->query('
-			select *
-			from lougis.cms_page
-			left join lougis.group_permission as gp2
-			on gp2.page_id = lougis.cms_page."id"
-			where restricted_access = FALSE
-			order by seqnum asc
-		;');
+			$Pg->query('
+				select *
+				from lougis.cms_page
+				left join lougis.group_permission as gp2
+				on gp2.page_id = lougis.cms_page."id"
+				where restricted_access = FALSE
+				order by seqnum asc
+			;');
 		}
 		while( $Pg->fetch() ) {
 			$Pages[$Pg->id] = clone($Pg);
 		}
-		//devlog($Pages);
+		devlog($Pages, "en_nav");
 		$this->navTree = $this->_recurseNavTreeData( $Pages );
 		return $this->navTree;
 		

@@ -153,6 +153,7 @@ Ext.define('Lougis.view.UsersAndGroups', {
     }
     ,showUserWindow: function(user) {
     	//if( typeof console != 'undefined' ) console.log(user);
+		console.log(user);
         user.beginEdit();
         var userForm = user.getForm();
 

@@ -11,10 +11,10 @@ class Lougis_cms_page extends \Lougis\DB_DataObject_Wrapper
 
     public $__table = 'lougis.cms_page';                 // table name
     public $id;                              // int4(4)  not_null default_nextval%28lougis.cms_page_id_seq%29 unique_key primary_key
-    public $site_id;                         // varchar(-1)  not_null unique_key multiple_key
+    public $site_id;                         // varchar(-1)  not_null
     public $lang_id;                         // bpchar(-1)  not_null
     public $title;                           // varchar(-1)  not_null
-    public $url_name;                        // varchar(-1)  unique_key multiple_key
+    public $url_name;                        // varchar(-1)  
     public $nav_name;                        // varchar(-1)  not_null
     public $published;                       // bool(1)  not_null default_false
     public $created_date;                    // timestamptz(8)  not_null
