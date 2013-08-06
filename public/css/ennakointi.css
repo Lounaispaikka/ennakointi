@@ -145,7 +145,7 @@ div#teema_uutiset {
 }
 /*Aineiston lisäys */
 
-div#addPageFormDialog, div#editPageInfoDialog, div#editPageContentDialog, #addToimiala {
+div#addPageFormDialog, div#editPageInfoDialog, div#editPageContentDialog, #addToimiala, #addTeema {
 	text-align:left !important;
 }
 
@@ -175,7 +175,7 @@ div#addPageFormDialog form fieldset, div#editPageFormDialog form fieldset, #addT
 }
 
 
-#cmsForm_info input[type="text"], #cmsForm_content input[type="text"], #cmsForm input[type="text"], #cmsForm textarea, #addToimiala input[type="text"], #addToimiala input[type="text"], #addToimiala input[type="text"], #addToimiala textarea {
+#cmsForm_info input[type="text"], #cmsForm_content input[type="text"], #cmsForm input[type="text"], #cmsForm textarea, #addToimiala input[type="text"], #addTeema input[type="text"], #addToimiala textarea, #addTeema textarea {
 	margin-bottom:12px; 
 	width:95%;
 	padding: .4em;
