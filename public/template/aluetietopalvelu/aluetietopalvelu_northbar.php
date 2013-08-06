@@ -50,10 +50,11 @@
 							</fieldset>
 							<fieldset>
 								<p><a href="/hallinta/" class="linkJs">Avaa sis&auml;ll&ouml;nhallinta</a></p>
+								<p><a href="javascript:void(0)" class="linkJs" id="openToimiala">Muokkaa toimialoja</a></p>
 							</fieldset>
 							<fieldset>
-								<p class="linkJs">Vaihda salasana</p>
-								<p class="linkJs">Vaihda s&auml;hk&ouml;postisoite</p>
+								<p><a href="javascript:void(0)" class="linkJs">Vaihda salasana</a></p>
+								<p><a href="javascript:void(0)" class="linkJs">Vaihda s&auml;hk&ouml;postisoite</a></p>
 							</fieldset>						
 						</fieldset>
 						<span><a href="/run/lougis/usersandgroups/logoutUser/">Kirjaudu ulos</a></span>
@@ -78,5 +79,13 @@
     
     
 <!--	<img id="logo" src="/img/lounaispaikka-logo.png" />-->
-
+	<script type="text/javascript">
+		$(function() {
+			$('#openToimiala').bind('click', function() {
+				console.log("clickta");
+				openToimialaDialog();
+				return false;
+			});
+		});
+	</script>
 </div>

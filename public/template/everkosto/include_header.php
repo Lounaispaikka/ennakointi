@@ -26,6 +26,9 @@ require_once(PATH_SERVER.'utility/LouGIS/mLogin.php');
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
  <!--   <script type="text/javascript" src="/js/ext/ext-all.js"></script>-->
+	<script type="text/javascript">
+		if (!console) console = {log: function() {}};
+	</script>
     <script type="text/javascript" src="/js/ext/ext-all-debug.js"></script>
 	<script type="text/javascript" src="/js/ymparisto/loader.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
@@ -45,10 +48,21 @@ require_once(PATH_SERVER.'utility/LouGIS/mLogin.php');
 	<link rel="stylesheet" type="text/css" href="/css/ymparisto.css" />
 	<link rel="stylesheet" type="text/css" href="/css/ennakointi.css" />
     <link rel="stylesheet" type="text/css" href="/css/prettyPhoto.css" /> 
+	<link rel="Stylesheet" type="text/css" href="/js/jHtmlArea/style/jHtmlArea.css" />
+
 	<!--<link rel="stylesheet" type="text/css" href="/css/modal_login.css" />-->
 	<link rel="stylesheet" type="text/css" href="/css/loginStyle.css" />
-		<script type="text/javascript" src="/js/lougis/lib/charts.ui.extjs.js"></script>
-		<script type="text/javascript" src="/js/lougis/lib/admin_menu.ui.extjs.js"></script>
+	<script type="text/javascript" src="/js/lougis/lib/charts.ui.extjs.js"></script>
+	<script type="text/javascript" src="/js/lougis/lib/admin_menu.ui.extjs.js"></script>
+	
+<? if ( isset($_SESSION['user_id']) ) { ?>
+	
+	<script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script> 
+	<script type="text/javascript" src="/js/lougis/lib/toimiala.ui.jquery.js"></script>
+	<script type="text/javascript" src="/js/jqueryPlugins/jquery.dform-1.0.1.js"></script>
+	<!--<script type="text/javascript" src="/js/jHtmlArea/scripts/jHtmlArea-0.7.5.min.js"></script>-->
+	<script type="text/javascript" src="/js/ckeditor/ckeditor.js"></script>
+<? } ?>	
 	<!--[if lte IE 8]><link rel="stylesheet" type="text/css" href="/css/aluetietopalvelu-ie8.css" /><![endif]-->
 	<!--[if lte IE 8]><link rel="stylesheet" type="text/css" href="/css/ymparisto-ie8.css" /><![endif]-->
      
@@ -57,6 +71,7 @@ require_once(PATH_SERVER.'utility/LouGIS/mLogin.php');
 <!--<div id="beta">BETA - Kehitysversio</div>-->
 
 <? 
+
 require_once('template/aluetietopalvelu/aluetietopalvelu_northbar.php');
  ?>
 <div id="site"> 
@@ -77,8 +92,15 @@ require_once('template/aluetietopalvelu/aluetietopalvelu_northbar.php');
                 
                         <div id="topNav">
 			<? $Cms->ouputTopNavigation(); ?>
+			
 		</div>
 		<? } ?>
 		<span id="topnavclr" class="clr" style="height: 0px;" />
+		
         </div>
 	<div id="middle">
+	
+		<!--  admin tools -->
+
+		<? include('template/everkosto/page/toimiala.php'); ?>
+		

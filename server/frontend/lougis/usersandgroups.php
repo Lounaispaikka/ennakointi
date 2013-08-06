@@ -85,6 +85,7 @@ class Usersandgroups extends \Lougis\abstracts\Frontend {
 	
 	
 	public function editToimialaGroup() {
+		devlog($_REQUEST, "ennakointi_group");
 		$pg = new \Lougis_cms_page();
 		$pg->id = $_REQUEST['page_id'];
 		$pg->find();
@@ -101,7 +102,10 @@ class Usersandgroups extends \Lougis\abstracts\Frontend {
 		
 		
 		*/
-		$groupData = $_REQUEST;
+		$user_group = explode(",", $_REQUEST['admin-group']);
+		//$user_group = json_encode($user_group);
+		
+		//$groupData = $_REQUEST;
 		$groupData['id'] = $grp->id;
 		//$groupData['name'] = $grp->name;
 		$groupData['name'] = ($grp->name == '')? $pg->title: $grp->name;
@@ -110,6 +114,7 @@ class Usersandgroups extends \Lougis\abstracts\Frontend {
 		$groupData['parent_id'] = $grp->parent_id;
 		$groupData['is_admin'] = $grp->is_admin;
 		$groupData['page_id'] = $_REQUEST['page_id'];
+		$groupData['users'] = $user_group;
         $group = new \Lougis\utility\Group();
         $group->saveGroup($groupData);
         $response = array(

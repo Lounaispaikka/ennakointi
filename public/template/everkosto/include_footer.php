@@ -27,7 +27,7 @@ if ( isset($_REQUEST['debug']) && strpos(PATH_SERVER, 'development') != false ) 
 }*/
 ?>
 <script type="text/javascript">
-	jQuery(document).ready(function(){
+	$(document).ready(function(){
 		$("a[rel^='prettyPhoto']").prettyPhoto({
 			deeplinking:false,
 			social_tools:false
@@ -38,6 +38,7 @@ if ( isset($_REQUEST['debug']) && strpos(PATH_SERVER, 'development') != false ) 
 		}*/
 		
 	});
+
 </script>
 </body>
 </html>

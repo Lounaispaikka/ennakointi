@@ -64,6 +64,7 @@ if ( $_SESSION['user_id']) {
 <div id="formResponse">
 	<p>dadaa</p>
 </div>
+<? include('toimiala.php'); ?>
 <?
 //Etsi alasivu tämän sivun alta
 $chartPage = new \Lougis_cms_page();
@@ -103,7 +104,7 @@ echo array_search('Tilastot', $alasivut);
 	var bar = $('.bar');
 	var percent = $('.percent');
 	var status = $('#status');
-	   
+	/*   
 	$('form').ajaxForm({
 		beforeSend: function() {
 			status.empty();
@@ -121,7 +122,7 @@ echo array_search('Tilastot', $alasivut);
 		},
 		url: "/run/lougis/file_upload/uploadFile/"
 	}); 
-
+*/
 	})();       
 
 </script>

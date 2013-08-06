@@ -5,12 +5,12 @@
 
 require_once('../server/config.php');
 	
-global $Site, $Session;
+/*global $Site, $Session;
 
 $Session = new \Lougis_session();
 $_SESSION['site_id'] = 'everkosto';
 $Site = new \Lougis_site( $_SESSION['site_id'] );
-
+*/
 $errMsg = "";
 if ( isset($_GET['logout']) ) $errMsg = "Olet kirjautunut ulos onnistuneesti.";
  

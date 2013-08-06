@@ -698,6 +698,7 @@ function newNews(parent_id) {
 					"name" : "news[source]",
 					"caption" : "L&auml;hde",
 					"type" : "text",
+					"value" : "http://",
 					"validate" : {
 						"required": true,
 						"minlength": 2,
@@ -832,6 +833,7 @@ function newLink(parent_id) {
 					"name" : "news[source_url]",
 					"caption" : "L&auml;hdelinkki",
 					"type" : "text",
+					"value" : "http://",
 					"validate" : {
 						"required": true,
 						"minlength": 2,

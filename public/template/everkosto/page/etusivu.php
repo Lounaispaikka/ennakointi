@@ -25,6 +25,7 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 							;');
 	*/?>
 	</div>
+
 	<? /*<div id="front-news">
 		<h1>Ajankohtaista</h1>
 		<ul>
@@ -40,5 +41,6 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 		</ul>
 		<p><a href="/fi/ajankohtaista/">Lis&auml;&auml; ajankohtaista...</a></p>
 	</div> */ ?>
-</div>
+</div>	
+	
 <? require_once(PATH_TEMPLATE.'everkosto/include_footer.php'); ?>
