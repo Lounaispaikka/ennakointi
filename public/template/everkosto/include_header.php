@@ -99,7 +99,8 @@ require_once('template/aluetietopalvelu/aluetietopalvelu_northbar.php');
 		
         </div>
 	<div id="middle">
-	
+		<!--<div id="loadingDiv"></div>-->
+		<div class="modal"></div>
 		<!--  admin tools -->
 
 		<? include('template/everkosto/page/toimiala.php'); ?>

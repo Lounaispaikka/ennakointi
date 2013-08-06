@@ -7,7 +7,7 @@
 			<li><a href="http://demo.ennakointi.lounaispaikka.fi" style="font-weight:bold;">Ennakointi</a></li>
 			<li><a href="http://www.lounaispaikka.fi">Kartat</a></li>
  		</ul>
-	
+
 		<!-- Login Starts Here -->
             <div id="loginContainer">
                 <a href="#" id="loginButton"><span><? if(!isset($_SESSION['user_id'])) echo 'Kirjaudu'; else echo 'Omat tiedot'; ?> </span> <em></em></a>
@@ -86,6 +86,15 @@
 				openToimialaDialog();
 				return false;
 			});
+			
+					$("body").on({
+						ajaxStart: function() { 
+							$(this).addClass("loading"); 
+						},
+						ajaxStop: function() { 
+							$(this).removeClass("loading"); 
+						}    
+					});
 		});
 	</script>
 </div>
