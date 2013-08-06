@@ -72,6 +72,9 @@ class CMS extends \Lougis\abstracts\Frontend {
 		
 		try {
 			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
+			
+			devlog($_POST, 'saveteema');
+			
 			$Pg = $this->_getPageInfo( $_POST['page_id'] );
 			$Co = $this->_getPageContent( $Pg->id, $Pg->lang_id );
 			$Co->content = pg_escape_string(trim($_POST['new_content']));

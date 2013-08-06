@@ -16,10 +16,10 @@
   
   .teema_btn { display:block; clear:both; margin: 5px 0 5px 0; width: 200px; text-align:left;}
   
-  #toimialaDialog #valittavat { float:left; width: 50%; text-align: left;}
-  #toimialaDialog #ohjeet {float: left; width: 50%; text-align: left;}
+  #valittavat { float:left; width: 50%; text-align: left;}
+  #ohjeet {float: left; width: 50%; text-align: left;}
   #addToimiala.ui-tabs, #addToimiala.ui-dialog-content, #addToimiala.ui-dialog { padding: 0; }
-
+  #addTeema.ui-tabs, #addTeema.ui-dialog-content, #addTeema.ui-dialog { padding: 0; }
   #dialog-message { display: none;}
  
   </style>
@@ -54,32 +54,29 @@
 				</div>
 			</div>
 			<form id="kayttajat_form" class="ui-widget">
-				<input type="submit" id="lah" />
+				
 			</form>
 			
 		</div>
 	</div>
 </div>
 
-<div id="teemaDialog">
-	
-	<h3 class="list-h3">Teemat</h3>
-	<button class="teema_btn"><img src="/img/icons/16x16/add.png" >Lis&auml;&auml; uusi teema</button>
-	<div id="valitse_teema">	
-	</div>
+<div id="teemaDialog">	
 </div>
 
 <div id="addTeema">
 	<ul>
 		<li><a href="#teema_tiedot">Perustiedot</a></li>
 		<li><a href="#teema_sisalto">Sis&auml;lt&ouml;</a></li>
-		<li><a href="#toimiala_kayttajat">K&auml;ytt&auml;j&auml;t</a></li>
-		<li><a href="#toimiala_teemat">Teemat</a></li>
 	</ul>	
 		
 			
 			<div id="teema_tiedot">
-				
+				<form id="teema_tiedot_form" class="ui-widget"></form>
+			</div>
+			
+			<div id="teema_sisalto">
+				<form id="teema_sisalto_form" class="ui-widget"></form>
 			</div>
 	</ul>
 </div>

@@ -8,8 +8,11 @@
 */
 
 function openToimialaDialog() {
-	console.log("open");
+
+	//tyhjenn‰ sek‰ teemaDialog ett‰ toimialaDialog ettei tule konflikteja
 	$('#toimialaDialog').empty(); //tyhjenn‰ ensin, ettei tule montaa kopiota listasta
+	$('#teemaDialog').empty(); //tyhjenn‰ ensin, ettei tule montaa kopiota listasta
+	
 	$('#toimialaDialog').dialog({
 		autoOpen: true,
 		modal: true,
@@ -32,7 +35,7 @@ function openToimialaDialog() {
 			$("#toimialaDialog").append("<div id='valittavat' />");
 			$("#toimialaDialog").append("<div id='ohjeet' />");
 			$("#valittavat").append("<h3 class='list-h3'>Toimialat</h3>");
-			$("#ohjeet").append("<h3 class='list-h3'>Ohjeet</h3><p>Valitse toimiala vasemmalta painamalla painiketta tai lis‰‰ uusi.</p>");
+			$("#ohjeet").append("<h3 class='list-h3'>Ohjeet</h3><p>Valitse toimiala vasemmalta painamalla painiketta tai lis&auml;&auml; uusi.</p>");
 			$("#ohjeet").append("<button id=\"new_toimiala\" class=\"teema_btn\"><img src=\"/img/icons/16x16/add.png\" >Lis&auml;&auml; uusi toimiala</button>");
 			$("#new_toimiala").click(function() {
 				addToimiala();
@@ -40,8 +43,6 @@ function openToimialaDialog() {
 			
 			$.each(xhr, function(i) {
 				console.log(xhr[i].title);
-				//$("#toimialaList").append("<li><a href='javascript:void(0)' id='toimiala_"  + xhr[i].id + "'>" + xhr[i].title + "</a></li>");
-				//$("#toimialaDialog").append("<button class=\"teema_btn\" id='toimiala_"  + xhr[i].id + "><img src=\"/img/icons/16x16/pencil.png\" >" + xhr[i].title + "</button>");
 				
 				$("#valittavat").append("<button class='teema_btn' id='toimiala_"  + xhr[i].id + "'><img src=\"/img/icons/16x16/pencil.png\" >" + xhr[i].title + "</button>");
 				$("#toimiala_" + xhr[i].id).click(function() { 
@@ -49,7 +50,6 @@ function openToimialaDialog() {
 					
 					$("#toimialaDialog").dialog('close');
 					addToimiala(xhr[i].id);
-					//$('#addToimiala').tabbedDialog(xhr[i].id);
 				});
 			});
 		});
@@ -62,33 +62,7 @@ function openToimialaDialog() {
 
 
 function addToimiala(pageId) {
-	//t‰ss‰ t‰ll‰ hetkelle pageId on todellisuudesssa parentid
 	
-	//$('#toimialaDialog').empty(); //tyhjennet‰‰n div
-	/*$('#toimialaDialog').append("<ul id='tabit' />");
-	$('#tabit').append("<li><a href='#tiedot'>Tiedot</a></li>");
-	$('#tabit').append("<li><a href='#sisalto'>Sis&auml;lt&ouml;</a></li>");
-	$('#tabit').append("<li><a href='#kayttajat'>Kayttajat</a></li>");
-	$('#tabit').append("<li><a href='#teemat'>Teemat</a></li>");
-	$("#toimialaDialog").tabs();
-	$('#toimialaDialog').dialog({
-		autoOpen: true,
-		modal: true,
-		width: 600,
-		buttons: {
-			"Peruuta": function() {
-				$(this).dialog('close');
-			}
-		}
-	});
-//	$('.ui-dialog-titlebar').remove();
-	//$('#toimialaDialog').find('.ui-tab-dialog-close').append($('a.ui-dialog-titlebar-close'));
-    //$('#toimialaDialog').find('.ui-tab-dialog-close').css({'position':'absolute','right':'0', 'top':'23px'});
-   // $('#toimialaDialog').find('.ui-tab-dialog-close > a').css({'float':'none','padding':'0'});
-    //var tabul = $('#toimialaDialog').find('ul:first');
-	tabul.addClass('ui-dialog-titlebar');
-	//$("#addToimiala").empty();
-	*/
 	$("#sortable1").empty();
 	$("#sortable2").empty();
 	function loadRestOfUsers(pageId) {
@@ -329,7 +303,8 @@ function addToimiala(pageId) {
 	});
 	var options_sisalto = { 
         target:        '#formResponse',   // target element(s) to be updated with server response 
-        beforeSubmit:  showRequest,  // pre-submit callback 
+        beforeSerialize: CKUpdate, // ckeditor textareas saved before send
+		beforeSubmit:  showRequest,  // pre-submit callback 
         success:       showResponse, // post-submit callback 
  
         // other available options: 
@@ -396,7 +371,14 @@ function addToimiala(pageId) {
     }; 
 	// bind form using 'ajaxForm' 
     $('#kayttajat_form').ajaxForm(options_kayttajat); 
-
+	
+	// before serialize
+	function CKUpdate() {
+		for ( instance in CKEDITOR.instances ) {
+            CKEDITOR.instances[instance].updateElement();
+        }
+        return true; 
+	}
 	// pre-submit callback 
 	function showRequest(formData, jqForm) { 
 		var queryString = $.param(formData); 
@@ -424,30 +406,6 @@ function addToimiala(pageId) {
 		console.log(statusText);
 	}
 	
-
-	
-	/*
-	$.fn.tabbedDialog = function () {
-		console.log("tabbed");
-		//this.empty(); //tyhjennet‰‰n div
-		this.tabs();
-		var taDialog = this.dialog({'modal':true,'minWidth':600, 'minHeight':450,'draggable':true});
-		this.find('.ui-tab-dialog-close').append($('a.ui-dialog-titlebar-close'));
-		this.find('.ui-tab-dialog-close').css({'position':'absolute','right':'0', 'top':'23px'});
-		this.find('.ui-tab-dialog-close > a').css({'float':'none','padding':'0'});
-		var tabul = this.find('ul:first');
-		this.parent().addClass('ui-tabs').prepend(tabul).draggable('option','handle',tabul); 
-		this.siblings('.ui-dialog-titlebar').remove();
-		tabul.addClass('ui-dialog-titlebar');
-		//addToimiala(pageId);
-		$(".cancel-btn").click(function() {
-			$("#addToimiala").dialog('close');
-			return false;
-		});
-	}
-	
-	$("#addToimiala").tabbedDialog();
- */
 	$("#addToimiala").tabs().dialog({
 		autoOpen: true,
 		width: 600,
@@ -483,8 +441,6 @@ function addToimiala(pageId) {
 			
 	});
 
-	
-	
 }
 
 
