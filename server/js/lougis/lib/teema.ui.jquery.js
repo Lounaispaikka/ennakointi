@@ -21,6 +21,11 @@ function teemaDialog(toimialaId) {
 				$("#ohjeet").append("<h3 class='list-h3'>Ohjeet</h3><p>Valitse teema vasemmalta painamalla painiketta tai lis&auml;&auml; uusi.</p>");
 				$("#ohjeet").append("<button id=\"new_teema\" class=\"teema_btn\"><img src=\"/img/icons/16x16/add.png\" >Lis&auml;&auml; uusi teema</button>");
 				
+				$("#new_teema").click(function() {
+					$("#teemaDialog").dialog('close');
+					addNewTeema(toimialaId);
+				});
+				
 				$.each(xhr, function(i, item) {
 					console.log("teema-success", item);
 				
@@ -29,7 +34,7 @@ function teemaDialog(toimialaId) {
 					
 					$("#teema_" + item.page_id).click(function() { 
 						console.log("Teeman page id: " + item.page_id);
-						addTeema(item.page_id);
+						editTeema(item.page_id);
 						$("#teemaDialog").dialog('close');
 						
 						//$('#addToimiala').tabbedDialog(xhr[i].id);
@@ -67,7 +72,7 @@ function teemaDialog(toimialaId) {
 }
 
 //Teeman muokkaus / luonti
-function addTeema(pageId) {
+function editTeema(pageId) {
 	
 	var pageData, pageContent, pageColumn;
 
@@ -292,7 +297,7 @@ function addTeema(pageId) {
 	}
 	
 	//luodaan dialog
-	$("#addTeema").tabs().dialog({
+	$("#editTeema").tabs().dialog({
 		autoOpen: true,
 		width: 600,
 		draggable: false,
@@ -318,4 +323,139 @@ function addTeema(pageId) {
 		return false;		
 	});
 	
+}
+
+/**
+* FUNKTIO: Lis‰‰ uusi toimiala
+*
+* toimiala_parent_id on toimiala-yl‰sivun id
+*
+**/
+function addNewTeema(toimiala_id) {
+	
+	$('#teema_tiedot_empty').empty();
+	$('#teema_tiedot_empty').dform({
+		"action" : "/run/lougis/cms/savePageInfo/",//"/run/lougis/cms/createNewPage/",
+		"method" : "post",
+		"html" :
+			[
+				//Hidden fields
+				{
+					"name" : "cms_page[page_type]",
+					"id" : "page_type",
+					"type" : "hidden",
+					"value" : "teema"
+				},
+				{
+					"name" : "cms_page[parent_id]",
+					"id" : "parent_id",
+					"type" : "hidden",
+					"value" : toimiala_id
+				},
+				//Input fields
+				{
+					"name" : "cms_page[title]",
+					"caption" : "Otsikko",
+					"type" : "text"
+				},
+				{
+					"name" : "cms_page[nav_name]",
+					"caption" : "Sivun nimi navigaatiossa",
+					"type" : "text"
+				},
+				{
+					"name" : "cms_page[description]",
+					"type" : "hidden",
+					"value" : null
+				},
+				{
+					"name" : "cms_page[visible]",
+					"value" : "true",
+					"type" : "hidden"
+				},
+				{
+					"name" : "cms_page[published]",
+					"type" : "hidden",
+					"value" : "true" 
+				},
+				{
+					"type" : "submit",
+					"value" : "Tallenna",
+					"class": "next-btn"
+				},
+				{
+					"type" : "button",
+					"html" : "Peruuta",
+					"class": "cancel-btn",
+					"id" : "cancel-btn"
+				}	
+				
+			]
+	});
+	var options_info = { 
+        target:        '#formResponse',   // target element(s) to be updated with server response 
+       // beforeSubmit:  showRequest,  // pre-submit callback 
+        success:       showResponse, // post-submit callback 
+ 
+        // other available options: 
+        url:       "/run/lougis/cms/createNewTeema/" ,       // override for form's 'action' attribute 
+        type:      "post",        // 'get' or 'post', override for form's 'method' attribute 
+        dataType:  "json"        // 'xml', 'script', or 'json' (expected server response type) 
+   
+    }; 
+	// bind form using 'ajaxForm' 
+    $('#teema_tiedot_empty').ajaxForm(options_info); 
+	 
+	// post-submit callback 
+	function showResponse(responseText, statusText)  { 
+		
+		$( "#dialog-message" ).dialog({
+			modal: true,
+			buttons: {
+				"Sulje": function() {
+				//	$( this ).dialog( "close" );
+				//	$("#editToimiala").dialog( "close" );
+					$(".ui-dialog-content").dialog("close");
+					$("#response_msg").empty();
+				},
+				"Jatka muokkausta": function() {
+				$( this ).dialog( "close" );
+				}			
+			}
+		});
+		$("#response_msg").append(responseText.msg);
+		console.log(responseText.msg);
+		console.log(statusText);
+	}
+	
+	
+	//Tab dialogin luonti
+	
+	$("#addTeema").tabs().dialog({
+		autoOpen: true,
+		width: 600,
+		draggable: false,
+		modal: true,
+		open: function() {
+			//$('.ui-dialog-titlebar').hide(); // hide the default dialog titlebar
+		},
+		close: function() {
+			//$('.ui-dialog-titlebar').show(); // in case you have other ui-dialogs on the page, show the titlebar 
+		},
+		
+	}).parent().draggable({handle: ".ui-tabs-nav"}); // the ui-tabs element (#tabdlg) is the object parent, add these allows the tab to drag the dialog around with it
+	// stop the tabs being draggable (optional)
+	$('.ui-tabs-nav li').mousedown(function(e){
+    	e.stopPropagation();
+	});
+	
+	
+	$(".cancel-btn").click(function() {
+		//sulkee kaikki dialogit
+		$(".ui-dialog-content").dialog("close");
+		console.log
+		("sulje");
+		return false;
+		
+	});
 }

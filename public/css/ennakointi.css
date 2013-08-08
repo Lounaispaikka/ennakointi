@@ -145,7 +145,13 @@ div#teema_uutiset {
 }
 /*Aineiston lisäys */
 
-div#addPageFormDialog, div#editPageInfoDialog, div#editPageContentDialog, #addToimiala, #addTeema {
+div#addPageFormDialog, 
+div#editPageInfoDialog, 
+div#editPageContentDialog, 
+#addToimiala,
+#addTeema,
+#editToimiala, 
+#editTeema {
 	text-align:left !important;
 }
 
@@ -155,27 +161,38 @@ div#addContentDialog button {
 	padding: 5px;
 }
 
-div#addPageFormDialog form label , div#editPageFormDialog form label, #addToimiala form label {
+div#addPageFormDialog form label , div#editPageFormDialog form label, #editToimiala form label {
 	display:block;
 }
 
-div#addPageFormDialog  form input, div#editPageFormDialog form input, #addToimiala form input {
+div#addPageFormDialog  form input, div#editPageFormDialog form input, #editToimiala form input {
 	display:block;
 }
-div#addPageFormDialog form input.text, div#editPageFormDialog form input.text, #addToimiala form input.text  {
+div#addPageFormDialog form input.text, div#editPageFormDialog form input.text, #editToimiala form input.text  {
 	margin-bottom:12px; 
 	width:95%;
 	padding: .4em;
 }
 
-div#addPageFormDialog form fieldset, div#editPageFormDialog form fieldset, #addToimiala form fieldset { 
+div#addPageFormDialog form fieldset, div#editPageFormDialog form fieldset, #editToimiala form fieldset { 
 	padding:0; 
 	border:0; 
 	margin-top:25px; 
 }
 
 
-#cmsForm_info input[type="text"], #cmsForm_content input[type="text"], #cmsForm input[type="text"], #cmsForm textarea, #addToimiala input[type="text"], #addTeema input[type="text"], #addToimiala textarea, #addTeema textarea {
+#cmsForm_info input[type="text"], 
+#cmsForm_content input[type="text"], 
+#cmsForm input[type="text"], 
+#cmsForm textarea, 
+#addToimiala input[type="text"], 
+#addTeema input[type="text"], 
+#addToimiala textarea, 
+#addTeema textarea,
+#editToimiala input[type="text"], 
+#editTeema input[type="text"], 
+#editToimiala textarea, 
+#editTeema textarea {
 	margin-bottom:12px; 
 	width:95%;
 	padding: .4em;

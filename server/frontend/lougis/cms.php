@@ -460,14 +460,15 @@ class CMS extends \Lougis\abstracts\Frontend {
 			$Pg->url_name($_POST['cms_page']['parent_id'].'_'.$_POST['cms_page']['page_id']);
 			if ( !isset($_POST['cms_page']['published']) ) $Pg->published = false;
 			if ( !isset($_POST['cms_page']['visible']) ) $Pg->visible = false;
-			if ( !isset($_POST['cms_page']['restricted_access']) && page_type != "tietopankki" ) $Pg->restricted_access = "t";
+			if ( !isset($_POST['cms_page']['restricted_access']) && $Pg->page_type != "tietopankki" ) $Pg->restricted_access = "t";
 			$Pg->created_date = date(DATE_W3C);
 			$Pg->created_by = $_SESSION['user_id'];
 			$Pg->site_id = $_SESSION['site_id'];			
 			$Pg->lang_id = 'fi';
 			//$Pg->comments_id = $Topic->id;
 			$Pg->setNextSeqNum();
-			
+			devlog($Pg, 'saveteema');
+			devlog($_POST, 'saveteema');
 			if ( !$Pg->save() ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: '.$Pg->_lastError);
 			
 			//oikeudet

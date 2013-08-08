@@ -8,8 +8,8 @@
   .userlist_org {display:block;font-size: 12px; color: #000; clear:both;}
   .userlist_email {display:block; font-size: 12px; color: blue; clear:both;}
   #cms_content {height: 300px; min-width: 350px; }
-  #addToimiala { display:none;}
-  #addTeema { display:none;}
+  #editToimiala { display:none;}
+  #editTeema { display:none;}
   
   #feedback { font-size: 1.4em; }
 
@@ -18,13 +18,13 @@
   
   #valittavat { float:left; width: 50%; text-align: left;}
   #ohjeet {float: left; width: 50%; text-align: left;}
-  #addToimiala.ui-tabs, #addToimiala.ui-dialog-content, #addToimiala.ui-dialog { padding: 0; }
-  #addTeema.ui-tabs, #addTeema.ui-dialog-content, #addTeema.ui-dialog { padding: 0; }
+  #editToimiala.ui-tabs, #editToimiala.ui-dialog-content, #editToimiala.ui-dialog { padding: 0; }
+  #editTeema.ui-tabs, #editTeema.ui-dialog-content, #editTeema.ui-dialog { padding: 0; }
   #dialog-message { display: none;}
  
   </style>
 <div id="toimialaDialog"></div>
-<div id="addToimiala">
+<div id="editToimiala">
 	<ul>
 		<li><a href="#toimiala_tiedot">Perustiedot</a></li>
 		<li><a href="#toimiala_sisalto">Sis&auml;lt&ouml;</a></li>
@@ -64,7 +64,7 @@
 <div id="teemaDialog">	
 </div>
 
-<div id="addTeema">
+<div id="editTeema">
 	<ul>
 		<li><a href="#teema_tiedot">Perustiedot</a></li>
 		<li><a href="#teema_sisalto">Sis&auml;lt&ouml;</a></li>
@@ -81,10 +81,18 @@
 	</ul>
 </div>
 
+<div id="addToimiala">
+	<form id="toimiala_tiedot_empty" class="ui-widget"></form>
+</div>
+<div id="addTeema">
+	<form id="teema_tiedot_empty" class="ui-widget"></form>
+</div>
+
+
 <div id="dialog-message" title="Tallennettu!">
-	<p id="response_msg">
+	<p id="response">
 		<span class="ui-icon ui-icon-circle-check" style="float: left; margin: 0 7px 50px 0;"></span>
-	
+		<span id="response_msg"></span>
 	</p>
 </div>
 
@@ -114,7 +122,7 @@
 	*/
 		//loadRestOfUsers(<?=$Pg->parent_id?>);
 		//loadGroupUsers(<?=$Pg->parent_id?>);
-		//addToimiala(<?=$Pg->parent_id?>);
+		//editToimiala(<?=$Pg->parent_id?>);
 		
 		$( "#selectable" ).selectable({
 			selected: function(event, ui) { 

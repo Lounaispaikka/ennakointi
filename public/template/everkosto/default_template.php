@@ -179,7 +179,7 @@ if ( $Pg->page_type == 'toimiala' && isset($_SESSION['user_id'])) {
 		$(function() {	
 			
 			$('#hallinta_toimiala_btn').click(function(){
-				addToimiala(<?=$Pg->id?>);
+				editToimiala(<?=$Pg->id?>);
 				return false;
 			});
 			
