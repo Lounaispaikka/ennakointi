@@ -28,7 +28,17 @@ Ext.define('Lougis.view.Navigation', {
                                 text: "Käyttäjien ja ryhmien hallinta",
                                 icon: '/img/icons/16x16/user_go.png',
                                 target: '/tools/users_and_groups'
-                            }, 
+                            },
+							{
+                                text: "Sisällönhallinta",
+                                icon: '/img/icons/16x16/page_edit.png',
+                                target: '/tools/cms'
+                            },
+							{
+								text: "Tilastot",
+                                icon: '/img/icons/16x16/chart_pie_alternative.png',
+                                target: '/tools/charts'
+                            },							
 							/*{
                                 text: "Tietopankki",
                                 icon: '/img/icons/16x16/things_digital.png',

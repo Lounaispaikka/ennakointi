@@ -320,9 +320,10 @@ class Charts extends \Lougis\abstracts\Frontend {
 			$Pg->nav_name = $_REQUEST['chart']['title'];
 			$Pg->created_by = $_SESSION['user_id'];
 			$Pg->created_date = date(DATE_W3C);
+			$Pg->template = 'indikaattorit_uusi.php';
 			$Pg->published = true;
 			$Pg->visible = true;
-			$Pg->restricted_access = true;
+			$Pg->restricted_access = false;
 			$Pg->page_type = 'chart';
 			if($_REQUEST['chart']['parent_id'] > 0) $Pg->parent_id = $_REQUEST['chart']['parent_id'];
 			if($_REQUEST['chart']['page_id'] < 1) $Pg->setNextSeqNum(); //jos uusi niin annettaan seqnum
@@ -336,6 +337,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 			if ( empty($Chart->created_date) ) throw new \Exception("Tilaston avaus epäonnistui.");
 			$Chart->setFrom($_REQUEST['chart']);
 			$Chart->page_id = $PgArray['id']; //page_id of created or updated page
+			$Chart->updated_date = date(DATE_W3C);
 			if ( empty($Chart->title) ) throw new \Exception("Tilaston otsikko on pakollinen!");
 			if ( !$Chart->updateJsonFileFields($_REQUEST['fields']) ) throw new \Exception("Tilastotiedon tallennus epäonnistui!");
 			if ( !$Chart->save() ) throw new \Exception("Tilaston tallennus epäonnistui.");

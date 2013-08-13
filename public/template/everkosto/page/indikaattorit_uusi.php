@@ -9,7 +9,7 @@ if ( $Cms->currentPageHasParent() || $Cms->currentPageHasChildren() ) {
 	$LeftCol = true;
 }
 $ifr = $Site->getChartIframe();
-if(isset($_GET['id'])) {
+/*if(isset($_GET['id'])) {
         if (!preg_match("/^\d+$/", $_GET['id'])) die("Tilastoa ei löytynyt");
         $Chart = new \Lougis_chart($_GET['id']);
 		$_SESSION['chart_id'] = $_GET['id'];
@@ -17,27 +17,35 @@ if(isset($_GET['id'])) {
         if ( empty($Chart->created_date) ) {
                 echo "Tilastoa ei löytynyt";die;
         }
-}
+}*/
 
+$Chart = new \Lougis_chart();
+$Chart->page_id = $Pg->id;
+$Chart->find();
+$Chart->fetch();
+		
+$_SESSION['chart_id'] = $Chart->id;
+$Caa = $Chart->toChartArray();
+if ( empty($Chart->created_date) ) {
+    echo "Tilastoa ei löytynyt";die;
+}
 
 ?>
 
 <div id="breadcrumb"><? // $Cms->outputBreadcrumb() ?></div>
 <div id="leftCol" class="col2">	
 <? $Cms->outputLeftNavigation($Parent); ?> 
-<hr />
-<h3>Tilastot</h3>
-<? $Cms->outputChartNavigation(); ?>
 </div>
-
 <div id="content" class="col2">
         <div id="cms_data" style="display: block;">
 <?
 $Con = $Page->getContentHtml();
-if ( !empty($Con) && !(isset($_GET['id'])) ) print $Con; 
+if ( !empty($Con) && !(isset($_SESSION['chart_id'])) ) print $Con; 
 
 ?>
+<? /*
 <button id="addNewChartBtn">Lis&auml;&auml; uusi tilasto</button>
+*/ ?>
 <script type="text/javascript">
 	$(function() {
 		console.log(<?=$Pg->id?>);
@@ -48,7 +56,7 @@ if ( !empty($Con) && !(isset($_GET['id'])) ) print $Con;
 	});
 </script>                
         </div>
-		<? if(isset($_GET['id'])) { ?>
+		<? if(isset($_SESSION['chart_id'])) { ?>
         <div id="chartDiv">
                 <script type="text/javascript" src="/js/ymparisto/legend_overrider.tilasto.extjs.js"></script>         
                 
@@ -57,7 +65,6 @@ if ( !empty($Con) && !(isset($_GET['id'])) ) print $Con;
                 
 				Ext.onReady(function () {
                         var chartObj = <?=json_encode($Caa)?>;
-                        console.log(chartObj);
                         var colors = ["#94ae0a", "#115fa6","#a61120", /*"#ff8809"*/"#595959", "#ffd13e", "#a61187", "#24ad9a", "#7c7474", "#a66111"];
 
                         Ext.define('Ext.chart.theme.Indit', {
@@ -101,6 +108,7 @@ if ( !empty($Con) && !(isset($_GET['id'])) ) print $Con;
                         function rend(storeItem, item) {
                                 var title = item.value[1];
                                 this.setTitle(title);
+								console.log(item);
                         }
                         
                         $.each(chartObj.config.series, function(index) {
@@ -206,7 +214,7 @@ if ( !empty($Con) && !(isset($_GET['id'])) ) print $Con;
         
         <div id="extraDetails">
                 <p>Upotuskoodi:</p><textarea style="margin-left:30px;" id="upotus" rows="4" cols="50" ><?=$ifr;?></textarea>
-                <p>Lataa tiedot CSV-tiedostona: <a href="../../ymparisto/download.php?id=<?=$_GET['id']?>">Lataa</a></p>
+                <p>Lataa tiedot CSV-tiedostona: <a href="../../ymparisto/download.php?id=<?=$_SESSION['chart_id']?>">Lataa</a></p>
             
         </div>
 		<? /*

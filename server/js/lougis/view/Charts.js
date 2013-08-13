@@ -62,7 +62,7 @@ Ext.define('Lougis.view.Charts', {
     
     ,createChartTreePanel: function() {
     	
-        /* this.chartTreeStore = Ext.create('Ext.data.TreeStore', {
+        this.chartTreeStore = Ext.create('Ext.data.TreeStore', {
 			fields: [ 'chart_id', 'text' ],
 			proxy: {
 				type: 'ajax',
@@ -70,15 +70,15 @@ Ext.define('Lougis.view.Charts', {
 			},
 			folderSort: false,
 			root: null
-		}); */
+		});
               
         this.treePanel = Ext.create('Ext.tree.Panel', {
 			id: 'ChartTreePanel',
 			title: 'Tilastot',
 			region:'west',
 			autoScroll: true,
-			//store: this.chartTreeStore,
-			store: 'ChartTreeStore',
+			store: this.chartTreeStore,
+			//store: 'ChartTreeStore',
 			width: 250,
 			split: true, //resizable
 			collapsible: true,   // make collapsible
@@ -113,6 +113,8 @@ Ext.define('Lougis.view.Charts', {
     
     	this.chartTreeStore.getRootNode().removeAll();
     	this.chartTreeStore.load();
+		//chartTreeStore.getRootNode().removeAll();
+		//chartTreeStore.load();
     
     }
     
@@ -906,7 +908,7 @@ Ext.define('Lougis.view.Charts', {
 				},
 				{
 					xtype: 'checkboxfield',
-					fieldLabel: 'Julkaise tilasto indikaattorina',
+					fieldLabel: 'Julkaise tilasto tietopankissa',
 					name: 'chart[published]',
 					inputValue: 'true',
 			                checked	  : chartObj.published	
