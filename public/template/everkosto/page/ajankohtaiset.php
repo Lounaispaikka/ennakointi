@@ -151,7 +151,7 @@ $(function(){
                                         top.location.href = new_url;
                                         
 				});
-				showBigImages('#lnid'+$ael.attr('data-nid'));
+				//showBigImages('#lnid'+$ael.attr('data-nid'));
 			});
 			$ncont.fadeIn(fadeTime);
 			
