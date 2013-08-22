@@ -60,6 +60,7 @@ require_once(PATH_SERVER.'utility/LouGIS/mLogin.php');
 	<script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script> 
 	<script type="text/javascript" src="/js/lougis/lib/toimiala.ui.jquery.js"></script>
 	<script type="text/javascript" src="/js/jqueryPlugins/jquery.dform-1.0.1.js"></script>
+	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
 	<!--<script type="text/javascript" src="/js/jHtmlArea/scripts/jHtmlArea-0.7.5.min.js"></script>-->
 	<script type="text/javascript" src="/js/ckeditor/ckeditor.js"></script>
 <? } ?>	

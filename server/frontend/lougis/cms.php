@@ -111,7 +111,7 @@ class CMS extends \Lougis\abstracts\Frontend {
 		try {
 		
 			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
-			
+			if ( $_POST['cms_page']['title'] == '' ) throw new \Exception('Anna jotain.'); 
 			$Pg = new \Lougis_cms_page($_POST['cms_page']['page_id']);
 			if ( empty($Pg->created_date) ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: Sivua ei voitu ladata!');
 			if ( $Pg->site_id != $_SESSION['site_id'] ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: Virheellinen sivusto!');

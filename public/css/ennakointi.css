@@ -161,20 +161,36 @@ div#addContentDialog button {
 	padding: 5px;
 }
 
-div#addPageFormDialog form label , div#editPageFormDialog form label, #editToimiala form label {
+div#addPageFormDialog form label ,
+div#editPageFormDialog form label,
+#editToimiala form label,
+#newcommentform form label,
+.replybox form label {
 	display:block;
 }
 
-div#addPageFormDialog  form input, div#editPageFormDialog form input, #editToimiala form input {
+div#addPageFormDialog  form input,
+div#editPageFormDialog form input,
+#editToimiala form input,
+#newcommentform form input,
+.replybox form input {
 	display:block;
 }
-div#addPageFormDialog form input.text, div#editPageFormDialog form input.text, #editToimiala form input.text  {
+div#addPageFormDialog form input.text,
+div#editPageFormDialog form input.text,
+#editToimiala form input.text,
+#newcommentform form input.text,
+.replybox form input.text {
 	margin-bottom:12px; 
 	width:95%;
 	padding: .4em;
 }
 
-div#addPageFormDialog form fieldset, div#editPageFormDialog form fieldset, #editToimiala form fieldset { 
+div#addPageFormDialog form fieldset,
+div#editPageFormDialog form fieldset,
+#editToimiala form fieldset,
+#newcommentform form fieldset,
+.replybox form fieldset{ 
 	padding:0; 
 	border:0; 
 	margin-top:25px; 
@@ -192,10 +208,17 @@ div#addPageFormDialog form fieldset, div#editPageFormDialog form fieldset, #edit
 #editToimiala input[type="text"], 
 #editTeema input[type="text"], 
 #editToimiala textarea, 
-#editTeema textarea {
+#editTeema textarea,
+.comment_form_fields  input[type="text"],
+.comment_form_fields textarea
+ {
 	margin-bottom:12px; 
 	width:95%;
 	padding: .4em;
+}
+.comment_form_fields textarea
+{
+	height: 150px;
 }
 
 #cmsForm_content #cms_content {
@@ -223,6 +246,11 @@ div#addPageFormDialog form fieldset, div#editPageFormDialog form fieldset, #edit
 	clear: left;
 	float: left;
 }
+
+.send_comment_btn {
+	margin: 15px 0 10px 0;
+}
+
 #formResponse {
 	display: none;
 	width: 80%;
@@ -268,21 +296,25 @@ div#comments #newthread {
 	padding-left:15px;
 }
 
-div#comments .msgform {
+div#comments .msgform  {
 	border: 1px solid #f08500;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 	padding: 0 10px 10px 10px;
+	margin: 10px 10px 50px 10px;
 }
+
 div#comments #closenewmsg {
 	float: right;
 	margin: 10px 5px 0 0;
 	cursor: pointer;
 }
 div#comments #newcomment {
-	opacity: 0;
+	/*opacity: 1; /*extjs => opacity = 0;*/
 	width: 480px;
+	display: none;
+	margin: 10px 10px 10px 15px;
 }
 div#comments ul#messages {
 	list-style-type: none;
@@ -296,6 +328,9 @@ div#comments ul#messages {
 	width: 100%;
 	list-style: none;
 	border-top: 1px solid #ccc;
+}
+#messages li li {
+	list-style: none;
 }
 #mesages h2 {
 	padding: 0;
@@ -323,9 +358,16 @@ ul#messages img.closereplybox {
 	cursor: pointer;
 }
 ul#messages div.replybox {
-	margin-left: 50px;
-	padding-left: 20px;
-	border-left: 1px solid #ccc;
+	margin: 10px 10px 10px 50px;
+	/*padding-left: 20px;*/
+	/*border-left: 1px solid #ccc;*/
+	border: 1px solid #f08500;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding: 0 10px 10px 20px;
+	width: 480px;
+	display: none;
 }
 ul#messages ul {
 	padding-right: 0;

@@ -216,7 +216,14 @@ function editToimiala(pageId) {
 					"name" : "cms_page[title]",
 					"caption" : "Otsikko",
 					"type" : "text",
-					"value" : pageData.title							
+					"value" : pageData.title,
+					"validate" : {
+						"required" : true,
+						"minlength" : 2,
+						"messages" : {
+							"required" : "Required input",
+						}
+					}
 				},
 				{
 					"name" : "cms_page[nav_name]",
@@ -387,7 +394,13 @@ function editToimiala(pageId) {
 	} 
 
 	// post-submit callback 
-	function showResponse(responseText, statusText)  { 
+	function showResponse(responseText)  { 
+		$( "#response_msg" ).empty();
+		if(responseText.success == false) {
+			console.log("false tuli");
+		}
+		else {
+		$( "#response_msg" ).append(responseText.msg);
 		$( "#dialog-message" ).dialog({
 			modal: true,
 			buttons: {
@@ -403,8 +416,9 @@ function editToimiala(pageId) {
 				
 			}
 		});
+		}
 		console.log(responseText);
-		console.log(statusText);
+	
 	}
 	
 	$("#editToimiala").tabs().dialog({

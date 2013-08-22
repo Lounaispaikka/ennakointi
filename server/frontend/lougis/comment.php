@@ -10,7 +10,7 @@ class Comment extends \Lougis\abstracts\Frontend {
 		global $Site, $Session;
 		
 		try {
-			
+			if(!isset($_SESSION['user_id'])) throw new \Exception("Ongelma kirjautumisessa. Ota yhteyttä sivuston ylläpitoon");
 			// testirivi: throw new \Exception("Tekninen virhe. Ota yhteyttä sivuston ylläpitoon comment_session". $_REQUEST['type']. ": ".$_REQUEST['type_id']);
 		
 			//Tarkistetaan koskeeko kommentti sivua, chartia...
@@ -58,7 +58,6 @@ class Comment extends \Lougis\abstracts\Frontend {
 				$cid->find();
 				$cid->fetch();
 				$_SESSION['comments_id'] = $cid->topic_id;
-				devlog($CmData['topic_id']);
 				if($CmData['topic_id'] != null) $_SESSION['comments_id'] = $CmData['topic_id'];
 				
 				if($_REQUEST['reply_to'] == null && $CmData['topic_id'] == null ) { 
@@ -70,7 +69,6 @@ class Comment extends \Lougis\abstracts\Frontend {
 					//$NewTopic->id = $cid->topic_id;
 					if ( !$NewTopic->save() ) throw new \Exception("2 Tekninen virhe uuden kommenttisivun luomisessa. Ota yhteyttä sivuston ylläpitoon");
 					$_SESSION['comments_id'] = $NewTopic->id;
-					devlog($NewTopic);
 				
 				}
 		//	}
@@ -86,22 +84,27 @@ class Comment extends \Lougis\abstracts\Frontend {
 				if ( empty($CmData[$ReqVal]) || strlen($CmData[$ReqVal]) < 2 ) throw new \Exception("Lomakkeessa tyhjä kenttä. Kaikki kentät ovat pakollisia");
 			}
 			//if ( strlen($CmData['nick']) > 200 || strlen($CmData['title']) > 200 ) throw new \Exception("Liian pitkä otsikko tai nimi.");
-			if ( empty($CmData['check']) || $CmData['check'] != date('Y') ) throw new \Exception("Virheellinen vastaus tarkistuskysymykseen! Kirjoita vastauskenttään luku ".date('Y'));
+			//if ( empty($CmData['check']) || $CmData['check'] != date('Y') ) throw new \Exception("Virheellinen vastaus tarkistuskysymykseen! Kirjoita vastauskenttään oikea vuosi.");
 			//if ( empty($_SESSION['comments_id']) ) throw new \Exception("Tekninen virhe. Ota yhteyttä sivuston ylläpitoon comment_session");
 			
 			
 			$Cm = new \Lougis_comment_msg();
-			$Cm->setFrom($CmData);
+			//$Cm->setFrom($CmData);
+			devlog($CmData, "ecom");
 			$Cm->user_id = $_SESSION['user_id'];	
 			$Cm->topic_id = $_SESSION['comments_id'];
 			$Cm->lang_id = $_SESSION['lang_id'];
+			$Cm->title = strip_tags($CmData['title']);
+			if($CmData['parent_id'] != null) $Cm->parent_id = $CmData['parent_id'];
 			$Cm->msg = strip_tags($CmData['msg']);
+			devlog($Cm, "ecom");
 			if ( !$Cm->save() )throw new \Exception("Tekninen virhe. Ota yhteyttä sivuston ylläpitoon msg". $Cm->_lastError);
-			devlog($Cm);
+			devlog($Cm, "ecom");
 			
 			$res = array(
 				"success" => true,
-				"comment" => $Cm->toArray()
+				"comment" => $Cm->toArray(),
+				"msg" => "Viesti on l&auml;hetetty!"
 			);
                         $mail_msg = "Viestin otsikko: ".$CmData['title']."\n\n".$CmData['msg']."\n\n (Tämä on automaattinen viesti, älä vastaa).";
 			//mail('ville@lounaispaikka.fi', $mail_msg, 'From: ymparisto@lounaispaikka.fi');
@@ -176,7 +179,7 @@ class Comment extends \Lougis\abstracts\Frontend {
 		$this->jsonOut($res);
 		
 	}
-	
+	/* original replybox
 	public function replyBoxHtml() {
 		
 		$MsgId = $_REQUEST['msgid'];
@@ -191,6 +194,93 @@ class Comment extends \Lougis\abstracts\Frontend {
 <div id="replyform<?=$MsgId?>"></div>
 		<?
 		//echo $Rules;
+		
+	}
+	*/
+	public function replyBoxHtml() {
+		
+		$MsgId = (int)($_POST['msgid']);
+		if ( empty($MsgId) ) {
+			echo "Tekninen virhe!";
+			die;
+		}
+		$Rules = \Lougis_cms_comment::getRules();
+		?>
+<img class="closereplybox" src="/img/close.png" alt="" title="Sulje" onclick="cancelMsgEdit();" />
+<h2>Vastaa viestiin</h2>
+<div id="replyform<?=$MsgId?>" ><form id="vastaa_form<?=$MsgId?>" class="ui-widget"></form></div>
+		<?
+		//echo $Rules;
+		
+	}
+	
+	//luo kommenttisivun html:n, ajax-hakuihin
+	public function getCommentsHtml() {
+		
+		$page_id = (int)$_POST['page_id'];
+		
+		$ct = new \Lougis_comment_topic();
+		$ct->page_id = $page_id;
+		$ct->find();
+		$ct->fetch();
+		
+		if ( $ct->id != null ) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);
+?>
+<? if ( count($Comments) > 0 ) { ?>
+		<ul id="messages">
+		<? foreach($Comments as $Cm) { ?>
+			<li id="cm<?=$Cm->id?>"><a name="cm<?=$Cm->id?>"></a>
+				<?/*
+				$clicked = in_array($Cm->id, $_SESSION['rated_comments']);
+				?>
+				<div id="lbox<?=$Cm->id?>" class="likebox<?=(($clicked) ? ' clicked' : '' )?>">
+					<a class="likethumb" onclick="<?=(($clicked) ? '' : 'likeComment('.$Cm->id.');' )?>" title="Äänestä viestiä (+)">
+						<img src="/img/thumbup.png" alt="" /> <span><?=$Cm->likes?></span>
+					</a>
+					<a class="dislikethumb" onclick="<?=(($clicked) ? '' : 'dislikeComment('.$Cm->id.');' )?>" title="Äänestä viestiä (-)">
+						<img src="/img/thumbdown.png" alt="" /> <span><?=$Cm->dislikes?></span>
+					</a>
+				</div>
+				*/ ?>
+				<span class="author">"<?=$Cm->getUsername()?>" kirjoitti <?=date('d.m.Y H:i:s', strtotime($Cm->date_created))?></span>
+				<h3><?=$Cm->title?></h3>
+				
+				<p><?=nl2br($Cm->msg)?></p>
+				
+				<a class="replythread" onclick="showReplyBox(<?=$page_id?>, <?=$Cm->id?>);">Vastaa</a>
+				
+				<div id="replybox<?=$Cm->id?>" class="replybox">
+					
+				</div>
+				
+				<? if ( count($Cm->replys) > 0 ) { ?>
+				<ul class="replys">
+				<? foreach($Cm->replys as $Reply) { ?>
+					<li><a name="cm<?=$Reply->id?>"></a>
+						<? /*
+						$clicked = in_array($Reply->id, $_SESSION['rated_comments']);					
+					?>
+						<div id="lbox<?=$Reply->id?>" class="likebox<?=(($clicked) ? ' clicked' : '' )?>">
+							<a class="likethumb" onclick="<?=(($clicked) ? '' : 'likeComment('.$Reply->id.');' )?>" title="Äänestä viestiä (+)">
+								<img src="/img/thumbup.png" alt="" /> <span><?=$Reply->likes?></span>
+							</a>
+							<a class="dislikethumb" onclick="<?=(($clicked) ? '' : 'dislikeComment('.$Reply->id.');' )?>" title="Äänestä viestiä (-)">
+								<img src="/img/thumbdown.png" alt="" /> <span><?=$Reply->dislikes?></span>
+							</a>
+						</div>
+						*/ ?>
+						<span class="author">"<?=$Reply->getUsername()?>" kirjoitti <?=date('d.m.Y H:i:s', strtotime($Reply->date_created))?></span>
+						<p><?=nl2br($Reply->msg)?></p>
+					</li>
+				<? } ?>
+				</ul>
+				<? } ?>
+			</li>
+		<? } ?> 
+		</ul>
+		<? } ?>
+<?
+		
 		
 	}
 	
