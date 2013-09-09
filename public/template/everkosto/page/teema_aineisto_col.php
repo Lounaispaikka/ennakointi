@@ -4,32 +4,54 @@ if ( $_SESSION['user_id']) {
 <script type="text/javascript" src="/js/jqueryPlugins/jquery.dform-1.0.1.js"></script>
 <script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script> 
 <script type="text/javascript" src="/js/lougis/lib/ennakointi.ui.jquery.js"></script>
+<script type="text/javascript" src="/js/lougis/lib/file.ui.jquery.js"></script>
+<script type="text/javascript" src="/js/lougis/lib/page.ui.jquery.js"></script>
+
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.0/jquery.validate.min.js"></script>
+
+<!-- chart tools -->
+<script type="text/javascript" src="/js/lougis/lib/chart.ui.jquery.js"></script>
+<script type="text/javascript" src="/js/handsontable/dist/jquery.handsontable.full.js"></script>
+<link rel="stylesheet" media="screen" href="http://handsontable.com/dist/jquery.handsontable.full.css">
+
 <div id="formResponse">
 	<p></p>
 </div>
-<!--<a href="#" id="addContent" onclick="createWindow(<?=$Pg->parent_id?>);" style="margin-left: 15px;">Lis&auml;&auml; aineisto</a><br />-->
-<!--<a id="addContent" class="linkJs">Lis&auml;&auml; aineisto(ext)</a>-->
-<a href="javascript:void(0)" id="addPage" class="linkJs">Lis&auml;&auml; sivu</a>
-<!--<a href="javascript:void(0)" id="addChart" class="linkJs">Lis&auml;&auml; tilasto</a>-->
-<a href="javascript:void(0)" id="addLink" class="linkJs">Lis&auml;&auml; linkki</a>
-<!--<a href="javascript:void(0)" id="addFile" class="linkJs">Lis&auml;&auml; tiedosto</a>-->
-<a href="javascript:void(0)" id="addNews" class="linkJs">Lis&auml;&auml; uutinen</a>
-<!--
+
+<h2>Hallintaty&ouml;kalut</h2>
+		<button id="addPage" class="ui-button teema_btn"><img src="/img/icons/16x16/page_add.png" > Lis&auml;&auml; sivu</button>
+		<button id="addLink" class="ui-button teema_btn"><img src="/img/icons/16x16/link_add.png" > Lis&auml;&auml; linkki</button>
+		<button id="addNews" class="ui-button teema_btn"><img src="/img/icons/16x16/newspaper_add.png" > Lis&auml;&auml; uutinen</button>
+		<button id="addChart" class="ui-button teema_btn"><img src="/img/icons/16x16/chart_bar_add.png" > Lis&auml;&auml; tilasto</button>
+		<button id="addFile" class="ui-button teema_btn"><img src="/img/icons/16x16/package_add.png" > Lis&auml;&auml; tiedosto</button>
+
 <div id="addFileDialog" title="Lis&auml;&auml; tiedosto">
-	<form action="" method="post" enctype="multipart/form-data" class="ui-widget">
+	<!--<form action="" method="post" enctype="multipart/form-data" class="ui-widget" id="upfile">
         <input type="file" name="f"><br>
+		<textarea name="description"></textarea>
         <input type="submit" value="L&auml;het&auml;">
-    </form>
+    </form>-->
+	<form id="upfile" class="ui-widget"></form>
+	
+	
     
     <div class="progress">
         <div class="bar"></div >
-        <div class="percent">0%</div >
+        <div class="percent"></div >
     </div>
     
     <div id="status"></div>
 </div>	
--->
+
+<div id="addChartDialog" title="Lis&auml;&auml; tilasto">
+	<p id="chartOhje" style="text-align: left;"></p>
+	<div id="datagrid" class="handsontable"></div>
+	<form id="chartform" class="ui-widget" enctype="multipart/form-data"></form>
+	
+	
+	
+</div>
+
 <!--<div id="addContentDialog" title="Lis&auml&auml; aineisto">
 	<button id="alasivuBtn"></button>
 	<button id="indikaattoriBtn"></button>
@@ -76,54 +98,31 @@ while( $chartPage->fetch() ) $alasivut[] = clone($chartPage);
 echo array_search('Tilastot', $alasivut);
 ?>
 <script type="text/javascript">
-	jQuery(function() {	
-		jQuery('#addPage').click(function(){
+	$(function() {	
+	
+		
+ 
+		$('#addPage').click(function(){
 			openAddPageDialog(<?=$Pg->id?>);
 			return false;
 		});
-		jQuery('#addChart').click(function(){
-			openAddDialog(<?=$Pg->id?>);
+		$('#addChart').click(function(){
+			openAddChartDialog(<?=$Pg->id?>);
 			return false;
 		});
-		jQuery('#addLink').click(function(){
+		$('#addLink').click(function(){
 			openAddLinkDialog(<?=$Pg->id?>);
 			return false;
 		});
-		jQuery('#addFile').click(function(){
-			openAddDialog(<?=$Pg->id?>);
+		$('#addFile').click(function(){
+			openAddFileDialog(<?=$Pg->id?>);
 			return false;
 		});
-		jQuery('#addNews').click(function(){
+		$('#addNews').click(function(){
 			openAddNewsDialog(<?=$Pg->id?>);
 			return false;
 		});
 	});
 	
-	(function() {
-		
-	var bar = $('.bar');
-	var percent = $('.percent');
-	var status = $('#status');
-	/*   
-	$('form').ajaxForm({
-		beforeSend: function() {
-			status.empty();
-			var percentVal = '0%';
-			bar.width(percentVal)
-			percent.html(percentVal);
-		},
-		uploadProgress: function(event, position, total, percentComplete) {
-			var percentVal = percentComplete + '%';
-			bar.width(percentVal)
-			percent.html(percentVal);
-		},
-		complete: function(xhr) {
-			status.html(xhr.responseText);
-		},
-		url: "/run/lougis/file_upload/uploadFile/"
-	}); 
-*/
-	})();       
-
 </script>
 <? } ?>

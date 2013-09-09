@@ -22,6 +22,8 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
     public $parent;                          // varchar(-1)  
     public $comments_id;                     // int4(4)  
     public $page_id;                         // int4(4)  
+    public $config_json;                     // varchar(-1)  
+    public $data_json;                       // varchar(-1)  
 
     /* Static get */
     function staticGet($k,$v=NULL) { return DB_DataObject::staticGet('Lougis_chart',$k,$v); }
@@ -53,6 +55,16 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    if ( $Data ) $Ar['data'] = $this->getChartJsonData();
 	    if ( $Config ) $Ar['config'] = $this->getChartConfig();
 	    if ( $Request ) $Ar['request'] = $this->getChartConfigRequest();
+	    return $Ar;
+	    
+    }
+	
+	 public function dbToChartArray( $Data = true, $Config = true, $Request = false ) {
+	    
+	    $Ar = $this->toArray();
+	    if ( $Data ) $Ar['data'] = $this->data_json;
+	    if ( $Config ) $Ar['config'] = $this->config_json;
+	    //if ( $Request ) $Ar['request'] = $this->getChartConfigRequest();
 	    return $Ar;
 	    
     }
@@ -272,18 +284,22 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
     }
      
     public function addUploadedDatafile( $fileArray ) {
-    
+		
     	$original = $this->getFileOriginalPath();
     	$csvfile = $this->getFileCsvPath();
-    	if ( move_uploaded_file($fileArray['tmp_name'], $original) ) {
-    		$this->original_filename = $fileArray['name'];
-    		return copy($original, $csvfile);
-    	} else {
-    		return false;
-    	}
+		$upload_dir = $this->getChartFolder();
+	
+		if ( move_uploaded_file($fileArray['tmp_name'], $original) ) {
+			$this->original_filename = $fileArray['name'];
+			return copy($original, $csvfile);
+		} 
+		else {
+			return $false;
+		}
+		
     
     }
-    
+  
     public function getChartJsonData() {
 	    
 	    if ( empty($this->jsonData) ) $this->jsonData = json_decode($this->getChartJsonDataString());
@@ -316,6 +332,12 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 		return file_put_contents($jsonfile, json_encode($json));
 	    
     }
+	
+	 public function updateDbData( $dataArray ) {
+	    
+		return $this->data_json = $dataArray;
+	    
+    }
     
     public function updateJsonFileFields( $fieldsArray ) {
 	    
@@ -325,19 +347,16 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 		return file_put_contents($jsonfile, json_encode($json));
 	    
     }
-    
-    public function buildJsonFileFromCsv(  ) {
-	    
-	    
+	
+	public function buildJsonFileFromCsv(  ) {
+		
+		 
 		$CsvFile = $this->getFileCsvPath();
 		$fa = file($CsvFile);
                 	
 		$headers = explode(';', $fa[0]);
 		$firstdata = explode(';', $fa[1]);
-		
-		//$headers = str_getcsv($fa[0]);
-		//$firstdata = str_getcsv($fa[1]);
-		
+	
 		$datatypes = array();
 		
 		
@@ -409,15 +428,175 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 			}
 			array_push($dataContent, $dataRow);
 		}
+		
+		$json = array(
+			"fields" => $dataConfig,
+			"data" => $dataContent
+		);
 		$jsonfile = $this->getFileJsonPath();
+		$encoded_json = json_encode($json);
+		
+		//json to db
+		$this->data_json = $encoded_json;
+		
+		return file_put_contents($jsonfile, json_encode($json));
+	    
+	    
+    }  
+    
+	public function buildJsonDataFromCsv($fileArray) {
+	    
+	    //use directly temp file, no need to save the file to server
+		$fa = file($fileArray['tmp_name']);
+        
+		$headers = explode(';', $fa[0]);
+		$firstdata = explode(';', $fa[1]);
+		
+		$datatypes = array();
+		devlog($firstdata);
+		
+	// 27.3.2013 vg
+	//T‰m‰ pit‰isi tehd‰ uudestaan. Nyt k‰y vain ensimm‰isen rivin l‰pi. Pit‰isi tiet‰‰ onko jollain rivill‰ float tms vaikka ekalla olisikin int tai tyhj‰
+		foreach($firstdata as $cell) {
+			$data = trim($cell);
+			if ( strpos($data, ',') !== false ) $data = str_replace(',', '.', $data);
+			switch(true) {
+				//jos solu on tyhj‰. 27.3.2013 vg
+				case $data == '';
+					$datatypes[] = 'float';
+				break;
+				case is_numeric($data):
+                    if ( strpos($data, '.') !== false ) {
+						$datatypes[] = 'float';
+					} else {
+						$datatypes[] = 'int';
+					}        
+				break;
+				case isDate($data):
+					$datatypes[] = 'datetime';
+				break;	
+				default:
+					$datatypes[] = 'string';
+				break;
+			}
+		}
+				//devlog($datatypes);
+		
+		$dataConfig = array();
+		for($i = 0;$i < count($headers); $i++) {
+			//Pist‰‰ arvauksena "vuosi". 27.3.2013 vg
+			if( ($i == 0) && $headers[$i] == '') $headers[$i] = 'Vuosi';
+			$dataConfig[] = array(
+				"name" => trim(utf8_encode($headers[$i])),
+				"type" => $datatypes[$i],
+				"dataindex" => "c".$i
+			);
+		}
+		
+		$dataContent = array();
+		for($i = 1;$i < count($fa); $i++) {
+			$rawRow = explode(';', $fa[$i]);
+            $rawRow = array_map('trim', $rawRow);
+			$dataRow = array();
+			foreach($datatypes as $index => $type) {
+				switch($type) {
+					case 'string':
+						array_push($dataRow, strval($rawRow[$index]));
+					break;
+					case 'int':
+						array_push($dataRow, $rawRow[$index]);
+					break;
+                    case 'float':
+						$floatval = ( strpos($rawRow[$index], ',') !== false ) ? str_replace(',', '.', $rawRow[$index]) : $rawRow[$index];
+						array_push($dataRow, floatval($floatval));
+					break;
+					case 'datetime':
+						array_push($dataRow, strtotime($rawRow[$index]));
+					break;
+					default:
+						array_push($dataRow, strval($rawRow[$index]));
+					break;
+				}
+			}
+			array_push($dataContent, $dataRow);
+		} 
+		/*
+		$dataContent = array();
+		//all rows
+		for($i = 1;$i < count($fa); $i++) {
+			$rawRow = explode(';', $fa[$i]);
+            $rawRow = array_map('trim', $rawRow);
+			$dataRow = array();
+			$datatypes = array();
+			//each row
+			foreach($rawRow as $cellData) {
+				switch(true) {
+					case is_int($cellData):
+						array_push($dataRow, intval($cellData));
+						break;
+					case is_float($cellData):
+						array_push($dataRow, floatval($cellData));
+						break;
+					case isDate($cellData):
+						array_push($dataRow, strtotime($cellData));
+						break;
+					default:
+						array_push($dataRow, strval($cellData));
+						break;
+				}
+			}
+			array_push($dataContent, $dataRow);
+			devlog($dataContent);
+		}
+		*/
+			
+		//$jsonfile = $this->getFileJsonPath();
 		$json = array(
 			"fields" => $dataConfig,
 			"data" => $dataContent
 		);
 		
-		return file_put_contents($jsonfile, json_encode($json));
+		$encoded_json = json_encode($json);
+		
+		//json to db
+		$this->data_json = $encoded_json;
+		
+		//return file_put_contents($jsonfile, json_encode($json));
+	    return $encoded_json;
 	    
-	    
-    }
-    
+    } 
+	
+	/*
+	* Requires utility/parsecsv/parsecsv.lib.php -class
+	*
+	* Outputs csv file from chart data
+	*
+	*/
+	public function parseCsvToFile() {
+		
+		require_once(PATH_SERVER.'utility/parsecsv/parsecsv.lib.php');
+		
+		//lis‰‰ viel‰ k‰yttˆoikeuden tarksitus
+		
+		$data = $this->data_json;
+		$data = json_decode($data, true); //return as array
+		
+		//csv array headings
+		$headings = array();
+		foreach($data['fields'] as $field_row) {
+			$headings[] = $field_row['name'];
+		}
+		
+		//generate filename
+		if($this->title !== null) {
+			$filename = preg_replace('/[^A-Za-z0-9\. -]/', '', $this->title);
+			$filename = str_replace(' ', '_', $filename);
+			$filename = $filename.'.csv';
+		}
+		else $filename = "data.csv";
+		
+		$csv = new parseCSV();
+		return $csv->output($filename, $data['data'], $headings, ';');
+		
+	}
 }

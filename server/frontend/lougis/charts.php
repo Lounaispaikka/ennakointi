@@ -153,6 +153,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 		
 		
 		try {
+
 			
 			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
 			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
@@ -180,6 +181,42 @@ class Charts extends \Lougis\abstracts\Frontend {
 		
 	}
 	
+	//update data to database from jquery chart editor
+	public function updateDbData() {
+		
+			devlog($_REQUEST['chart_data'], "e_chart_data");
+			
+		try {
+		
+			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
+			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
+			$Chart->updated_date = date(DATE_W3C);
+			$Chart->data_json = json_encode($_REQUEST['chart_data']);
+			//$data = json_decode($_REQUEST['data']);
+			if ( count($data) == 0 ) throw new \Exception("Taulukko on tyhjä. Tyhjää taulukkoa ei voi tallentaa");
+			//json file päivitys
+			if ( !$Chart->updateData( $data ) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttä ylläpitoon.");
+			//tietokantaan päivitys
+			if ( !$Chart->save() ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttä ylläpitoon.");
+			
+			$res = array(
+				"success" => true,
+				//"msg" => "Taulukko tallennettu."
+			);
+		
+			
+		} catch(\Exception $e) {
+			
+			$res = array(
+				"success" => false,
+				"msg" => $e->getMessage()
+			);
+			
+		}
+		$this->jsonOut($res);
+		
+	}
+	
 	public function uploadData() {
 	
 		global $Site, $User;
@@ -187,7 +224,49 @@ class Charts extends \Lougis\abstracts\Frontend {
 		try {
 			
 			//if ( $_FILES['datafile']['type'] != 'text/csv' ) throw new \Exception("Virheellinen tiedostotyyppi! Tiedoston tulee olla CSV-tiedosto (tiedostopääte .csv)");
+			unset($_SESSION['new_chart_id']); //väliaikainen testaamiseen
+			if ( isset($_SESSION['new_chart_id']) ) {
+				$Chart = new \Lougis_chart($_SESSION['new_chart_id']);
+			} else {
+				$Chart = new \Lougis_chart();
+				$Chart->setNextKey();
+			}
+			$fila = implode("|", $_FILES['datafile']);
+		
+			//if ( !$Chart->addUploadedDatafile($_FILES['datafile']) ) throw new \Exception("Datatiedostoa ei voitu tallentaa palvelimelle.". $fila );
+			//if ( !$Chart->buildJsonFileFromCsv() ) throw new \Exception("Dataa ei voitu lukea");
+			if ( !$Chart->buildJsonDataFromCsv($_FILES['datafile']) ) throw new \Exception("Dataa ei voitu lukea");
+			$Chart->created_date = date(DATE_W3C);
+			$Chart->created_by = $User->id;
+			if ( !$Chart->save() ) throw new \Exception("Tilastoa ei voitu tallentaa");
 			
+			$_SESSION['new_chart_id'] = $Chart->id;
+			
+			$res = array(
+				"success" => true,
+				"chart" => $Chart->dbToChartArray()
+			);
+			
+		} catch(\Exception $e) {
+			
+			$res = array(
+				"success" => false,
+				"msg" => $e->getMessage()
+			);
+			
+		}
+		$this->jsonHtmlOut($res);
+	
+	}
+	
+	/* public function uploadData() {
+	
+		global $Site, $User;
+		
+		try {
+			
+			//if ( $_FILES['datafile']['type'] != 'text/csv' ) throw new \Exception("Virheellinen tiedostotyyppi! Tiedoston tulee olla CSV-tiedosto (tiedostopääte .csv)");
+			//unset($_SESSION['new_chart_id']);
 			if ( isset($_SESSION['new_chart_id']) ) {
 				$Chart = new \Lougis_chart($_SESSION['new_chart_id']);
 			} else {
@@ -217,7 +296,8 @@ class Charts extends \Lougis\abstracts\Frontend {
 		}
 		$this->jsonHtmlOut($res);
 	
-	}
+	} */
+	
 	public function getChartObj() {
                 global $Site, $User;
                 
