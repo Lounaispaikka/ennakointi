@@ -90,14 +90,16 @@ class CMS extends \Lougis\abstracts\Frontend {
 			
 			$res = array(
 				"success" => true,
-				"msg" => "Sivun sisältö tallennettu onnistuneesti!"
+				"msg" => "Sivun sisältö tallennettu onnistuneesti!",
+				"type" => "content"
 			);
 		
 		} catch(\Exception $e) {
 		
 			$res = array(
 				"success" => false,
-				"msg" => $e->getMessage()
+				"msg" => $e->getMessage(),
+				"type" => "content"
 			);
 			
 		}
@@ -133,14 +135,16 @@ class CMS extends \Lougis\abstracts\Frontend {
 
 			$res = array(
 				"success" => true,
-				"msg" => "Sivun tiedot tallennettu onnistuneesti!"
+				"msg" => "Sivun tiedot tallennettu onnistuneesti!",
+				"type" => "info"
 			);
 		
 		} catch(\Exception $e) {
 			
 			$res = array(
 				"success" => false,
-				"msg" => $e->getMessage()
+				"msg" => $e->getMessage(),
+				"type" => "info"
 			);
 			
 		}
@@ -649,6 +653,36 @@ class CMS extends \Lougis\abstracts\Frontend {
 			$res = array(
 				"success" => true,
 				"msg" => "Sivu poistettu onnistuneesti!"
+			);
+		
+		} catch(\Exception $e) {
+			
+			$res = array(
+				"success" => false,
+				"msg" => $e->getMessage()
+			);
+			
+		}
+		
+		$this->jsonOut($res);
+		
+	}
+	
+	public function deleteToimiala() {
+		
+		try {
+			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.');  //kuuluu oikeaan käyttäjäryhmään
+			$Pg = new \Lougis_cms_page($_POST['page_id']);
+			if ( empty($Pg->created_date) ) throw new \Exception('Sivun poistaminen epäonnistui: Sivua ei voitu ladata!');
+			//if ( $Pg->created_by !== $_SESSION['user_id'] ) throw new \Exception('Sivun poistaminen epäonnistui: Puuttuvat käyttöoikeudet!');
+			if ( $Pg->site_id != $_SESSION['site_id'] ) throw new \Exception('Sivun poistaminen epäonnistui: Virheellinen sivusto!');
+		
+			
+			if ( !$Pg->delete() ) throw new \Exception('Toimialan poistaminen epäonnistui: '.$Pg->_lastError);
+			
+			$res = array(
+				"success" => true,
+				"msg" => "Toimiala ".$Pg->title. " poistettu onnistuneesti!"
 			);
 		
 		} catch(\Exception $e) {

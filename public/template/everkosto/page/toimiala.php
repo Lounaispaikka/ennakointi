@@ -1,28 +1,3 @@
-<style>
-  .list-h3 { padding: 10px 0 10px 5px; margin: 0; font-size: 14px; font-weight: 700; }
-  .list-with-heading { display:block; float:left; margin: 0 15px 0 15px; }
-  #sortable1, #sortable2 { list-style-type: none; margin: 0; padding: 0 ; float: left; margin-right: 2px; border: 1px solid; min-width: 226px; min-height: 50px; background-color: #fff}
-  #sortable1 li, #sortable2 li { margin: 0 2px 0 2px; padding: 2px 2px 2px 2px; font-size: 1.2em; width: 220px; min-height: 45px; }
-  #sortable1 li:hover, #sortable2 li:hover {cursor: pointer; border: 2px solid;}
-  .userlist_name {display:block; font-size: 14px; color: #000; clear:both;}
-  .userlist_org {display:block;font-size: 12px; color: #000; clear:both;}
-  .userlist_email {display:block; font-size: 12px; color: blue; clear:both;}
-  #cms_content {height: 300px; min-width: 350px; }
-  #editToimiala { display:none;}
-  #editTeema { display:none;}
-  
-  #feedback { font-size: 1.4em; }
-
-  
-  .teema_btn { display:block; clear:both; margin: 5px 0 5px 0; width: 200px; text-align:left;}
-  
-  #valittavat { float:left; width: 50%; text-align: left;}
-  #ohjeet {float: left; width: 50%; text-align: left;}
-  #editToimiala.ui-tabs, #editToimiala.ui-dialog-content, #editToimiala.ui-dialog { padding: 0; }
-  #editTeema.ui-tabs, #editTeema.ui-dialog-content, #editTeema.ui-dialog { padding: 0; }
-  #dialog-message { display: none;}
- 
-  </style>
 <div id="toimialaDialog"></div>
 <div id="editToimiala">
 	<ul>
@@ -78,7 +53,7 @@
 			<div id="teema_sisalto">
 				<form id="teema_sisalto_form" class="ui-widget"></form>
 			</div>
-	</ul>
+	
 </div>
 
 <div id="addToimiala">
@@ -88,13 +63,9 @@
 	<form id="teema_tiedot_empty" class="ui-widget"></form>
 </div>
 
-
-<div id="dialog-message" title="Tallennettu!">
-	<p id="response">
-		<span class="ui-icon ui-icon-circle-check" style="float: left; margin: 0 7px 50px 0;"></span>
-		<span id="response_msg"></span>
-	</p>
+<div id="dialog_confirm">
 </div>
+
 
 <script type="text/javascript"></script>
 <script> 
@@ -111,6 +82,11 @@
 				console.log("inside", adminGroup);
 				$("#admin-group").val(adminGroup);
 				//saveGroup(<?=$Pg->parent_id?>, adminGroup);
+			},
+			sort: function() {
+				if ($(this).hasClass("cancel")) {
+					return false;
+				}
 			}
 		});
 		//$("#kayttajat_form").on("submit", (event){
@@ -131,8 +107,6 @@
 			}  
 		});
 	
-	
-
 	});
   
 	

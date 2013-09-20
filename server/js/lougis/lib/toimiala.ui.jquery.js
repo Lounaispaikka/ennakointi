@@ -13,12 +13,17 @@ function openToimialaDialog() {
 	$('#toimialaDialog').empty(); //tyhjennä ensin, ettei tule montaa kopiota listasta
 	$('#teemaDialog').empty(); //tyhjennä ensin, ettei tule montaa kopiota listasta
 	
+	var wWidth = $(window).width();
+    var dWidth = wWidth * 0.8;
+    var wHeight = $(window).height();
+    var dHeight = wHeight * 0.8;
 	$('#toimialaDialog').dialog({
 		autoOpen: true,
 		modal: true,
-		width: 600,
+		width: dWidth,
+		height: dHeight,
 		buttons: {
-			"Peruuta": function() {
+			"Sulje": function() {
 				$(this).dialog('close');
 			}
 		}
@@ -248,16 +253,22 @@ function editToimiala(pageId) {
 					"value" : "true" 
 				},
 				{
+					"type" : "button",
+					"html" : "Poista",
+					"id" : "delete-btn"
+				}
+				/* ,
+				{
 					"type" : "submit",
 					"value" : "Tallenna",
 					"class": "next-btn"
 				},
 				{
 					"type" : "button",
-					"html" : "Peruuta",
+					"html" : "Sulje",
 					"class": "cancel-btn",
 					"id" : "cancel-btn"
-				}	
+				}	 */
 				
 			]
 	});
@@ -272,10 +283,74 @@ function editToimiala(pageId) {
         dataType:  "json"        // 'xml', 'script', or 'json' (expected server response type) 
    
     }; 
+	
+	// bind delete button
+	$("#delete-btn").click(function() {
+			$( "#dialog_confirm" ).empty();
+			$( "#dialog_confirm" ).append("<p>Oletko varma, että haluat poistaa toimialan?</p>");
+			//confirm dialog
+			$( "#dialog_confirm" ).dialog({
+				resizable: false,
+				height:140,
+				modal: true,
+				buttons: {	
+					"Peruuta" : function() {
+						$(".ui-dialog-content").dialog("close");
+					},
+					"Poista toimiala" : function() {
+						deleteToimiala();
+						$( this ).dialog( "close" );
+					}
+				}
+			});
+			
+			//delete toimiala
+			function deleteToimiala() {
+				var del = jQuery.ajax({
+					url: '/run/lougis/cms/deleteToimiala/',
+					data: { page_id: pageId },
+					type: 'POST',
+					dataType: 'json'
+				});
+				del.done(function(xhr) {
+					console.log("xhr-success", xhr);
+					$( "#response_msg" ).empty();
+					$( "#response_msg" ).append(xhr.msg);
+					$( "#dialog-message" ).dialog({
+						modal: true,
+						buttons: {
+							"Sulje": function() {
+								$(".ui-dialog-content").dialog("close");
+								$("#response_msg").empty();
+							}			
+						}
+					});
+				});
+				del.fail(function(xhr) {
+					$( "#response_msg" ).empty();
+					$( "#response_msg" ).append(xhr.msg);
+					$( "#dialog-message" ).dialog({
+						modal: true,
+						buttons: {
+							"Sulje": function() {
+								$(".ui-dialog-content").dialog("close");
+								$("#response_msg").empty();
+							}		
+						}
+					});
+				});
+				return false;
+			}
+			$( "#dialog_confirm" ).empty();
+			return false;
+			
+	});
+	
+	
 	// bind form using 'ajaxForm' 
     $('#tiedot_form').ajaxForm(options_info); 
 
-
+	
 	
 	$('#sisalto_form').empty();
 	$('#sisalto_form').dform({
@@ -295,7 +370,7 @@ function editToimiala(pageId) {
 							"caption" : "Sis&auml;lt&ouml;",
 							"value" : pageContent,
 							"type" : "textarea"
-						},
+						}/* ,
 						{
 							"type" : "submit",
 							"value" : "Tallenna",
@@ -303,9 +378,9 @@ function editToimiala(pageId) {
 						},
 						{
 							"type" : "button",
-							"html" : "Peruuta",
+							"html" : "Sulje",
 							"class": "cancel-btn"
-						}
+						} */
 				
 			]
 	});
@@ -352,7 +427,7 @@ function editToimiala(pageId) {
 					"class": "next-btn",
 					"id" : "admin-group",
 					"name" : "admin-group"
-				},
+				}/* ,
 				{
 					"type" : "submit",
 					"value" : "Tallenna",
@@ -361,9 +436,9 @@ function editToimiala(pageId) {
 				},
 				{
 					"type" : "button",
-					"html" : "Peruuta",
+					"html" : "Sulje",
 					"class": "cancel-btn"
-				}
+				} */
 				
 			]
 	});
@@ -395,12 +470,9 @@ function editToimiala(pageId) {
 
 	// post-submit callback 
 	function showResponse(responseText)  { 
-		$( "#response_msg" ).empty();
-		if(responseText.success == false) {
-			console.log("false tuli");
-		}
-		else {
-		$( "#response_msg" ).append(responseText.msg);
+		//$( "#response_msg" ).empty();
+		$( "#response_msg" ).append(responseText.msg); //poistettu käytöstä kunnes jokaisen tabin tallennus on erikseen.
+		//$( "#response_msg" ).append("Jatka toimialan tietojen muokkausta tai lopeta muokkaus.");
 		$( "#dialog-message" ).dialog({
 			modal: true,
 			buttons: {
@@ -415,25 +487,38 @@ function editToimiala(pageId) {
 				
 				
 			}
+		
 		});
-		}
+		
 		console.log(responseText);
 	
 	}
-	
+	var wWidth = $(window).width();
+    var dWidth = wWidth * 0.8;
+    var wHeight = $(window).height();
+    var dHeight = wHeight * 0.8;
 	$("#editToimiala").tabs().dialog({
 		autoOpen: true,
-		width: 600,
+		width: dWidth,
+		height: dHeight,
 		draggable: false,
 		modal: true,
-		/*buttons: {
-			'Tallenna': function() {                    
-				$(this).dialog('close');                    
+		buttons: [
+			{
+				text: "Sulje",
+				click: function() {
+					$(this).dialog("close");
+				}	
 			},
-			'Close': function() {                    
-				$(this).dialog('close');                    
+			{
+				text: "Tallenna",
+				click: function() {
+					$('#tiedot_form').submit();
+					$('#sisalto_form').submit();
+					$('#kayttajat_form').submit();	
+				}
 			}
-		},*/
+        ],
 		open: function() {
 			$('.ui-dialog-titlebar').hide(); // hide the default dialog titlebar
 		},
@@ -470,6 +555,7 @@ function addNewToimiala(/*toimiala_parent_id*/) {
 	$('#toimiala_tiedot_empty').dform({
 		"action" : "/run/lougis/cms/savePageInfo/",//"/run/lougis/cms/createNewPage/",
 		"method" : "post",
+		"class" : "lomake",
 		"html" :
 			[
 				//Hidden fields
@@ -489,12 +575,14 @@ function addNewToimiala(/*toimiala_parent_id*/) {
 				{
 					"name" : "cms_page[title]",
 					"caption" : "Otsikko",
-					"type" : "text"
+					"type" : "text",
+					"class" : "lomake"
 				},
 				{
 					"name" : "cms_page[nav_name]",
 					"caption" : "Sivun nimi navigaatiossa",
-					"type" : "text"
+					"type" : "text",
+					"class" : "lomake"
 				},
 				{
 					"name" : "cms_page[description]",
@@ -510,7 +598,8 @@ function addNewToimiala(/*toimiala_parent_id*/) {
 					"name" : "cms_page[published]",
 					"type" : "hidden",
 					"value" : "true" 
-				},
+				}
+				/*,
 				{
 					"type" : "submit",
 					"value" : "Tallenna",
@@ -518,10 +607,10 @@ function addNewToimiala(/*toimiala_parent_id*/) {
 				},
 				{
 					"type" : "button",
-					"html" : "Peruuta",
+					"html" : "Sulje",
 					"class": "cancel-btn",
 					"id" : "cancel-btn"
-				}	
+				}*/	
 				
 			]
 	});
@@ -552,23 +641,44 @@ function addNewToimiala(/*toimiala_parent_id*/) {
 					$("#response_msg").empty();
 				},
 				"Jatka muokkausta": function() {
-				$( this ).dialog( "close" );
+					editToimiala(responseText.page_id);
 				}			
 			}
 		});
-		$("#response_msg").append(responseText.msg);
+		//$("#response_msg").append(responseText.msg); //kaikki tallennetaan samalla
+		if(responseText.success === true) $("#response_msg").append("Tiedot tallennettu onnistuneesti.");
 		console.log(responseText.msg);
 		console.log(statusText);
 	}
 	
-	
+	var wWidth = $(window).width();
+    var dWidth = wWidth * 0.8;
+    var wHeight = $(window).height();
+    var dHeight = wHeight * 0.8;
 	//Tab dialogin luonti
 	
 	$("#addToimiala").tabs().dialog({
 		autoOpen: true,
-		width: 600,
+		width: dWidth,
+		height: dHeight,
 		draggable: false,
 		modal: true,
+		title: "Lis&auml;&auml; uusi toimiala",
+		buttons: [
+			{
+				text: "Sulje",
+				click: function() {
+					$(this).dialog("close");
+				}
+				
+			},
+			{
+				text: "Tallenna",
+				click: function() {
+					$('#toimiala_tiedot_empty').submit();
+				}
+			}
+        ],
 		open: function() {
 			//$('.ui-dialog-titlebar').hide(); // hide the default dialog titlebar
 		},
