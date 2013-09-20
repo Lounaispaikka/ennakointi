@@ -30,7 +30,6 @@ if(isset($_POST['email']) && isset($_POST['password'])) {
 				break;
     		default:
     			$_SESSION['admin_login'] = false;
-				header('Location: /');
 				break;
     	}
     }

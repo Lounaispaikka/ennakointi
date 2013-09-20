@@ -22,6 +22,7 @@ $Lang = new \Lougis_language( $_SESSION['lang_id'] );
 
 $Cms = new \Lougis\Utility\CmsPublic($Site, $Lang);
 $Cms->showRequestPage();
-//ölö
+
+if($_GET['page']) header('Location: /fi/'.$_GET['page'].'/');
 //echo PATH_PUBLIC;
 ?>
