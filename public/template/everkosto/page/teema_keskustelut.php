@@ -7,9 +7,9 @@ require_once(PATH_PUBLIC.'phorum/include/format_functions.php');
 
 global $Site, $Cms;
 
-$Class = 'col3';
+$Class = 'col2';
 $LeftCol = true;
-$RightCol = true;
+$RightCol = false;
 $Pg = $Cms->getPage();
 
 $CmsCom = new \Lougis\utility\CmsComment();
@@ -19,20 +19,43 @@ if ( $Cms->currentPageHasParent() || $Cms->currentPageHasChildren() ) {
 	$LeftCol = true;
 }
 
+
 if(isset($_GET['tid'])) {
         if (!preg_match("/^\d+$/", $_GET['tid'])) die("Keskustelua ei löytynyt");
-        $ct = new \Lougis_comment_topic($_GET['tid']);
-		if(isset($_GET['debug'])) {if($ct->title != null) print($ct->id);}
+		else { 
+			$topic_id = $_GET['tid'];
+        //$ct = new \Lougis_comment_topic($_GET['tid']);
+		//if(isset($_GET['debug'])) {if($ct->title != null) print($ct->id);}
+
+
+//if($ct->id != null) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);*/
+?>
+<script>
+		
+		var request = $.ajax({
+			url: '/run/lougis/comment/getCommentsHtml/',
+			data: {
+				page_id: <?=$Pg->id?>,
+				topic_id: <?=$topic_id?>
+			},
+			type: "POST"
+		});
+		request.done(function(response) {
+			$("#ajax_request_div").empty();
+			$("#ajax_request_div").append(response);
+			
+		});
+</script>
+
+<? 		}
 }
-
-if($ct->id != null) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);
-
 //if ( $Cms->hasRightColumn() || $Pg->page_type == 'keskustelu') {
 	//$RightCol = true;
 //}
 //teeman etusivu eli mitkä keskustelut haetaan
 
 ?>
+<script type="text/javascript" src="/js/jqueryPlugins/jquery_tablesorter/jquery.tablesorter.min.js"></script> 
 <div id="breadcrumb"><? $Cms->outputBreadcrumb() ?></div>
 <? if ( $LeftCol ) { ?>
 <div id="leftCol" class="<?=$Class?>">
@@ -42,11 +65,11 @@ if($ct->id != null) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);
 <? if ( $RightCol ) { ?>
 <div id="rightCol" class="<?=$Class?> keskustelu">
 	<h2>Aiheet</h2>
-<? $CommentTopics = $CmsCom->getTopics($Pg->parent_id); ?>
+<?/* $CommentTopics = $CmsCom->getTopics($Pg->parent_id); ?>
 <? foreach($CommentTopics as $Topic) { ?>
 	<a href="?tid=<?=$Topic->topicid?>"><? if($Topic->page_id != $Pg->id || $Topic->ctitle == null) {echo $Topic->title;} else { echo $Topic->ctitle; } ?> (viimeisin viesti <?=date('d.m.Y H:i:s', strtotime($Topic->date_created))?>)</a>
 	
-	<? }?>
+	<? }*/?>
 </div>
 <? } ?>
 
@@ -55,14 +78,47 @@ if($ct->id != null) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);
 <div id="content" class="<?=$Class?>">
 
 	<h1>Keskustelut</h1>
-	<p class="comment_add_link" onclick="showNewMsg('<?=$Pg->id?>')";>Aloita uusi keskustelu</p>
+<? if ( !$topic_id ) { ?>
+	<table id="comment_topics" class="tablesorter" >
+		<thead>
+			<tr>
+				<th>Aihe</th>
+				<th>Viestej&auml;</th>
+				<th>Viimeisin viesti</th>
+			</tr>
+		</thead>
+		<tbody id="topics_body">
+	<? $CommentTopics = $CmsCom->getTopics($Pg->parent_id); ?>
+	<? foreach($CommentTopics as $Topic) { ?>
+			<tr id="<?=$Topic->topicid?>" class="topic_row">
+				<td class="topic_topic">
+					<a href="?tid=<?=$Topic->topicid?>"><? if($Topic->page_id != $Pg->id || $Topic->ctitle == null) {echo $Topic->title;} else { echo $Topic->ctitle; } ?> </a>
+				</td>
+				<td class="topic_details">
+					
+				</td>
+					
+				<td class="topic_last">
+					
+					<?=date('d.m.Y H:i:s', strtotime($Topic->date_created))?>
+				</td>
+			</tr>
+	<? } ?>
+		</tbody>
+	</table>
 	
+	<p class="comment_add_link" onclick="showNewMsg('<?=$Pg->id?>')";>Aloita uusi keskustelu</p>
+
 	<div id="newcomment" class="replybox" style="display:none;">
 			<img id="closenewmsg" src="/img/close.png" alt="" title="Sulje" onclick="hideNewMsg();" />
 			<h2>Uusi viesti</h2>
 			<div id="newcommentform"></div>
 	</div>
-<? if ( count($Comments) > 0 ) { ?>
+<? } else {?>
+	<a href="#" onclick="javascript:window.history.back(-1);return false;">N&auml;yt&auml; kaikki keskustelut</a>
+<? } ?>
+	<div id="ajax_request_div"></div>
+<? /*if ( count($Comments) > 0 ) { ?>
 	<? $topic_title = new \Lougis_comment_topic($_GET['tid']);
 		echo '<h2>'.$topic_title->title.'</h2>';
 	?>
@@ -148,6 +204,7 @@ if($ct->id != null) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);
 <script>
 
   jQuery(function() {
+	$("#comment_topics").tablesorter(); 
     //Accordion
 	/*jQuery( "#accordion" ).accordion({
 		heightStyle: "content"

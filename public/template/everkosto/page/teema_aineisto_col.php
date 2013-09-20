@@ -13,7 +13,7 @@ if ( $_SESSION['user_id']) {
 <script type="text/javascript" src="/js/lougis/lib/chart.ui.jquery.js"></script>
 <script type="text/javascript" src="/js/handsontable/dist/jquery.handsontable.full.js"></script>
 <link rel="stylesheet" media="screen" href="http://handsontable.com/dist/jquery.handsontable.full.css">
-
+<script src="http://code.highcharts.com/highcharts.js"></script>
 <div id="formResponse">
 	<p></p>
 </div>
@@ -44,11 +44,33 @@ if ( $_SESSION['user_id']) {
 </div>	
 
 <div id="addChartDialog" title="Lis&auml;&auml; tilasto">
-	<p id="chartOhje" style="text-align: left;"></p>
-	<div id="datagrid" class="handsontable"></div>
-	<form id="chartform" class="ui-widget" enctype="multipart/form-data"></form>
+	<ul>
+		<li><a href="#chart_upload">CSV-tiedosto</a></li>
+		<li><a href="#chart_table">Taulukko</a></li>
+		<li><a href="#chart_config">Asetukset</a></li>
+		<li><a href="#chart_preview">Esikatselu</a></li>
+	</ul>
 	
+	<div id="chart_upload">
+		<p id="chartOhje" style="text-align: left;"></p>
+		<form id="chartform_upload" class="ui-widget"></form>
+	</div>
 	
+	<div id="chart_table">
+		<div id="datagrid" class="handsontable"></div>
+		<form id="chartform_table" class="ui-widget"></form>
+	</div>
+	
+	<div id="chart_config">
+		<p id="chartOhje" style="text-align: left;"></p>
+		<form id="chartform_config" class="ui-widget"></form>
+	</div>
+	
+	<div id="chart_preview">
+		<p id="chartOhje" style="text-align: left;"></p>
+		<div id="chart_container" style="height: 400px"></div>
+		<form id="chartform_preview" class="ui-widget"></form>
+	</div>
 	
 </div>
 
