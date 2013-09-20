@@ -149,6 +149,82 @@ class Charts extends \Lougis\abstracts\Frontend {
 		
 	}
 	
+	//highchart configs
+	public function saveHighchartConfig() {
+		
+		try {
+		
+			$ChartData = $_REQUEST['chart'];
+			
+			$Chart = new \Lougis_chart($ChartData['id']);
+			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
+			$Chart->title = $ChartData['title'];
+			
+			//config array
+			$config = array();
+			$config["type"] = $ChartData['config']['type'];
+			$config["x_title"] = $ChartData['config']['x_title'];
+			$config["y_title"] = $ChartData['config']['y_title'];
+			
+			//if chart type == pie
+			if ( $config["type"] == 'pie' ) {
+				$config["plotOptions"]["pie"]["allowPointSelect"] = true;
+				$config["plotOptions"]["pie"]["cursor"] = 'pointer';
+				$config["series"]["type"] = 'pie';
+			}
+			
+			$Chart->config_json = json_encode($config);
+			if ( !$Chart->save() ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttä ylläpitoon.");
+		
+			//$Chart->buildHighchart();
+			
+			/* $res = array(
+				"success" => true,
+				"msg" => $Msg,
+				"conf" => $ChartConf
+			); */
+			
+			$res = array(
+				"success" => true
+			);
+			
+		} catch(\Exception $e) {
+			
+			$res = array(
+				"success" => false,
+				"msg" => $e->getMessage()
+			);
+			
+		}
+		$this->jsonOut($res);
+		
+	}
+	
+	public function getHighchart() {
+		
+		try {
+			
+			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
+			$ChartGraph = $Chart->buildHighchart();
+			$ChartConf = $Chart->config_json;
+			//käsittele config_json json muodosta käytettävksi
+			
+			$res = array(
+				"success" => true,
+				"chart" => $ChartGraph,
+				"conf" => $ChartConf,
+			);
+		} catch(\Exception $e) {
+			
+			$res = array(
+				"success" => false,
+				"msg" => $e->getMessage()
+			);
+			
+		}
+		$this->jsonOut($res);
+	}
+	
 	public function updateData() {
 		
 		
@@ -187,16 +263,14 @@ class Charts extends \Lougis\abstracts\Frontend {
 			devlog($_REQUEST['chart_data'], "e_chart_data");
 			
 		try {
-		
+			$data = json_encode($_REQUEST['chart_data']);
 			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
 			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
 			$Chart->updated_date = date(DATE_W3C);
-			$Chart->data_json = json_encode($_REQUEST['chart_data']);
-			//$data = json_decode($_REQUEST['data']);
+			$Chart->data_json = $data;
+			
 			if ( count($data) == 0 ) throw new \Exception("Taulukko on tyhjä. Tyhjää taulukkoa ei voi tallentaa");
-			//json file päivitys
-			if ( !$Chart->updateData( $data ) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttä ylläpitoon.");
-			//tietokantaan päivitys
+			
 			if ( !$Chart->save() ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttä ylläpitoon.");
 			
 			$res = array(

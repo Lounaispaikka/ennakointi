@@ -119,6 +119,70 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    
     }
     
+	//build highchart
+	public function buildHighchart(/* $chartdata */) {
+		
+		//get this->data_json data as array
+		$data_json = (array)json_decode($this->data_json, true);
+devlog($data_json["fields"], "e_hc");
+		//transpose data_json
+		$arr = array();
+		$arr = $data_json["data"];
+		
+		$fields = array();
+		$fields = $data_json["fields"];
+		
+		$transposed_data = array();
+		function transpose($array) {
+			array_unshift($array, null);
+			return call_user_func_array('array_map', $array);
+		}
+		$transposed_data = transpose($arr);
+		devlog($transposed_data, "e_hc");
+		//switch values to int, float or string if necessary
+		foreach ( $transposed_data as $k=>$serie ) {
+			foreach ( $serie as $key=>$val ) {
+				
+				switch(true) {
+					case ctype_digit($val): //jos stringissä on vain numeroita
+						$transposed_data[$k][$key] = (int)$val;
+						break;
+					case is_numeric($val): //jos string on numeerinen
+						$transposed_data[$k][$key] = (float)$val;
+						break;
+					default: //jos string
+						$transposed_data[$k][$key] = $val;
+				}
+			}		
+		}
+	
+		$highchart = array();
+		
+		//for pie-chart use
+		foreach($transposed_data[0] as $key=>$value) {
+			$highchart["pie_series"][$value] = $transposed_data[1][$key];
+		}
+		devlog($transposed_data[0], "e_hc");
+		devlog($transposed_data[1], "e_hc");
+		devlog($highchart["pie_series"], "e_hc");
+		
+		
+		//x-axis
+		$highchart["xAxis"]["categories"] = $transposed_data[0];
+		//series
+		for($i = 1; $i < count($transposed_data); $i++) {
+			//$highchart["series"][$i-1]["name"] = "nimi".$i;
+			$highchart["series"][$i-1]["name"] = $fields[$i]["name"];
+			$highchart["series"][$i-1]["data"] = $transposed_data[$i];		
+			
+		}
+		
+			
+		return $highchart;
+		
+	}
+	
+	
     public function buildExtJsonChart( $chartData ) {
 	    
 	    $ext = array(
@@ -233,6 +297,18 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 		return file_put_contents($jsonfile, json_encode($ExtConfig));
 		
     }
+	
+	//save highchart config
+	public function saveHighchartConfig( $ExtConfig, $configRequest = null ) {
+	    
+	    if ( !empty($configRequest) ) {
+		    $reqfile = $this->getChartConfigRequestPath();
+		    file_put_contents($reqfile, json_encode($configRequest));
+	    }
+	    $jsonfile = $this->getChartConfigPath();
+		return file_put_contents($jsonfile, json_encode($ExtConfig));
+		
+    }
     
     public function getChartConfig() {
 	    
@@ -330,12 +406,6 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 		$json = $this->getChartJsonData();
 		$json->data = $dataArray;
 		return file_put_contents($jsonfile, json_encode($json));
-	    
-    }
-	
-	 public function updateDbData( $dataArray ) {
-	    
-		return $this->data_json = $dataArray;
 	    
     }
     
