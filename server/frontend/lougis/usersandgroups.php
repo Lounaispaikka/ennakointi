@@ -53,8 +53,8 @@ class Usersandgroups extends \Lougis\abstracts\Frontend {
             "success" => true,
 			//"id" => $group->id
             "group" => $group->getGroupByPageId($_REQUEST['page_id'])
-        );
 
+        );
         $this->jsonOut($response);
     }
 
@@ -85,41 +85,65 @@ class Usersandgroups extends \Lougis\abstracts\Frontend {
 	
 	
 	public function editToimialaGroup() {
-		devlog($_REQUEST, "ennakointi_group");
-		$pg = new \Lougis_cms_page();
-		$pg->id = $_REQUEST['page_id'];
-		$pg->find();
-		$pg->fetch();
+
+		try {
+			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.');
+			//user can't remove herself from the users
+			$user_group = explode(",", $_REQUEST['admin-group']);
+			if( !in_array($_SESSION['user_id'], $user_group) )throw new \Exception('Et voi poistaa itseäsi käyttäjäryhmästä.');
+			
+			
+			$pg = new \Lougis_cms_page();
+			$pg->id = $_REQUEST['page_id'];
+			$pg->find();
+			$pg->fetch();
+			
+			$grp = new \Lougis_group();
+			$grp->page_id = $_REQUEST['page_id'];
+			$grp->find();
+			$grp->fetch();
+			/*
+			if($grp < 0)
+				$grp 
+			
+			
+			
+			*/
+			
+			//$user_group = explode(",", $_REQUEST['admin-group']);
+			devlog($user_group, "e_grp");
+			//$user_group = json_encode($user_group);
+			
+			//$groupData = $_REQUEST;
+			$groupData['id'] = $grp->id;
+			//$groupData['name'] = $grp->name;
+			$groupData['name'] = ($grp->name == '')? $pg->title: $grp->name;
+			$groupData['public_joining'] = $grp->public_joining;
+			$groupData['description'] = $grp->description;
+			$groupData['parent_id'] = $grp->parent_id;
+			$groupData['is_admin'] = $grp->is_admin;
+			$groupData['page_id'] = $_REQUEST['page_id'];
+			$groupData['users'] = $user_group;
+			$group = new \Lougis\utility\Group();
+			
+			$group->saveGroup($groupData);
+			
+			$response = array(
+				"success" => true,
+				"msg" => "Käyttäjien oikeudet tallennettu onnistuneesti!",
+				"type" => "group"
+			);
 		
-		$grp = new \Lougis_group();
-		$grp->page_id = $_REQUEST['page_id'];
-		$grp->find();
-		$grp->fetch();
-		/*
-		if($grp < 0)
-			$grp 
+		} catch(\Exception $e) {
+			
+			$response = array(
+				"success" => false,
+				"msg" => "flases",//$e->getMessage(),
+				"type" => "group"
+			);
+			
+		}
 		
-		
-		
-		*/
-		$user_group = explode(",", $_REQUEST['admin-group']);
-		//$user_group = json_encode($user_group);
-		
-		//$groupData = $_REQUEST;
-		$groupData['id'] = $grp->id;
-		//$groupData['name'] = $grp->name;
-		$groupData['name'] = ($grp->name == '')? $pg->title: $grp->name;
-		$groupData['public_joining'] = $grp->public_joining;
-		$groupData['description'] = $grp->description;
-		$groupData['parent_id'] = $grp->parent_id;
-		$groupData['is_admin'] = $grp->is_admin;
-		$groupData['page_id'] = $_REQUEST['page_id'];
-		$groupData['users'] = $user_group;
-        $group = new \Lougis\utility\Group();
-        $group->saveGroup($groupData);
-        $response = array(
-            "success" => true
-        );
         $this->jsonOut($response);
     }
     public function deleteUser() {
@@ -128,7 +152,7 @@ class Usersandgroups extends \Lougis\abstracts\Frontend {
         $user->deleteUser($id);
         $response = array(
             "success" => false,
-			"msg" => "suksee"
+			"msg" => "Käyttäjä poistettu."
         );
         $this->jsonOut($response);
     }
