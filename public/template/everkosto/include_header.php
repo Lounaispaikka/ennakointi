@@ -52,7 +52,6 @@ require_once(PATH_SERVER.'utility/LouGIS/mLogin.php');
 
 	<!--<link rel="stylesheet" type="text/css" href="/css/modal_login.css" />-->
 	<link rel="stylesheet" type="text/css" href="/css/loginStyle.css" />
-	<script type="text/javascript" src="/js/lougis/lib/charts.ui.extjs.js"></script>
 	<script type="text/javascript" src="/js/lougis/lib/admin_menu.ui.extjs.js"></script>
 	
 <? if ( isset($_SESSION['user_id']) ) { ?>
@@ -76,7 +75,7 @@ require_once(PATH_SERVER.'utility/LouGIS/mLogin.php');
 require_once('template/aluetietopalvelu/aluetietopalvelu_northbar.php');
  ?>
 <div id="site"> 
-
+	
         <div id="header" class="ymparisto">
                 <div id="title_container">
                         <div id="title_left">
@@ -100,6 +99,12 @@ require_once('template/aluetietopalvelu/aluetietopalvelu_northbar.php');
 		
         </div>
 	<div id="middle">
+		<div id="dialog-message" title="Tallennettu!">
+			<p id="response">
+				<span class="ui-icon ui-icon-circle-check" style="float: left; margin: 0 7px 50px 0;"></span>
+				<span id="response_msg"></span>
+			</p>
+		</div>
 		<!--<div id="loadingDiv"></div>-->
 		<div class="modal"></div>
 		<!--  admin tools -->

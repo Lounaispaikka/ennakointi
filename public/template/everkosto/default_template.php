@@ -44,7 +44,7 @@ $TavoitteetPrinted = false;
 <? if ( $RightCol ) { ?>
 <div id="rightCol" class="<?=$Class?>">
 	<? if ( $Pg->page_type == "toimiala" ) {
-		?><h1>Hallintaty&ouml;kalut</h2>
+		?><h2>Hallintaty&ouml;kalut</h2>
 		<button id="hallinta_toimiala_btn" class="ui-button teema_btn"><img src="/img/icons/16x16/pencil.png" > Toimialan asetukset</button>
 		<button id="hallinta_teema_btn" class="ui-button teema_btn"><img src="/img/icons/16x16/pencil.png" > Ennakointiteemat</button>
 		<? } else {

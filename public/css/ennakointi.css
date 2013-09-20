@@ -56,9 +56,7 @@ body, .x-body {
 }
 #front-content {
 	clear: both;
-	/*width: 66.6%;*/
-/*        width: 633px;*/
-        width: 100%;
+    width: 100%;
 	padding: 0px 60px 0px 60px;
 	
 }
@@ -137,12 +135,14 @@ div#teema_uutiset {
 	margin: 5px 0 5px -15px;
 	font-size: 11px;
 }
-#teema_container ul li a {
+#teema_container ul li {
 	list-style:none;
 	padding-left: 0px;
 	margin: 5px 0 5px 5px;
 	font-size: 11px;
 }
+
+
 /*Aineiston lisäys */
 
 div#addPageFormDialog, 
@@ -151,7 +151,10 @@ div#editPageContentDialog,
 #addToimiala,
 #addTeema,
 #editToimiala, 
-#editTeema {
+#editTeema,
+#upfile,
+#chartform,
+.lomake {
 	text-align:left !important;
 }
 
@@ -165,6 +168,7 @@ div#addPageFormDialog form label ,
 div#editPageFormDialog form label,
 #editToimiala form label,
 #newcommentform form label,
+.lomake,
 .replybox form label {
 	display:block;
 }
@@ -173,6 +177,7 @@ div#addPageFormDialog  form input,
 div#editPageFormDialog form input,
 #editToimiala form input,
 #newcommentform form input,
+.lomake,
 .replybox form input {
 	display:block;
 }
@@ -180,6 +185,7 @@ div#addPageFormDialog form input.text,
 div#editPageFormDialog form input.text,
 #editToimiala form input.text,
 #newcommentform form input.text,
+.lomake form input.text,
 .replybox form input.text {
 	margin-bottom:12px; 
 	width:95%;
@@ -190,6 +196,7 @@ div#addPageFormDialog form fieldset,
 div#editPageFormDialog form fieldset,
 #editToimiala form fieldset,
 #newcommentform form fieldset,
+.lomake form fieldset,
 .replybox form fieldset{ 
 	padding:0; 
 	border:0; 
@@ -209,6 +216,15 @@ div#editPageFormDialog form fieldset,
 #editTeema input[type="text"], 
 #editToimiala textarea, 
 #editTeema textarea,
+#upfile input[type="text"], 
+#upfile input[type="file"], 
+#upfile textarea, 
+#chartform input[type="text"], 
+#chartform input[type="file"], 
+#chartform textarea,
+.lomake textarea,
+.lomake input[type="text"], 
+.lomake input[type="file"], 
 .comment_form_fields  input[type="text"],
 .comment_form_fields textarea
  {
@@ -291,9 +307,9 @@ div#comments {
 	margin-top: 2px;
 }
 div#comments #newthread {
-	float:right;
+	float:left;
 	cursor: pointer;
-	padding-left:15px;
+	margin: 15px 0 10px 15px;
 }
 
 div#comments .msgform  {
@@ -458,3 +474,117 @@ body.loading {
 body.loading .modal {
     display: block;
 }
+table#messages {
+	width: 100%;
+}
+table#messages h1.msg_topic {
+	font-size: 12px;
+}
+table#messages .message_msg{
+	width: 80%;
+}
+table#messages .message_info{
+	width: 20%;
+}
+table#messages td {
+	border: 1px solid #fff;
+}
+
+/* This is the style for our default (even) row */
+table#messages tr {
+    background-color: #fafafa;
+}
+ 
+/* This is the style for our striped (odd) row */
+table#messages tr:nth-child(odd) {
+    background-color: #f1f1f1;
+}
+table#messages tr:nth-child(odd) td {
+    border: 1px solid #fff;
+}
+
+.teema_btn { display:block; clear:both; margin: 5px 5px 5px 0; width: 190px; text-align:left;}
+
+table#comment_topics {
+	width: 100%;
+}
+table#comment_topics td {
+	border: 1px solid #fff;
+}
+
+table#comment_topics tbody#topics_body tr {
+	height: 30px;
+}
+
+table#comment_topics td.topic_topic {
+	width: 70%;
+}
+
+table#comment_topics td.topic_details {
+	width: 8%;
+}
+
+table#comment_topics td.topic_last {
+	width: 22%;
+}
+
+table#comment_topics tr.topic_row {
+	background-color: #fafafa;
+}
+
+table#comment_topics tbody#topics_body tr:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+table#comment_topics tr:nth-child(odd).topic_row {
+    background-color: #f1f1f1;
+}
+
+#addFileDialog {
+	display: none; 
+}
+
+#addChartDialog {
+	display: none; 
+}
+
+
+#addFileDialog .percent {
+	clear:both;
+	text-align: left;
+}
+.file_list{
+	list-style: none outside none !important;
+	padding-left: 0px;
+	margin: 5px 0 5px 0px;
+}
+
+/*Toimiala templaten css*/
+.list-h3 { padding: 10px 0 10px 5px; margin: 0; font-size: 14px; font-weight: 700; }
+.list-with-heading { display:block; float:left; margin: 0 15px 0 15px;}
+#sortable1, #sortable2 { list-style-type: none; margin: 0; padding: 0 ; float: left; margin-right: 2px; border: 1px solid; min-width: 350px; min-height: 29px; background-color: #fff;}
+#sortable1 li, #sortable2 li { margin: 0 2px 0 2px; padding: 2px 2px 2px 2px; font-size: 1.2em; width: 100%; min-height: 24px; }
+#sortable1 li:hover, #sortable2 li:hover {cursor: pointer; border: 2px solid;}
+.userlist_name { font-size: 14px; color: #000; margin: 0 3px 0 3px}
+.userlist_org {font-size: 12px; color: #000;margin: 0 3px 0 3px}
+.userlist_email {font-size: 12px; color: blue; margin: 0 3px 0 3px}
+#cms_content {height: 300px; min-width: 350px;}
+#editToimiala { display:none;}
+#editTeema { display:none;}
+#feedback { font-size: 1.4em; }
+#valittavat { float:left; width: 50%; text-align: left;}
+#ohjeet {float: left; width: 50%; text-align: left;}
+#editToimiala.ui-tabs, #editToimiala.ui-dialog-content, #editToimiala.ui-dialog { padding: 0; }
+#editTeema.ui-tabs, #editTeema.ui-dialog-content, #editTeema.ui-dialog { padding: 0; }
+#dialog-message { display: none;}
+
+#delete-btn {
+	color: #ff0000;
+}
+
+/* dialog buttons */
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { width: 100%;}
+.ui-dialog-buttonset .ui-button:last-child {float:right !important;}
+.ui-dialog-buttonset .ui-button:first-child {float:left !important;}
+

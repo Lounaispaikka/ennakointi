@@ -10,7 +10,7 @@
 
 		<!-- Login Starts Here -->
             <div id="loginContainer">
-                <a href="#" id="loginButton"><span><? if(!isset($_SESSION['user_id'])) echo 'Kirjaudu'; else echo 'Omat tiedot'; ?> </span> <em></em></a>
+                <a href="#" id="loginButton"><span><? if(!isset($_SESSION['user_id'])) echo 'Kirjaudu'; else echo 'Asetukset'; ?> </span> <em></em></a>
                 <div style="clear:both"></div>
                 <div id="loginBox">
 					<? if (!isset($_SESSION['user_id'])) { ?>
@@ -52,10 +52,10 @@
 								<p><a href="/hallinta/" class="linkJs">Avaa sis&auml;ll&ouml;nhallinta</a></p>
 								<p><a href="javascript:void(0)" class="linkJs" id="openToimiala">Muokkaa toimialoja</a></p>
 							</fieldset>
-							<fieldset>
+							<!--<fieldset>
 								<p><a href="javascript:void(0)" class="linkJs">Vaihda salasana</a></p>
 								<p><a href="javascript:void(0)" class="linkJs">Vaihda s&auml;hk&ouml;postisoite</a></p>
-							</fieldset>						
+							</fieldset>						-->
 						</fieldset>
 						<span><a href="/run/lougis/usersandgroups/logoutUser/">Kirjaudu ulos</a></span>
 					</div>
