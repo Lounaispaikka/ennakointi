@@ -216,17 +216,66 @@ class Comment extends \Lougis\abstracts\Frontend {
 	
 	//luo kommenttisivun html:n, ajax-hakuihin
 	public function getCommentsHtml() {
-		
-		$page_id = (int)$_POST['page_id'];
-		
-		$ct = new \Lougis_comment_topic();
-		$ct->page_id = $page_id;
-		$ct->find();
-		$ct->fetch();
+		//kommentit sivulla
+		if($_POST['topic_id']) {
+			$topic_id = (int)$_POST['topic_id'];
+			$ct = new \Lougis_comment_topic($topic_id);	
+		}
+		//kommentit keskustelu-osiossa
+		else {
+			$page_id = (int)$_POST['page_id'];
+			$ct = new \Lougis_comment_topic();
+			$ct->page_id = $page_id;
+			$ct->find();
+			$ct->fetch();
+		}
 		
 		if ( $ct->id != null ) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);
 ?>
-<? if ( count($Comments) > 0 ) { ?>
+	<? if ( count($Comments) > 0 ) { ?>
+		<table id="messages">
+		<? foreach($Comments as $Cm) { ?>
+			<tr>
+				<td class="message_info">
+					<p><span class="author"><?=$Cm->getUsername()?></span></p>
+					<p><span class="author"><?=date('d.m.Y H:i:s', strtotime($Cm->date_created))?></span></p>
+				</td>
+				<td class="message_msg">
+					<h1 class="msg_topic"><?=$Cm->title?></h1>
+					<p><?=nl2br($Cm->msg)?></p>
+				</td>
+<? //poistetaan vastaus mahdollisuus, ts. kaikki viestit menevät yhdelle tasolle
+/*
+				<td>
+					<a class="replythread" onclick="showReplyBox(<?=$page_id?>, <?=$Cm->id?>);">Vastaa</a>
+					<div id="replybox<?=$Cm->id?>" class="replybox">
+				</td>
+*/ ?>
+			</tr>
+		<? if ( count($Cm->replys) > 0 ) { ?>
+			<? foreach($Cm->replys as $Reply) { ?>
+			<tr class="replys">
+				<td>
+					<p><span class="author"><?=$Cm->getUsername()?></span></p>
+					<p><span class="author"><?=date('d.m.Y H:i:s', strtotime($Cm->date_created))?></span></p>
+				</td>
+				<td>
+					<h1 class="msg_topic">VS: <?=$Cm->title?></h1>
+					<p><?=nl2br($Reply->msg)?></p>
+				</td>
+<? /*
+				<td>
+				</td>
+*/?>
+				</tr>
+			<? 		} 
+				}
+			}?>
+		</table>
+
+<?		} 
+/*
+
 		<ul id="messages">
 		<? foreach($Comments as $Cm) { ?>
 			<li id="cm<?=$Cm->id?>"><a name="cm<?=$Cm->id?>"></a>
@@ -241,7 +290,7 @@ class Comment extends \Lougis\abstracts\Frontend {
 						<img src="/img/thumbdown.png" alt="" /> <span><?=$Cm->dislikes?></span>
 					</a>
 				</div>
-				*/ ?>
+				*/ /* ?>
 				<span class="author">"<?=$Cm->getUsername()?>" kirjoitti <?=date('d.m.Y H:i:s', strtotime($Cm->date_created))?></span>
 				<h3><?=$Cm->title?></h3>
 				
@@ -268,7 +317,7 @@ class Comment extends \Lougis\abstracts\Frontend {
 								<img src="/img/thumbdown.png" alt="" /> <span><?=$Reply->dislikes?></span>
 							</a>
 						</div>
-						*/ ?>
+						*//* ?>
 						<span class="author">"<?=$Reply->getUsername()?>" kirjoitti <?=date('d.m.Y H:i:s', strtotime($Reply->date_created))?></span>
 						<p><?=nl2br($Reply->msg)?></p>
 					</li>
@@ -279,7 +328,7 @@ class Comment extends \Lougis\abstracts\Frontend {
 		<? } ?> 
 		</ul>
 		<? } ?>
-<?
+<? */
 		
 		
 	}

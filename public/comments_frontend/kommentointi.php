@@ -31,14 +31,18 @@ if ( $_SESSION['user_id'] ) {
 			$("#ajax_request_div").append(response);
 			
 		});
+
+
 	</script>
 	<div id="comments">
-	<? if ( $ct->id != null ) { ?>
-		<a id="newthread" onclick="showNewMsg(<?=$Pg->id?>, <?=$ct->id?>);">Kirjoita uusi viesti</a>
-	<? } else { ?>
-		<a id="newthread" onclick="showNewTopic(<?=$Pg->id?>);">Kirjoita uusi viesti</a>
-	<? } ?>
+	
+	
 		<h2>Keskustelu</h2>
+		<?
+	if ( $ct->id == null ) { ?>
+		<a id="newthread" onclick="showNewTopic(<?=$Pg->id?>);">Kommentoi</a>
+	<? } ?>
+		<div id="ajax_request_div"></div>
 		<div id="newcomment" class="msgform">
 			<img id="closenewmsg" src="/img/close.png" alt="" title="Sulje" onclick="cancelMsgEdit();" />
 			<? //=$Rules?>
@@ -48,7 +52,9 @@ if ( $_SESSION['user_id'] ) {
 			</div>
 			
 		</div>
-		<div id="ajax_request_div"></div>
+		<? if ( $ct->id != null ) { ?>
+			<a id="newthread" onclick="showNewMsg(<?=$Pg->id?>, <?=$ct->id?>);" style="margin-top:15px;">Kommentoi</a>
+		<? } ?>
 	</div>
 	<div id="dialog-message" title="Viesti l&auml;hetetty!">
 		<p id="response">
@@ -56,7 +62,7 @@ if ( $_SESSION['user_id'] ) {
 			<span id="response_msg"></span>
 		</p>
 	</div>
-	<?
+	<? 
 	/*
 	$Co = new \Lougis\utility\Compiler("comments-ui-extjs", "js");
 	$Co->addJs("/js/lougis/lib/comments.ui.extjs.js");
