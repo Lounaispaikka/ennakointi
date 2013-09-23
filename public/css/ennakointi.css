@@ -476,6 +476,7 @@ body.loading .modal {
 }
 table#messages {
 	width: 100%;
+	clear: both;
 }
 table#messages h1.msg_topic {
 	font-size: 12px;

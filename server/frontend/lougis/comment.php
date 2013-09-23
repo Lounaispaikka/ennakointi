@@ -243,6 +243,9 @@ class Comment extends \Lougis\abstracts\Frontend {
 				<td class="message_msg">
 					<h1 class="msg_topic"><?=$Cm->title?></h1>
 					<p><?=nl2br($Cm->msg)?></p>
+					<? /* if($_SESSION['user_id'] === $Cm->user_id) { ?>
+					<button id="del_<?=$Cm->id?>" class="del_comment_btn">Poista viesti</button>
+					<? } */?>
 				</td>
 <? //poistetaan vastaus mahdollisuus, ts. kaikki viestit menevät yhdelle tasolle
 /*
@@ -378,6 +381,36 @@ class Comment extends \Lougis\abstracts\Frontend {
 		}
 		echo json_encode($res);
 		//return $Comments;
+	}
+	
+	public function deleteComment() {
+		global $Site;
+		try {
+			
+			$Comment = new \Lougis_comment_msg($_REQUEST['comment_id']);
+			//auth user or admin
+			if ( $Comment->user_id !== $_SESSION['user_id'] ) throw new \Exception('Kommentin poistaminen epäonnistui: Käyttäjän tunnistaminen ei onnistunut!');
+			if ( empty($Comment->msg) ) throw new \Exception('Kommentin poistaminen epäonnistui: Kommenttia ei voitu ladata!');
+			if ( $Comment->site_id != $Site->id ) throw new \Exception('Kommentin poistaminen epäonnistui: Virheellinen sivusto!');
+				
+			if ( !$Comment->delete() ) throw new \Exception('Kommentin poistaminen epäonnistui: '.$News->_lastError);
+			
+			$res = array(
+				"success" => true,
+				"msg" => "Kommentti poistettu onnistuneesti!"
+			);
+		
+		} catch(\Exception $e) {
+		
+			$res = array(
+				"success" => false,
+				"msg" => $e->getMessage()
+			);
+			
+		}
+		
+		$this->jsonOut($res);
+		
 	}
 	
 	

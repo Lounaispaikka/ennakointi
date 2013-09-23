@@ -31,7 +31,8 @@ if ( $_SESSION['user_id'] ) {
 			$("#ajax_request_div").append(response);
 			
 		});
-
+		
+		
 
 	</script>
 	<div id="comments">
@@ -74,6 +75,19 @@ if ( $_SESSION['user_id'] ) {
 	?>
 	<!--<script type="text/javascript" src="/js/lougis/lib/comments.ui.extjs.js"></script>-->
 	<script type="text/javascript" src="/js/lougis/lib/comments.ui.jquery.js"></script>
+	<? /*
+	<script type="text/javascript">
+		$(function() {	
+			
+			$('.del_comment_btn').click(function(){
+				console.log("del");
+				return false;
+			});
+			
+			
+		});
+	</script>
+	*/ ?>
 <?
 }
 ?>
