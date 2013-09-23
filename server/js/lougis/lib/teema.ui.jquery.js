@@ -50,12 +50,20 @@ function teemaDialog(toimialaId) {
 	
 	
 	$('#valitse_teema').empty(); //tyhjennä ensin, ettei tule montaa kopiota listasta
+	
+	//dialog width and height according to window size
+	var wWidth = $(window).width();
+    var dWidth = wWidth * 0.8;
+    var wHeight = $(window).height();
+    var dHeight = wHeight * 0.8;
+	
 	$('#teemaDialog').dialog({
 		autoOpen: true,
 		modal: true,
-		width: 600,
+		width: dWidth,
+		height: dHeight,
 		buttons: {
-			"Peruuta": function() {
+			"Sulje": function() {
 				$(this).dialog('close');
 			}
 		}
@@ -150,12 +158,14 @@ function editTeema(pageId) {
 					"name" : "cms_page[title]",
 					"caption" : "Otsikko",
 					"type" : "text",
+					"class" : "lomake",
 					"value" : pageData.title							
 				},
 				{
 					"name" : "cms_page[nav_name]",
 					"caption" : "Sivun nimi navigaatiossa",
 					"type" : "text",
+					"class" : "lomake",
 					"value" : pageData.nav_name
 				},
 				{
@@ -173,7 +183,7 @@ function editTeema(pageId) {
 					"name" : "cms_page[published]",
 					"type" : "hidden",
 					"value" : "true" 
-				},
+				}/* ,
 				{
 					"type" : "submit",
 					"value" : "Tallenna",
@@ -181,10 +191,10 @@ function editTeema(pageId) {
 				},
 				{
 					"type" : "button",
-					"html" : "Peruuta",
+					"html" : "Sulje",
 					"class": "cancel-btn",
 					"id" : "cancel-btn"
-				}	
+				}	 */
 				
 			]
 	});
@@ -220,7 +230,7 @@ function editTeema(pageId) {
 							"caption" : "Sis&auml;lt&ouml;",
 							"value" : pageContent,
 							"type" : "textarea"
-						},
+						}/* ,
 						{
 							"type" : "submit",
 							"value" : "Tallenna",
@@ -228,9 +238,9 @@ function editTeema(pageId) {
 						},
 						{
 							"type" : "button",
-							"html" : "Peruuta",
+							"html" : "Sulje",
 							"class": "cancel-btn"
-						}
+						} */
 				
 			]
 	});
@@ -283,25 +293,50 @@ function editTeema(pageId) {
 				"Sulje": function() {
 				//	$( this ).dialog( "close" );
 				//	$("#addToimiala").dialog( "close" );
+					$("#response_msg").empty();
+					loadTeemat();
 					$(".ui-dialog-content").dialog("close");
 				},
 				"Jatka muokkausta": function() {
-				$( this ).dialog( "close" );
-				}
-				
-				
+					$("#response_msg").empty();
+					$( this ).dialog( "close" );
+				}		
 			}
 		});
+		$("#response_msg").append("<li>" + responseText.msg + "</li>" );
 		console.log(responseText);
 		console.log(statusText);
 	}
 	
+	//dialog width and height according to window size
+	var wWidth = $(window).width();
+    var dWidth = wWidth * 0.8;
+    var wHeight = $(window).height();
+    var dHeight = wHeight * 0.8;
+	
 	//luodaan dialog
 	$("#editTeema").tabs().dialog({
 		autoOpen: true,
-		width: 600,
+		width: dWidth,
+		height: dHeight,
 		draggable: false,
 		modal: true,
+		buttons: [
+			{
+				text: "Sulje",
+				click: function() {
+					$(this).dialog("close");
+				}
+				
+			},
+			{
+				text: "Tallenna",
+				click: function() {
+					$('#teema_sisalto_form').submit();
+					$('#teema_tiedot_form').submit();
+				}
+			}
+        ],
 		open: function() {
 			$('.ui-dialog-titlebar').hide(); // hide the default dialog titlebar
 		},
@@ -356,12 +391,14 @@ function addNewTeema(toimiala_id) {
 				{
 					"name" : "cms_page[title]",
 					"caption" : "Otsikko",
-					"type" : "text"
+					"type" : "text",
+					"class" : "lomake"
 				},
 				{
 					"name" : "cms_page[nav_name]",
 					"caption" : "Sivun nimi navigaatiossa",
-					"type" : "text"
+					"type" : "text",
+					"class" : "lomake"
 				},
 				{
 					"name" : "cms_page[description]",
@@ -385,7 +422,7 @@ function addNewTeema(toimiala_id) {
 				},
 				{
 					"type" : "button",
-					"html" : "Peruuta",
+					"html" : "Sulje",
 					"class": "cancel-btn",
 					"id" : "cancel-btn"
 				}	
@@ -419,7 +456,9 @@ function addNewTeema(toimiala_id) {
 					$("#response_msg").empty();
 				},
 				"Jatka muokkausta": function() {
-				$( this ).dialog( "close" );
+					$( this ).dialog( "close" );
+					$("#response_msg").empty();
+					editTeema(responseText.page_id);
 				}			
 			}
 		});
@@ -428,12 +467,18 @@ function addNewTeema(toimiala_id) {
 		console.log(statusText);
 	}
 	
+	//dialog width and height according to window size
+	var wWidth = $(window).width();
+    var dWidth = wWidth * 0.8;
+    var wHeight = $(window).height();
+    var dHeight = wHeight * 0.8;
 	
 	//Tab dialogin luonti
 	
 	$("#addTeema").tabs().dialog({
 		autoOpen: true,
-		width: 600,
+		width: dWidth,
+		height: dHeight,
 		draggable: false,
 		modal: true,
 		open: function() {

@@ -27,7 +27,7 @@ jQuery(function() {
 * 
 * FUNKTIO: Lis‰‰ uusi alasivu ennakointiin
 *
-*/
+*//*
 function openAddPageDialog(parent_id) {
 	//Add new sub page
 	jQuery('#addPageFormDialog').dialog({
@@ -39,7 +39,7 @@ function openAddPageDialog(parent_id) {
 	newPage(parent_id);
 	jQuery('#addContentDialog').dialog('close');
 	return false;
-}
+}*/
 
 /*
 * 
@@ -462,174 +462,6 @@ function editPageContentDialog(pageId, contentData) {
 
 /**********************************************************************************************/
 
-function newPage(parent_id) {
-	//clear div first
-	jQuery('#cmsForm').empty();
-	//dform
-	jQuery('#cmsForm').dform({
-		"action" : "testiNotRela.php",//"/run/lougis/cms/createNewPage/",
-		"method" : "get",
-		"html" :
-			[
-				//Hidden fields
-				{
-					"name" : "cms_page[page_type]",
-					"id" : "page_type",
-					"type" : "hidden",
-					"value" : "teema_aineisto"
-				},
-				{
-					"name" : "cms_page[parent_id]",
-					"id" : "parent_id",
-					"type" : "hidden",
-					"value" : parent_id
-				},
-				/*{ //t‰m‰ pit‰‰ pist‰‰ automaattisesti sivun page_id:ksi (php-funktio hoitaa sen)
-					"name" : "cms_page[url_name]",
-					"id" : "url_name",
-					"caption" : "url-nimi",
-					"type" : "text",
-					"validate" : {
-						"required": true,
-						"minlength": 2,
-						"messages": {
-							"required": "Pakollinen tieto",
-						}
-					}
-				},*/
-				//Input fields
-				{
-					"name" : "cms_page[title]",
-					"caption" : "Otsikko",
-					"type" : "text",
-					"validate" : {
-						"required": true,
-						"minlength": 2,
-						"messages": {
-							"required": "Pakollinen tieto",
-						}
-					}
-				},
-				{
-					"name" : "cms_page[nav_name]",
-					"caption" : "Sivun nimi navigaatiossa",
-					"type" : "text",
-					"validate" : {
-						"required": true,
-						"minlength": 2,
-						"messages": {
-							"required": "Pakollinen tieto",
-						}
-					}
-				},
-				{
-					"name" : "cms_page[description]",
-					//"caption" : "Lyhyt kuvaus",
-					"type" : "hidden",
-					"value" : null
-					/*"type" : "textarea",
-					"validate" : {
-						"required": true,
-						"minlength": 2,
-						"messages": {
-							"required": "Pakollinen tieto",
-						}
-					}
-					*/
-				},
-				/*{
-					"name" : "cms_page[visible]",
-					"caption" : "Navigaatiossa",
-					"addcheck" : "addCheck",
-					"type" : "checkbox"
-				},
-				{
-					"name" : "cms_page[published]",
-					"caption" : "Julkaistu",
-					"addcheck" : "addCheck",
-					"type" : "checkbox"
-				},*/
-				{
-					"name" : "cms_page[visible]",
-					"value": "t",
-					"type" : "hidden"
-				},
-				{
-					"name" : "cms_page[published]",
-					"value": "t",
-					"type" : "hidden"
-				},
-				{
-					"type" : "submit",
-					"value" : "Tallenna",
-					"class": "next-btn"
-				},
-				{
-					"type" : "button",
-					"html" : "Peruuta",
-					"class": "cancel-btn"
-				}
-				
-			]
-		
-	});
-	//Buttons behaviour
-	//Seuraava ja peruuta
-	
-	jQuery(".cancel-btn").click(function() {
-		jQuery('#editPageFormDialog').dialog('close');
-		return false;
-	});
-	//form submit
-    var options = { 
-        target:        '#formResponse',   // target element(s) to be updated with server response 
-        beforeSubmit:  showRequest,  // pre-submit callback 
-        success:       showResponse, // post-submit callback 
- 
-        // other available options: 
-        url:       "/run/lougis/cms/createNewPage/" ,       // override for form's 'action' attribute 
-        //type:      type        // 'get' or 'post', override for form's 'method' attribute 
-        dataType:  "json"        // 'xml', 'script', or 'json' (expected server response type) 
-        //clearForm: true        // clear all form fields after successful submit 
-        //resetForm: true        // reset the form after successful submit 
- 
-        // $.ajax options can be used here too, for example: 
-        //timeout:   3000 
-    }; 
-	// bind form using 'ajaxForm' 
-    $('#cmsForm').ajaxForm(options); 
-	
-		
-	// pre-submit callback 
-	function showRequest(formData, jqForm) { 
-		// formData is an array; here we use $.param to convert it to a string to display it 
-		// but the form plugin does this for you automatically when it submits the data 
-		var queryString = $.param(formData); 
-	 
-		// jqForm is a jQuery object encapsulating the form element.  To access the 
-		// DOM element for the form do this: 
-		// var formElement = jqForm[0]; 
-	 
-		//alert('About to submit: \n\n' + queryString); 
-	 
-		// here we could return false to prevent the form from being submitted; 
-		// returning anything other than false will allow the form submit to continue 
-		return true; 
-	} 
-	 
-	// post-submit callback 
-	function showResponse(responseText, statusText)  { 
-		jQuery("#formResponse").fadeOut( 100 , function() {
-			jQuery("#formResponse p").html(responseText.msg);
-		}).fadeIn( 1000 ).delay(1300).fadeOut(1000);	
-		jQuery('#addPageFormDialog').dialog('close');
-		//quick fix sivun lataus, t‰m‰n voisi muuttaa ajax lataukseksi
-		setTimeout(function(){
-                         window.location.reload();
-             }, 3300); 
-	} 
-}
-/***************************************************************************************************/
 
 //Uutinen
 
@@ -953,9 +785,9 @@ function newLink(parent_id) {
 		}).fadeIn( 1000 ).delay(1300).fadeOut(1000);	
 		jQuery('#addPageFormDialog').dialog('close');
 		//quick fix sivun lataus, t‰m‰n voisi muuttaa ajax lataukseksi
-		setTimeout(function(){
+		/*setTimeout(function(){
             window.location.reload();
-        }, 3300); 
+        }, 3300); */
 	} 
 	
 }
