@@ -687,7 +687,6 @@ class CMS extends \Lougis\abstracts\Frontend {
 		
 		} catch(\Exception $e) {
 		
-			devlog($Pg, 'pyry');
 			
 			$res = array(
 				"success" => false,
@@ -698,6 +697,23 @@ class CMS extends \Lougis\abstracts\Frontend {
 		
 		$this->jsonOut($res);
 		
+	}
+	
+	public function getTeemat() {
+		
+		$page_id = $_REQUEST['page_id'];
+		$teema = new \Lougis_cms_page();
+		$teema->parent_id = $page_id;
+		$teema->page_type = "teema";
+		$teema->find();
+
+		
+		$teemat = array();
+		
+		while ( $teema->fetch() ) {
+			$teemat[] = clone($teema);
+		}
+		return $this->jsonOut($teemat);
 	}
 	
 	private function _navTreeData( $Type = null ) {
