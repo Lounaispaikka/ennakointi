@@ -5,11 +5,32 @@
 */
 function openAddFileDialog(parent_id) {
 	
+	//dialog width and height according to window size
+	var wWidth = $(window).width();
+    var dWidth = wWidth * 0.8;
+    var wHeight = $(window).height();
+    var dHeight = wHeight * 0.8;
+	
 	$('#addFileDialog').dialog({
 		autoOpen: false,
 		modal: true,
-		width: 600,
-		title: "Tiedoston lataus"
+		width: dWidth,
+		height: dHeight,
+		title: "Tiedoston lataus",
+		buttons: [
+			{
+				text: "Sulje",
+				click: function() {
+					$(this).dialog("close");
+				}	
+			},
+			{
+				text: "Tallenna",
+				click: function() {
+					$('#upfile').submit();
+				}
+			}
+        ]
 	});
 	$('#addFileDialog').dialog('open');
 	uploadFile(parent_id);
@@ -27,7 +48,9 @@ function uploadFile(parent_id) {
 				{
 					"name" : "description",
 					"caption" : "Kuvaus",
-					"type" : "textarea"/*,
+					"type" : "textarea",
+					"class" : "lomake"/*,
+					
 					"validate" : {
 						"required": true,
 						"minlength": 2,
@@ -44,7 +67,7 @@ function uploadFile(parent_id) {
 					"name" : "parent_id",
 					"value" : parent_id,
 					"type" : "hidden"
-				},
+				}/* ,
 				{
 					"type" : "submit",
 					"value" : "Tallenna",
@@ -54,7 +77,7 @@ function uploadFile(parent_id) {
 					"type" : "button",
 					"html" : "Peruuta",
 					"class": "cancel-btn"
-				}
+				} */
 			]
 	});	
 	
@@ -102,25 +125,17 @@ function uploadFile(parent_id) {
 			});
 	}*/
 	function showResponse(responseText)  { 
-		$( "#response_msg" ).empty();
-		if(responseText.success == false) {
-			console.log("false tuli");
-		}
-		else {
-			console.log(responseText.msg);
-			$("#response_msg").empty();
-			$( "#response_msg" ).append(responseText.msg);
-			$("#addFileDialog").dialog("close");
-			$( "#dialog-message" ).dialog({
-				modal: true,
-				buttons: {
-					"Sulje": function() {
-						$(".ui-dialog-content").dialog("close");
-					}			
-				}
-			});
-		}
-		
-	
+		console.log(responseText.msg);
+		$("#response_msg").empty();
+		$("#response_msg").append(responseText.msg);
+		$("#addFileDialog").dialog("close");
+		$( "#dialog-message" ).dialog({
+			modal: true,
+			buttons: {
+				"Sulje": function() {
+					$(".ui-dialog-content").dialog("close");
+				}			
+			}
+		});
 	}
 }

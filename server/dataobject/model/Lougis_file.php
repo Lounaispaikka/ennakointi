@@ -18,9 +18,8 @@ class Lougis_file extends \Lougis\DB_DataObject_Wrapper
     public $file_size;                       // int4(4)  not_null
     public $created_by;                      // int4(4)  not_null
     public $description;                     // varchar(-1)  
-    public $created_date;                    // timestamptz(8)  not_null
-    public $page_id;                         // int4(4)  not_null
-    public $comments_id;                     // int4(4)  
+    public $created_date;                    // timestamptz(8)  not_null default_now%28%29
+    public $page_id;                         // int4(4)  
 
     /* Static get */
     function staticGet($k,$v=NULL) { return DB_DataObject::staticGet('Lougis_file',$k,$v); }
