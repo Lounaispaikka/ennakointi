@@ -113,13 +113,13 @@ class CMS extends \Lougis\abstracts\Frontend {
 		try {
 		
 			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
-			if ( $_POST['cms_page']['title'] == '' ) throw new \Exception('Anna jotain.'); 
+			if ( $_POST['cms_page']['title'] == '' ) throw new \Exception('Otsikko puuttuu.'); 
 			$Pg = new \Lougis_cms_page($_POST['cms_page']['page_id']);
 			if ( empty($Pg->created_date) ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: Sivua ei voitu ladata!');
 			if ( $Pg->site_id != $_SESSION['site_id'] ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: Virheellinen sivusto!');
 			
 			$Pg->setFrom($_POST['cms_page']);
-			devlog($_POST['cms_page']);
+	
 			//$Pg->url_name = $_POST['cms_page']['parent_id'].'_'.$_POST['cms_page']['page_id']);
 			if ( !isset($_POST['cms_page']['parent_id']) || empty($_POST['cms_page']['parent_id']) ) $Pg->parent_id = "NULL";
 			if ( !isset($_POST['cms_page']['published']) ) $Pg->published = false;
@@ -130,7 +130,7 @@ class CMS extends \Lougis\abstracts\Frontend {
 			//$Pg->created_by = $_SESSION['user_id'];
 			//$Pg->site_id = $_SESSION['site_id'];
 			//$Pg->lang_id = 'fi';
-			devlog($Pg);
+	
 			if ( !$Pg->save() ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: '.$Pg->_lastError);
 
 			$res = array(
@@ -634,6 +634,9 @@ class CMS extends \Lougis\abstracts\Frontend {
 		try {
 			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
 			$Pg = new \Lougis_cms_page($_POST['page_id']);
+			
+			//only creator and admin can delete
+			if ( $_SESSION['user_id'] != $Pg->created_by ) throw new \Exception('Sivun poistaminen epäonnistui: Ei oikeuksia poistaa!');
 			if ( empty($Pg->created_date) ) throw new \Exception('Sivun poistaminen epäonnistui: Sivua ei voitu ladata!');
 			if ( $Pg->site_id != $_SESSION['site_id'] ) throw new \Exception('Sivun poistaminen epäonnistui: Virheellinen sivusto!');
 			
