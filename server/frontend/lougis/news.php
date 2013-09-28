@@ -238,14 +238,13 @@ class News extends \Lougis\abstracts\Frontend {
 			$News->page_id = $PgArray['id'];
 			if ( !isset($_REQUEST['news']['published']) && $News->N == 1 ) $News->published = false;
 			
-			if ( strlen($News->title) < 5 || strlen($News->title) > 250 ) throw new \Exception("Tiedotteen otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
+			//if ( strlen($News->title) < 5 || strlen($News->title) > 250 ) throw new \Exception("Tiedotteen otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
 			if ( !$News->save() ) throw new \Exception('Tiedotteen tallentaminen epäonnistui: '.$News->_lastError->userinfo);
 			//if ( !$News->setPages( json_decode($_REQUEST['news_pages']) ) ) throw new \Exception('Tiedotteen linkkien tallennus epäonnistui: '.$Pg->_lastError);
 			
 			$res = array(
 				"success" => true,
-				"msg" => "msg",//$msg,
-				"news_id" => "0"//$News->id
+				"msg" => "Uutinen on luotu!"
 			);
 		
 		} catch(\Exception $e) {
@@ -359,8 +358,8 @@ class News extends \Lougis\abstracts\Frontend {
 		global $Site;
 		devlog($_REQUEST);
 		try {
-			$page_id = $_REQUEST['page_id'];
-			if ( $page_id != null/* && is_int($page_id)*/ ) {
+			$page_id = (int)$_POST['page_id'];
+			if ( $page_id != null) {
 				$page = new \Lougis_cms_page($page_id);
 				if ( !$page->delete() ) throw new \Exception('Tiedotesivun poistaminen epäonnistui: '.$page->_lastError);
 			}

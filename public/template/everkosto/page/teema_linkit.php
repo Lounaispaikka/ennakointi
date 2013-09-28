@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 global $Site, $Page ,$Cms;
 
@@ -17,7 +17,7 @@ while ($uutinen_sivu->fetch()) {
 	$uutiset[] = clone($uutinen_sivu);
 }
 
-//yksitt�isen uutisen sivu
+//yksittäisen uutisen sivu
 $tama_uutinen = new \Lougis_news();
 $tama_uutinen->page_id = $Pg->id;
 $tama_uutinen->find();
@@ -44,7 +44,14 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 	</ul>
 	<? //uutissivu ?>
 	<?if ( $tama_uutinen->id != null) { ?>
-	<div id="delNewsDiv" style="float:right"><button id="delNews" style="float:right;">Poista</button></div>
+		<?  //if user is creator of page or admin
+		if ( $_SESSION['user_id'] === $Pg->created_by && $Pg->page_type === "news" ) { ?>
+		<div id="editTools" style="float:right;">
+			<a href="javascript:void(0)" id="editLink" class="linkJs"><img src="/img/icons/16x16/document_prepare.png" >Muokkaa tietoja</a>
+			<a href="javascript:void(0)" id="delLink" class="linkJs"><img src="/img/icons/16x16/delete.png" >Poista</a>
+
+		</div>
+		<? } ?>
 	<div id="News" style="clear:both">
 		<a href="<?=$tama_uutinen->source_url?>" class="linkJs" ><?=$tama_uutinen->source_url?></a>
 		<p>L&auml;hde: <?=$tama_uutinen->source?></p>
@@ -54,16 +61,22 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 		
 <? if ($tama_uutinen->id !=null ) require_once(PATH_PUBLIC.'comments_frontend/kommentointi.php'); ?>	
 </div>
-<script type="text/javascript" src="/js/lougis/lib/ennakointi.ui.jquery.js"></script>
+<script type="text/javascript" src="/js/lougis/lib/link.ui.jquery.js"></script>
 <script type="text/javascript">
 	$(function() {
 
-		jQuery('#delNews').click(function(){
-			//var newsPageId = $("#delNews").closest("li").attr("id");
-			//var newsId = $("#delNews").closest("div").attr("id");
-			//delNews(newsPageId, newsId); //ennakointi.ui.jquery.js
-			delNews(<?=$Pg->id?>, <?=$Pg->parent_id?>); //page_id, parent_id
-			return false;
+		$('#delLink').click(function(){
+			var del = window.confirm("Oletko varma, että haluat poistaa linkin?");
+			if(del == true) {
+				delLink(<?=$Pg->id?>, <?=$Pg->parent_id?>);
+				return false;
+			} else {
+				return false;
+			}	
+		});
+		$('#editLink').click(function(){
+			window.alert("Linkin muokkaaminen valmistuu pian. Tässä demoversiossa sitä ei vielä valitettavasti ole.");
+			
 		});
 				
 	});

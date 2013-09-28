@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 global $Site, $Page ,$Cms;
 
@@ -17,7 +17,7 @@ while ($uutinen_sivu->fetch()) {
 	$uutiset[] = clone($uutinen_sivu);
 }
 
-//yksitt�isen uutisen sivu
+//yksittäisen uutisen sivu
 $tama_uutinen = new \Lougis_news();
 $tama_uutinen->page_id = $Pg->id;
 $tama_uutinen->find();
@@ -35,13 +35,25 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 
 <div id="content" class="<?=$Class?>">
 	<h1><?=$Pg->title?></h1>
-	<? //uutisetusivu ?>
+	
+	
+<? //uutisetusivu ?>
 	<ul>
 	<? foreach($uutiset as $uutinen) { ?>
-		<li id="<?=$uutinen->id?>"><div id="<?=$uutinen->news_id?>"><a href="../<?=$uutinen->id?>/" ><?=$uutinen->title?></a> <button id="delNews">Poista</button></div></li> 
+		<li id="<?=$uutinen->id?>"><div id="<?=$uutinen->news_id?>"><a href="../<?=$uutinen->id?>/" ><?=$uutinen->title?></a> </li> 
 	<? } ?>
 	</ul>
-	<? //uutissivu ?>
+	
+	
+<? //uutissivu ?>
+	<?  //if user is creator of page or admin
+		if ( $_SESSION['user_id'] === $Pg->created_by && $Pg->page_type === "news" ) { ?>
+		<div id="editTools" style="float:right;">
+			<a href="javascript:void(0)" id="editNews" class="linkJs"><img src="/img/icons/16x16/document_prepare.png" >Muokkaa tietoja</a>
+			<a href="javascript:void(0)" id="delNews" class="linkJs"><img src="/img/icons/16x16/delete.png" >Poista</a>
+
+		</div>
+	<? } ?>
 	<p><b><?=$tama_uutinen->description?></b></p>
 	
 	<p><?=$tama_uutinen->content?></p>
@@ -51,15 +63,22 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 		
 <? if ($tama_uutinen->id !=null ) require_once(PATH_PUBLIC.'comments_frontend/kommentointi.php'); ?>	
 </div>
-<script type="text/javascript" src="/js/lougis/lib/ennakointi.ui.jquery.js"></script>
+<script type="text/javascript" src="/js/lougis/lib/news.ui.jquery.js"></script>
 <script type="text/javascript">
 	$(function() {
 
-		jQuery('#delNews').click(function(){
-			var newsPageId = $("#delNews").closest("li").attr("id");
-			var newsId = $("#delNews").closest("div").attr("id");
-			delNews(newsPageId, newsId); //ennakointi.ui.jquery.js
-			return false;
+		$('#delNews').click(function(){
+			var del = window.confirm("Oletko varma, että haluat poistaa linkin?");
+			if(del == true) {
+				delNews(<?=$Pg->id?>, <?=$Pg->parent_id?>);
+				return false;
+			} else {
+				return false;
+			}	
+		});
+		$('#editNews').click(function(){
+			window.alert("Uutisen muokkaaminen valmistuu pian. Tässä demoversiossa sitä ei vielä valitettavasti ole.");
+			
 		});
 				
 	});
