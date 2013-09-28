@@ -501,7 +501,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 		
 		
 		try {
-			$chart_id = (int)$_REQUEST['chart_id'];
+			$chart_id = (int)$_POST['chart_id'];
 			$Chart = new \Lougis_chart($chart_id);
 			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Tilastoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
 			

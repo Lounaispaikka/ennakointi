@@ -491,9 +491,11 @@ function delChart(chart_id) {
 	})
 	.done(function (res) {
 		console.log(res.msg);
+		window.alert(res.msg);
 	})
 	.fail(function (res) {
 		console.log(res.msg);
+		window.alert(res.msg);
 	});
 	
 }
