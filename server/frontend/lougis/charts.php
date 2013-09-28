@@ -149,7 +149,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 		
 	}
 	
-	//highchart configs
+	//Save configs and create cms_page
 	public function saveHighchartConfig() {
 		
 		try {
@@ -175,7 +175,10 @@ class Charts extends \Lougis\abstracts\Frontend {
 			
 			$Chart->config_json = json_encode($config);
 			if ( !$Chart->save() ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttä ylläpitoon.");
-		
+			$ChartData['page_id'] = $Chart->page_id;
+			//create cms_page
+			if(!$this->saveCmsPageForChart($ChartData)) throw new \Exception("Tekninen virhe! Tilastosivua ei voida tallentaa.");
+			
 			//$Chart->buildHighchart();
 			
 			/* $res = array(
@@ -257,12 +260,83 @@ class Charts extends \Lougis\abstracts\Frontend {
 		
 	}
 	
-	//update data to database from jquery chart editor
+	//Create cms page for chart
+	public function saveCmsPageForChart($chartData) {
+		
+		try {
+		devlog($chartData, "e_cha");
+			//get parent page
+			$parent = new \Lougis_cms_page();
+			$parent->parent_id = $chartData['parent_id'];
+			$parent->page_type = "teema_tilastot";
+			$parent->find();
+			$parent->fetch();
+			
+			//update cms_page
+			if(isset($chartData['page_id'])) {
+				$page = new \Lougis_cms_page($chartData['page_id']);
+				$page->title = $chartData['title'];
+				$page->nav_name = $chartData['title'];
+				if ( !$page->save() ) throw new \Exception("Sivun tallennus epäonnistui.");
+			}
+			else {
+				//create cms_page
+				$page = new \Lougis_cms_page();
+				$page->site_id = 'everkosto';
+				$page->lang_id = 'fi';
+				$page->title = $chartData['title'];
+				$page->nav_name = $chartData['title'];
+				$page->created_by = $_SESSION['user_id'];
+				$page->created_date = date(DATE_W3C);
+				$page->published = true;
+				$page->template = 'teema_tilastot.php';
+				$page->visible = true;
+				$page->restricted_access = true;
+				$page->page_type = 'chart';
+				if($parent->id != null) $page->parent_id = $parent->id;
+				$page->setNextSeqNum(); //jos uusi niin annettaan seqnum
+				if ( !$page->save() ) throw new \Exception("Sivun tallennus epäonnistui.");
+			}
+			
+			$PgArray = $page->toArray();
+			
+			//create permissions
+			if($page->page_type == "chart") {
+				$pa = $page->getParentIdArray(); //sivun sukupolvet id arrayna
+				
+				$group = new \Lougis_group();
+				$group->page_id = $pa[2]; //arrayn indeksissä 2 on oikea parent, eli tämän toimialan id.
+				$group->find();
+				$group->fetch();
+				$permission = new \Lougis_group_permission();
+				$permission->page_id = $page->id;
+				$permission->group_id = $group->id;
+				$permission->find();
+				if(!$permission->fetch()) { $permission->insert(); }
+			}
+			
+			//update chart page_id
+			$Chart = new \Lougis_chart($chartData['id']);
+			$Chart->page_id = $page->id;
+			if ( !$Chart->save() ) throw new \Exception("Tilaston tallennus epäonnistui.");
+			
+			
+		} catch(\Exception $e) {
+			
+			return false;
+			
+		}
+		return true;
+		
+	}
+	
+	
+	//update data to database from jquery chart editor. 
 	public function updateDbData() {
 		
-			devlog($_REQUEST['chart_data'], "e_chart_data");
 			
 		try {
+			
 			$data = json_encode($_REQUEST['chart_data']);
 			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
 			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
@@ -305,7 +379,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 				$Chart = new \Lougis_chart();
 				$Chart->setNextKey();
 			}
-			$fila = implode("|", $_FILES['datafile']);
+			//$fila = implode("|", $_FILES['datafile']);
 		
 			//if ( !$Chart->addUploadedDatafile($_FILES['datafile']) ) throw new \Exception("Datatiedostoa ei voitu tallentaa palvelimelle.". $fila );
 			//if ( !$Chart->buildJsonFileFromCsv() ) throw new \Exception("Dataa ei voitu lukea");
@@ -422,16 +496,25 @@ class Charts extends \Lougis\abstracts\Frontend {
 		
 	}
 	
+	//Delete chart (and cms_page)
 	public function deleteChart() {
 		
 		
 		try {
+			$chart_id = (int)$_REQUEST['chart_id'];
+			$Chart = new \Lougis_chart($chart_id);
+			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Tilastoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
 			
-			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
-			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
-			
-			if ( !$Chart->delete() ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu poistaa. Ota yhteyttä ylläpitoon.");
-			$ChAr = array();
+			//if page_id already set. Deleting page will delete chart also (foreign key).
+			if($Chart->page_id > 0) {
+				$Pg = new \Lougis_cms_page($Chart->page_id); //get csm_page
+				if ( empty($Pg->created_date) ) throw new \Exception('Sivun poistaminen epäonnistui: Sivua ei voitu ladata!');
+				if ( $Pg->site_id != $_SESSION['site_id'] ) throw new \Exception('Sivun poistaminen epäonnistui: Virheellinen sivusto!');
+				if ( !$Pg->delete() ) throw new \Exception('Sivun poistaminen epäonnistui: '.$Pg->_lastError);
+			}
+			else {
+				if ( !$Chart->delete() ) throw new \Exception("Tekninen virhe! Tilastoa ei voitu poistaa. Ota yhteyttä ylläpitoon.");
+			/*$ChAr = array();
 			$ChAr = $Chart->toArray();
 			if( $ChAr['page_id'] > 0) {
 				//delete page also
@@ -439,6 +522,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 				if ( empty($Pg->created_date) ) throw new \Exception('Sivun poistaminen epäonnistui: Sivua ei voitu ladata!');
 				if ( $Pg->site_id != $_SESSION['site_id'] ) throw new \Exception('Sivun poistaminen epäonnistui: Virheellinen sivusto!');
 				if ( !$Pg->delete() ) throw new \Exception('Sivun poistaminen epäonnistui: '.$Pg->_lastError);
+			}*/
 			}
 			$res = array(
 				"success" => true,
