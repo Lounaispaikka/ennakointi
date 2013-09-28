@@ -139,3 +139,23 @@ function uploadFile(parent_id) {
 		});
 	}
 }
+
+//delete chart
+function delFile(page_id, file_id) {
+	$.ajax({
+		url: "/run/lougis/file_upload/deleteFile/",
+		data: {
+			"page_id": page_id,
+			"file_id": file_id
+			},
+		dataType: 'json',
+		type: 'POST'
+	}).done(function (res) {
+		console.log(res.msg);
+		window.alert(res.msg);
+	})
+	.fail(function (res) {
+		console.log(res.msg);
+		window.alert(res.msg);
+	});
+}

@@ -356,8 +356,8 @@ class News extends \Lougis\abstracts\Frontend {
 	public function deleteNews() {
 		
 		global $Site;
-		devlog($_REQUEST);
 		try {
+			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.');
 			$page_id = (int)$_POST['page_id'];
 			if ( $page_id != null) {
 				$page = new \Lougis_cms_page($page_id);

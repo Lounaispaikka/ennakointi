@@ -19,7 +19,7 @@ function openAddNewsDialog(parent_id) {
 		height: dHeight,
 		buttons: [
 			{
-				text: "Sulje",
+				text: "Peruuta",
 				click: function() {
 					$(this).dialog("close");
 				}

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 global $Site, $Page ,$Cms;
 
@@ -8,7 +8,7 @@ $Class = "col2"; //class ulkoasulle eli col2 = kaksi palstaa
 $Parent = $Cms->findCurrentPageTopParent( );
 
 $pages = $Pg->getParentPages();
-//v�liaikainen
+//väliaikainen
 if($Pg->page_type == "teema_tiedostot") {
 	$FilePages = array();
 	$FilePage = new \Lougis_cms_page();
@@ -62,7 +62,15 @@ if ($Pg->page_type == "teema_tiedostot") { ?>
 	</table>
 <? } else {?>
 
-<? //yksitt�isen tiedoston sivu ?>
+<? //yksittäisen tiedoston sivu ?>
+	<?  //if user is creator of page or admin
+		if ( $_SESSION['user_id'] === $Pg->created_by && $Pg->page_type === "file" ) { ?>
+		<div id="editTools" style="float:right;">
+			<!--<a href="javascript:void(0)" id="editPageInfo" class="linkJs"><img src="/img/icons/16x16/document_prepare.png" >Muokkaa tietoja</a>-->
+			<a href="javascript:void(0)" id="delFile" class="linkJs"><img src="/img/icons/16x16/delete.png" >Poista</a>
+
+		</div>
+	<? } ?>
 	 <p><?=$file->description?></p>
 	 <p>Lataa tiedosto: <a href="../../ymparisto/download.php?id=<?=$file->id?>">Lataa</a></p>
 	 
@@ -73,8 +81,27 @@ require_once(PATH_PUBLIC.'comments_frontend/kommentointi.php');
 } ?>
 </div>
 <script type="text/javascript" src="/js/lougis/lib/ennakointi.ui.jquery.js"></script>
+<script type="text/javascript" src="/js/lougis/lib/file.ui.jquery.js"></script>
+<? if($file->id != null) { ?>
+<script type="text/javascript" charset="utf8">
+	$(function() {
 
+		$('#delFile').click(function(){
+			var del = window.confirm("Oletko varma, että haluat poistaa tiedoston?");
+			if(del == true) {
+				delFile(<?=$Pg->id?>, <?=$file->id?>);
+				return false;
+			} else {
+				return false;
+			}	
+		});
+				
+	});
+	
+	
+</script>
 
+<? } ?>
 
 
 <? require_once(PATH_TEMPLATE.'everkosto/include_footer.php'); ?>

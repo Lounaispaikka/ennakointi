@@ -19,6 +19,7 @@ class File_upload extends \HTTP_Upload {
 		$file = $upload->getFiles("f");
 		devlog($file, "e_fileupload");
 		try {
+			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.');
 			//Sallitut tiedostotyypit
 			$exts = array("pdf","doc","docx","csv","xls","xlsx","txt","ppt","pptx","odt","ods","odp","gif","jpg","png");
 			//Tiedosto
@@ -117,8 +118,36 @@ class File_upload extends \HTTP_Upload {
 	}
 	
 	public function deleteFile() {
-		//poista tiedosto
-		
+		global $Site;
+		try {
+			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.');
+			$file_id = (int)$_POST['file_id'];
+			$page_id = (int)$_POST['page_id'];
+			
+			if ($file_id == null && $page_id == null) throw new \Exception('Tiedoston poistaminen ep&auml;onnistui.');
+			
+			if ( $page_id != null) {
+				$page = new \Lougis_cms_page($page_id);
+				if ( !$page->delete() ) throw new \Exception('Tiedostosivun poistaminen epäonnistui: '.$page->_lastError);
+			}
+			else {
+				$file = new \Lougis_file($file_id);
+				if ( !$file->delete() ) throw new \Exception('Tiedoston poistaminen epäonnistui: '.$file->_lastError);
+			}
+			//poista tiedosto
+			
+			$res = array(
+					"success" => true,
+					"msg" => "Tiedosto poistettu onnistuneesti"
+				);
+		}
+		catch(\Exception $e) {
+			$res = array(
+				"success" => false,
+				"msg" => $e->getMessage()
+			);
+		}
+		echo json_encode($res);
 		//poista cms_page (samalla poistuu file tietokannasta)
 	}
 }
