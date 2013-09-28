@@ -44,9 +44,12 @@ $TavoitteetPrinted = false;
 <? if ( $RightCol ) { ?>
 <div id="rightCol" class="<?=$Class?>">
 	<? if ( $Pg->page_type == "toimiala" ) {
-		?><h2>Hallintaty&ouml;kalut</h2>
-		<button id="hallinta_toimiala_btn" class="ui-button teema_btn"><img src="/img/icons/16x16/pencil.png" > Toimialan asetukset</button>
-		<button id="hallinta_teema_btn" class="ui-button teema_btn"><img src="/img/icons/16x16/pencil.png" > Ennakointiteemat</button>
+		?>
+		<div id="rightColGrey">
+			<h2>Hallintaty&ouml;kalut</h2>
+			<button id="hallinta_toimiala_btn" class="ui-button teema_btn"><img src="/img/icons/16x16/pencil.png" > Toimialan asetukset</button>
+			<button id="hallinta_teema_btn" class="ui-button teema_btn"><img src="/img/icons/16x16/pencil.png" > Ennakointiteemat</button>
+		</div>
 		<? } else {
 	
                 
@@ -94,44 +97,57 @@ $TavoitteetPrinted = false;
 ?>
 
 
-<?if ( $Pg->page_type == "toimiala") {
-	
-	$teema = new \Lougis_cms_page();
-	$teema->parent_id = $Pg->id;
-	$teema->page_type = "teema";
-	$teema->find();
-
-	
-	$teemat = array();
-	
-	while ( $teema->fetch() ) {
-		$teemat[] = clone($teema);
-	}
-
-	?>
+<? if ( $Pg->page_type == "toimiala") {
+?>
+	<script type="text/javascript">
+		
+		//lataa teemat, funktio ajetaan myös teema-js-filessä
+		function loadTeemat() {
+			//load teemat
+			$.ajax({
+				url: '/run/lougis/cms/getTeemat/',
+				data: {
+					page_id: <?=$Pg->id?>
+				},
+				type: "POST"
+			}).done(function(response) {
+				$("#teema_list").empty();
+				//$("#teema_list").append("<li><a href=/fi/<?=$teema_li->id?>/><?=$teema_li->title?></a></li>"
+				$.each( response, function( ) {
+					$("#teema_list").append("<li><a href=/fi/" + this.id + ">" + this.title + "</a></li>");
+				});
+			});
+			return false;
+		}
+		$(function() {
+			
+			loadTeemat();
+		});
+	</script>
 	<h2>Ennakointiteemat</<h2>
-	<ul>
-		<? foreach($teemat as $teema_li) { 
-			//ohjaa suoraan teemasivulle jos vain yksi teema
-			/*if ( count($teemat) == 1 ) {
-				header("Location: /fi/".$teema_li->id."/");
-			}*/
-			?>
-			<li><a href="/fi/<?=$teema_li->id?>/"><?=$teema_li->title?></a></li>
-		<? } ?>
-	</ul>
+	<ul id="teema_list"></ul>
+<? }	
+?>
+	
 
-<? }
+<? 
 //Ennakointisivu
 if ( $Pg->page_type == 'teema' ) {
 	require_once(PATH_TEMPLATE.'everkosto/page/teema_aineisto.php');
 }
 if ( $Pg->page_type == 'teema_aineisto' && $_SESSION['user_id']) {
 ?>
-	<div id="editTools" style="clear:both; margin-top:10px;">
-		<a href="javascript:void(0)" id="editPageInfo" class="linkJs">Muokkaa sivun perustietoja</a>
-		<a href="javascript:void(0)" id="editPageContent" class="linkJs">Muokkaa sivun sis&auml;lt&ouml;&auml;</a>
+<script type="text/javascript" src="/js/lougis/lib/page.ui.jquery.js"></script>
+
+<?  //if user is creator of page or admin
+	if ( $_SESSION['user_id'] === $Pg->created_by) { ?>
+	<div id="editTools" style="float:right;">
+		<a href="javascript:void(0)" id="editPageInfo" class="linkJs"><img src="/img/icons/16x16/document_prepare.png" >Muokkaa tietoja</a>
+		<a href="javascript:void(0)" id="editPageContent" class="linkJs"><img src="/img/icons/16x16/page_white_edit.png" >Muokkaa sis&auml;lt&ouml;&auml;</a>
+		<a href="javascript:void(0)" id="delPage" class="linkJs"><img src="/img/icons/16x16/delete.png" >Poista</a>
+
 	</div>
+<? } ?>
 	<div id="pageContent" style="margin-left:15px;margin-top:20px;">{PAGE_CONTENT}</div>
 	<div id="formResponse">
 		<p></p>
@@ -165,6 +181,12 @@ if ( $Pg->page_type == 'teema_aineisto' && $_SESSION['user_id']) {
 				jQuery('#editPageContentDialog').css("padding-bottom", "40px;");
 				return false;
 			});
+			
+			$('#delPage').click(function(){
+				delPage(<?=$Pg->id?>, <?=$Pg->parent_id?>); 
+				return false;
+			});
+			
 			
 		});
 	</script>

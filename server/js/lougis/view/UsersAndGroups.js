@@ -34,7 +34,9 @@ Ext.define('Lougis.view.UsersAndGroups', {
                 ,multiSelect: false
                 ,emptyText: "Ei käyttäjiä"
                 ,autoScroll: true
-                ,anchor: '100%'
+				,layout: 'fit'
+				//,height: 500
+                //,anchor: '100%'
                 ,title: "Rekisteröityneet käyttäjät"
                 ,bbar: [
                     Ext.create('Ext.form.Label', {
@@ -66,9 +68,9 @@ Ext.define('Lougis.view.UsersAndGroups', {
                         this.showUserWindow(record);
                     }
                 }
-                ,height: 250
+               // ,height: 400
             });
-            this.add(this.userGrid);
+            //this.add(this.userGrid);
 
             this.groupGrid = Ext.create('Ext.grid.Panel', {
                 columns: [
@@ -85,7 +87,8 @@ Ext.define('Lougis.view.UsersAndGroups', {
                 ,multiSelect: false
                 ,emptyText: "Ei ryhmiä"
                 ,autoScroll: true
-                ,anchor: '100%'
+				,layout: 'fit'
+               // ,anchor: '100%'
                 ,title: "Ryhmät"
                 ,bbar: [
                     Ext.create('Ext.form.Label', {
@@ -111,8 +114,8 @@ Ext.define('Lougis.view.UsersAndGroups', {
                             }
                     })
                 ]
-                ,height: 250,
-                listeners: {
+                //,height: 400
+                ,listeners: {
                     scope: this,
                     itemclick: function(view, record, item, index, event, options) {
 						console.log(view);
@@ -122,8 +125,40 @@ Ext.define('Lougis.view.UsersAndGroups', {
                     }
                 }
             });
-            this.add(this.groupGrid);
-        }
+            //this.add(this.groupGrid);
+        
+			//Accordion layout
+			this.accordionPanel = Ext.create('Ext.panel.Panel', {
+				title: 'Accordion Layout',
+				height: 500,
+				//anchor: '100% 100%',
+					// applied to each contained panel
+				defaults: {
+					layout: 'fit',
+					height: '100%',
+					width: '100%',
+					autoScroll: true
+				},
+				split: true,
+				margin: "5 0 20 0",
+				shrinkToFit: true,
+				layout: {
+					// layout-specific configs go here
+					type: 'accordion',
+					titleCollapse: false,
+					animate: true,
+					activeOnTop: false
+				},
+				items: [ this.userGrid, this.groupGrid ]
+			});
+			this.add(this.accordionPanel);
+		}
+		
+		
+		
+		//toggle group grid
+		
+		//this.groupGrid.hide();
     }
     ,filterUserStore: function(textfield, event) {
         var store = Ext.getStore('userStore');
@@ -226,7 +261,8 @@ Ext.define('Lougis.view.UsersAndGroups', {
         window.show();
     }
     ,showGroupWindow: function(group) {
-        group.beginEdit();
+        console.log("group", group);
+		group.beginEdit();
         var groupForm = group.getForm();
 
         var formPanel = Ext.create('Ext.form.Panel', {
@@ -283,6 +319,8 @@ Ext.define('Lougis.view.UsersAndGroups', {
                                     public_joining: group.get('public_joining'),
                                     description: group.get('description'),
                                     parent_id: group.get('parent_id'),
+									page_id: group.get('page_id'),
+									del_if_no_perm: group.get('del_if_no_perm'),
 									is_admin: group.get('is_admin')
                                 },
                                 success: function(form, msg) {

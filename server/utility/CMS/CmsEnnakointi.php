@@ -10,6 +10,7 @@ class CmsEnnakointi extends \Lougis\abstracts\Utility {
 
 	public function latestNewsEnnakointi($amount = 3) {
 		global $Page;
+		$amount = (int)($amount);
 		if ( empty($Page->id) ) return false;
     	$newsArray = array();
     	$News = new \Lougis_news();
@@ -24,6 +25,26 @@ class CmsEnnakointi extends \Lougis\abstracts\Utility {
     	}
     	return $newsArray;
 		
+	}
+	
+	
+	//tiedosto-listaus
+	public function ennakointiFiles() {
+		global $Page;
+		if ( empty($Page->id) ) return false;
+		
+		$FilePages = array();
+		$FilePage = new \Lougis_cms_page();
+		$sql = "select *
+				from lougis.cms_page, lougis.file
+				where cms_page.parent_id = ".$Page->id."
+				and cms_page.page_type = 'file'
+				and cms_page.id = file.page_id;";
+		$FilePage->query($sql);
+		while($FilePage->fetch() ) {
+			$FilePages[] = clone($FilePage);
+		}
+		return $FilePages;
 	}
 	
 	/*public function latestCommentsEnnakointi($amount = 3) {

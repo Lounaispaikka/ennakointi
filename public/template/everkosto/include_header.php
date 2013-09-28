@@ -27,17 +27,17 @@ require_once(PATH_SERVER.'utility/LouGIS/mLogin.php');
     <![endif]-->
  <!--   <script type="text/javascript" src="/js/ext/ext-all.js"></script>-->
 	<script type="text/javascript">
-		if (!console) console = {log: function() {}};
+		if (!window.console) console = {log: function() {}};
 	</script>
-    <script type="text/javascript" src="/js/ext/ext-all-debug.js"></script>
-	<script type="text/javascript" src="/js/ymparisto/loader.js"></script>
+   <!-- <script type="text/javascript" src="/js/ext/ext-all-debug.js"></script>-->
+	<!-- <script type="text/javascript" src="/js/ymparisto/loader.js"></script> -->
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 	<script type="text/javascript" src="/js/jqueryPlugins/jquery.prettyPhoto.js"></script>
 	<script type="text/javascript" src="/js/jqueryPlugins/jquery.ba-outside-events.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="/js/ext/resources/css/ext-all.css" />
 	
-	<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.10.0/themes/ui-lightness/jquery-ui.css" />
-	<script type="text/javascript" src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+	<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.10.3/themes/flick/jquery-ui.css" />
+	<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 	
 	<!--<script type="text/javascript" src="js/lougis/lib/login.jquery.js"></script>-->
 	<script type="text/javascript" src="/js/lougis/lib/login.js"></script>
@@ -45,7 +45,7 @@ require_once(PATH_SERVER.'utility/LouGIS/mLogin.php');
     <!--<link rel="stylesheet" type="text/css" href="/js/jpaginate/css/style.css" />-->
     <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Maven+Pro:400,700" />
 	<link rel="stylesheet" type="text/css" href="/css/aluetietopalvelu.css" /> 
-	<link rel="stylesheet" type="text/css" href="/css/ymparisto.css" />
+	<!-- <link rel="stylesheet" type="text/css" href="/css/ymparisto.css" /> -->
 	<link rel="stylesheet" type="text/css" href="/css/ennakointi.css" />
     <link rel="stylesheet" type="text/css" href="/css/prettyPhoto.css" /> 
 	<link rel="Stylesheet" type="text/css" href="/js/jHtmlArea/style/jHtmlArea.css" />
@@ -76,25 +76,34 @@ require_once('template/aluetietopalvelu/aluetietopalvelu_northbar.php');
  ?>
 <div id="site"> 
 	
-        <div id="header" class="ymparisto">
+        <div id="header">
+			<div id="title_container">
+				<div id="title_l">
+					<h1>HORISONTTI</h1>
+					
+				</div>
+				
+				<div id="title_r">
+					<p>Varsinais-Suomen ennakointipalvelu - Egentliga Finlands prognostiseringstjänst</p>
+				</div>
+			</div>
+				<? /*
                 <div id="title_container">
                         <div id="title_left">
                                 <div id="title">
-                                    <h1>Koulutustarve-ennakointi</h1>
-									<p>E-palvelualusta &ndash; työkalu verkostoyhteistyölle</p>
+                                    <h1>HORISONTTI</h1>
+									<span style="float:right;"><p>Varsinais-Suomen ennakointipalvelu</p><p>Egentliga Finlands prognostiseringstjänst</p></span>
                                 </div>
                         </div>
-                        <div id="title_pic">
-                                 <img src="/img/oasis_mv.jpg" alt="" />
-						</div>
-                </div>
+                        <!-- <div id="title_pic">
+						</div> -->
+                </div> */ ?>
                 <? if ( $LayoutConf['outputTopNav'] ) { ?>  
                 
                         <div id="topNav">
 			<? $Cms->ouputTopNavigation(); ?>
-			
-		</div>
-		<? } ?>
+	
+		<? }  ?>
 		<span id="topnavclr" class="clr" style="height: 0px;" />
 		
         </div>

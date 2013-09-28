@@ -136,8 +136,8 @@ class CmsPublic extends \Lougis\abstracts\Utility {
 		$ParentStack = $this->getCurrentPageParentStack();
 		for($i=1; $i < count($ParentStack); $i++) {
 			$Pg = $ParentStack[$i];
-			echo '<a href="'.$Pg->getPageUrl().'">'.trim($Pg->title).'</a>';
-			if ( $i < (count($ParentStack)-1) ) echo " | ";
+			echo ' >> <a href="'.$Pg->getPageUrl().'">'.trim($Pg->title).'</a>';
+			//if ( $i < (count($ParentStack)-1) ) echo " ";
 		}
 	
 	}

@@ -8,7 +8,7 @@ if ( $Cms->currentPageHasParent() || $Cms->currentPageHasChildren() ) {
 	$Parent = $Cms->findCurrentPageTopParent( );
 	$LeftCol = true;
 }
-$ifr = $Site->getChartIframe();
+//$ifr = $Site->getChartIframe();
 /*if(isset($_GET['id'])) {
         if (!preg_match("/^\d+$/", $_GET['id'])) die("Tilastoa ei löytynyt");
         $Chart = new \Lougis_chart($_GET['id']);
@@ -31,7 +31,7 @@ if ( empty($Chart->created_date) ) {
 }
 
 ?>
-
+<script type="text/javascript" src="/js/lougis/lib/chart.ui.jquery.js""></script>
 <div id="breadcrumb"><? // $Cms->outputBreadcrumb() ?></div>
 <div id="leftCol" class="col2">	
 <? $Cms->outputLeftNavigation($Parent); ?> 
@@ -43,169 +43,55 @@ $Con = $Page->getContentHtml();
 if ( !empty($Con) && !(isset($_SESSION['chart_id'])) ) print $Con; 
 
 ?>
-<? /*
-<button id="addNewChartBtn">Lis&auml;&auml; uusi tilasto</button>
-*/ ?>
-<script type="text/javascript">
-	$(function() {
-		console.log(<?=$Pg->id?>);
-		jQuery('#addNewChartBtn').click(function(){
-			startNewChart(<?=$Pg->id?>); //viittaa charts.ui.extjs.js olevaan funktioon
-			return false;
-		});
-	});
-</script>                
+            
         </div>
 		<? if(isset($_SESSION['chart_id'])) { ?>
         <div id="chartDiv">
-                <script type="text/javascript" src="/js/ymparisto/legend_overrider.tilasto.extjs.js"></script>         
-                
+            <div style="margin-bottom: 10px;" class="chartinfo">
+				<h1>{<?=$Chart->title?></h1>
+				<p class="pvm">Tilasto p&auml;ivitetty: <?=$Chart->updated_date?></p>
+			</div> 
 				
-				<script type="text/javascript">
-                
-				Ext.onReady(function () {
-                        var chartObj = <?=json_encode($Caa)?>;
-                        var colors = ["#94ae0a", "#115fa6","#a61120", /*"#ff8809"*/"#595959", "#ffd13e", "#a61187", "#24ad9a", "#7c7474", "#a66111"];
+				
+			<script type="text/javascript">
+				$(function() {
+					createChartGraph(<?=$Chart->id?>);
+				
+				});
+					var tpl_h = new Ext.XTemplate(
+							'<tpl for=".">',
+									'<div style="margin-bottom: 10px;" class="chartinfo">',
+									  '<h1>{title}</h1>',
+									  '<p class="pvm">Tilasto päivitetty: {updated_date}</p>',
+									'</div>',
+							'</tpl>'
+					);
+					var infoHeading = Ext.create('Ext.view.View', {
+							store: store,
+							itemSelector: 'div.chartinfo',
+							tpl: tpl_h,
+							id: 'chartInfoHeading',
+							width: 680
+					});
+					var tpl_d = new Ext.XTemplate(
+							'<tpl for=".">',
+									'<div style="margin-bottom: 10px;" class="chartinfo">',
+									'<p class="short_desc">{short_description}</p>',
+									'<p>{description}</p>',
+								   
+									'</div>',
+							'</tpl>'
+					);
 
-                        Ext.define('Ext.chart.theme.Indit', {
-                            extend: 'Ext.chart.theme.Base',
-                            id: 'Indit',
-                            constructor: function(config) {
-                                this.callParent([Ext.apply({
-                                    axisTitleLeft: {
-                                            font: 'bold 12px Verdana'
-                                    },
-                                    axisTitleBottom: {
-                                            font: 'bold 12px Verdana'
-                                    },
-                                    colors: colors
-                                }, config)]);
-                            }
-                        });
-                        
-                        var storeFields = [];
-						//ongelma data on nolla tai ei ole objekti IE8
-                                Ext.each(chartObj.data.fields, function(field, idx) {
-                                        var storeField = {
-                                                name: field.dataindex,
-                                                type: field.type
-                                        };
-                                        storeFields.push(storeField);
-                                }, this);
-
-                            var chartStore = Ext.create('Ext.data.ArrayStore', {
-                                autoDestroy: true,
-                                fields: storeFields,
-                                data: chartObj.data.data
-                            });
-                      
-
-                        chartObj.config.store = chartStore;
-                        chartObj.config.width = 600;
-                        chartObj.config.height = 400;
-                        chartObj.config.theme = 'Indit';
-                       
-                        function rend(storeItem, item) {
-                                var title = item.value[1];
-                                this.setTitle(title);
-								console.log(item);
-                        }
-                        
-                        $.each(chartObj.config.series, function(index) {
-                                chartObj.config.series[index].tips = new Array();
-                                chartObj.config.series[index].tips.trackMouse = true;
-                                chartObj.config.series[index].tips.width = 75;
-                                chartObj.config.series[index].tips.height = 28;
-                                chartObj.config.series[index].tips.renderer = rend;
-                           
-                        });
-                        chartObj.updated_date = chartObj.updated_date.substr(0,11);
-                        Ext.define('TilastoTiedot', {
-                                extend: 'Ext.data.Model',
-                                fields: ['created_by', 'description', 'id', 'original_filename', 'published', 'short_description', 'title', 'updated_date'] 
-                        });
-                        
-                        var store = Ext.create('Ext.data.Store', {
-                                model: 'TilastoTiedot',
-                                data : chartObj
-                                
-                        });
-						var axes = chartObj.config.axes;
-						var carr = chartObj.data.data;
-         
-						 // Lisää minimum-arvon 0, jos axes type on numeric (== kuvaaja pakotetaan alkaa nollasta)
-						 var neg = false;
-						 $.each(carr, function(index) {
-							
-								 $.each(carr[index], function(i) {
-							   
-										if(carr[index][i] < 0) {
-												neg = true;
-										}
-										
-								});
-						 });
-						 if(neg === false) {
-								$.each(axes, function(index) {
-										if(axes[index].type === 'Numeric') { 
-												axes[index].minimum = 0;
-										} 
-								});
-						 }
-                        var tpl_h = new Ext.XTemplate(
-                                '<tpl for=".">',
-                                        '<div style="margin-bottom: 10px;" class="chartinfo">',
-                                          '<h1>{title}</h1>',
-                                          '<p class="pvm">Tilasto päivitetty: {updated_date}</p>',
-                                        '</div>',
-                                '</tpl>'
-                        );
-                        var infoHeading = Ext.create('Ext.view.View', {
-                                store: store,
-                                itemSelector: 'div.chartinfo',
-                                tpl: tpl_h,
-                                id: 'chartInfoHeading',
-                                width: 680
-                        });
-                        var tpl_d = new Ext.XTemplate(
-                                '<tpl for=".">',
-                                        '<div style="margin-bottom: 10px;" class="chartinfo">',
-                                        '<p class="short_desc">{short_description}</p>',
-                                        '<p>{description}</p>',
-                                       
-                                        '</div>',
-                                '</tpl>'
-                        );
-
-                        var infoDescription = Ext.create('Ext.view.View', {
-                                store: store,
-                                itemSelector: 'div.chartinfo',
-                                tpl: tpl_d,
-                                id: 'chartInfoDescription',
-                                width: 600
-                        });
-                        
-                   
-                  
-                       var panel = Ext.create('Ext.panel.Panel', {
-                                frame: false,
-                                border: 0,
-                                renderTo: 'chartDiv',
-                                width: 600
-                              
-                        });
-                        
-                        
-                        
-                        panel.add(infoHeading);
-                        panel.add(chartObj.config);
-                        panel.add(infoDescription);
-
-                        panel.doLayout();
-                   
-                });
-               
-                </script>
+			   
+			});
+		   
+			</script>
+			<div style="margin-bottom: 10px;" class="chartinfo">
+				<p class="short_desc"><?=$Chart->short_description?></p>
+				<p><?=$Chart->description?></p>
+								   
+			</div>
                  
         </div>
         <?
@@ -214,7 +100,7 @@ if ( !empty($Con) && !(isset($_SESSION['chart_id'])) ) print $Con;
         
         <div id="extraDetails">
                 <p>Upotuskoodi:</p><textarea style="margin-left:30px;" id="upotus" rows="4" cols="50" ><?=$ifr;?></textarea>
-                <p>Lataa tiedot CSV-tiedostona: <a href="../../ymparisto/download.php?id=<?=$_SESSION['chart_id']?>">Lataa</a></p>
+                <p>Lataa tiedot CSV-tiedostona: <a href="../../ymparisto/dlcsv.php?id=<?=$_SESSION['chart_id']?>">Lataa</a></p>
             
         </div>
 		<? /*

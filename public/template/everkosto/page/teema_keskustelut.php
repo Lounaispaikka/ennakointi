@@ -200,7 +200,6 @@ if(isset($_GET['tid'])) {
 </div>
 */ ?>
 </div>
-<script type="text/javascript" src="/js/lougis/lib/comments.ui.extjs.js"></script>
 <script>
 
   jQuery(function() {

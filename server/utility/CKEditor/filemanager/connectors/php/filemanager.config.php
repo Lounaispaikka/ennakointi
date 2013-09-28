@@ -63,7 +63,7 @@ $config['icons']['default'] = 'default.png';
  */
 $config['upload']['overwrite'] = false; // true or false; Check if filename exists. If false, index will be added
 $config['upload']['size'] = false; // integer or false; maximum file size in Mb; please note that every server has got a maximum file upload size as well.
-$config['upload']['imagesonly'] = false; // true or false; Only allow images (jpg, gif & png) upload?
+$config['upload']['imagesonly'] = true; // true or false; Only allow images (jpg, gif & png) upload?
 
 /**
  *	Images array

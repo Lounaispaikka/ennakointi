@@ -8,7 +8,8 @@ Ext.define('Lougis.model.Group', {
         {name: 'description', type: 'string'},
         {name: 'parent_id', type: 'int'},
 		{name: 'is_admin', type: 'boolean'},
-		{name: 'page_id', type: 'int'}
+		{name: 'page_id', type: 'int'},
+		{name: 'del_if_no_perm', type: 'boolean'}
     ],
     hasMany: {
         model: 'Lougis.model.User',
@@ -27,6 +28,10 @@ Ext.define('Lougis.model.Group', {
             xtype: 'hiddenfield',
             name: 'id',
             value: this.get('id')
+        },{
+            xtype: 'hiddenfield',
+            name: 'del_if_no_perm',
+            value: false
         },{
             xtype: 'textfield',
             name: 'name',
