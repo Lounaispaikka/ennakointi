@@ -65,8 +65,13 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 	$(function() {
 
 		$('#delChart').click(function(){
-			delChart(<?=$Chart->id?>);
-			return false;
+			var del = window.confirm("Oletko varma, että haluat poistaa tiedoston?");
+			if(del == true) {
+				delChart(<?=$Chart->id?>);
+				return false;
+			} else {
+				return false;
+			}	
 		});
 		$('#editChart').click(function(){
 			window.alert("Tilaston muokkaaminen valmistuu pian. Tässä demoversiossa sitä ei vielä valitettavasti ole.");
