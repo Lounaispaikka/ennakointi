@@ -24,26 +24,70 @@ Värit
 		-tumma: #f08500 rgb(240, 133, 0)
 		Harmaa-vaalea: #6f6e6d rgb(111, 110, 109)
 		-tumma: #5e5d5b rgb(94, 93, 91)
+		
+		th #58595b
+		
+		p #f16465
 */
 body, .x-body {
-    /* IE10 Consumer Preview */ 
-	background-image: -ms-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%);
+
+	background: #f7f7f8;
+     /* IE10 Consumer Preview */ 
+/* 	background-image: -ms-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%); */
 
 	/* Mozilla Firefox */ 
-	background-image: -moz-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%);
+/* 	background-image: -moz-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%); */
 
 	/* Opera */ 
-	background-image: -o-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%);
+	/* background-image: -o-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%); */
 
 	/* Webkit (Safari/Chrome 10) */ 
-	background-image: -webkit-gradient(linear, left top, right bottom, color-stop(0, #FFFFFF), color-stop(1, #E7E7E8));
+	/* background-image: -webkit-gradient(linear, left top, right bottom, color-stop(0, #FFFFFF), color-stop(1, #E7E7E8)); */
 
 	/* Webkit (Chrome 11+) */ 
-	background-image: -webkit-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%);
+	/* background-image: -webkit-linear-gradient(top left, #FFFFFF 0%, #E7E7E8 100%); */
 
 	/* W3C Markup, IE10 Release Preview */ 
-	background-image: linear-gradient(to bottom right, #FFFFFF 0%, #E7E7E8 100%);
+	/* background-image: linear-gradient(to bottom right, #FFFFFF 0%, #E7E7E8 100%); */ */
 }
+#title_container {
+	
+	position: relative;
+	padding-top: 60px;
+}
+#title_l {
+	float:left;
+	color: #da4646;
+	font-size: 42px;
+	font-family: Maven Pro,Verdana,Geneva,Arial,Helvetica,sans-serif;
+	position: absolute; bottom: 19px; left: 0;
+}
+
+#title_r {
+	/* margin: 40px 0 17px 0; */
+	float: right;
+	font-family: Maven Pro,Verdana,Geneva,Arial,Helvetica,sans-serif;
+	position: absolute; bottom: 10px; right: 0;
+	
+	
+}
+#title_l h1 {
+	display: block;
+	padding: 0;
+	font-size: 42px;
+	line-height: 0;
+	color: #f16465;
+}
+#title_r p {
+	display: block;   
+	padding: 0;
+	font-size: 16px;
+	line-height: 0;
+	font-weight: 400;
+	vertical-align:bottom;
+}
+
+
 
 #site #middle #rightCol #rightColGrey {
 	
@@ -51,44 +95,86 @@ body, .x-body {
 	-moz-border-radius: 5px;
 	border-radius: 5px;*/
 	padding: 0 5px 5px 5px;
-    background-color: #e7e7e8;
+    border: 1px solid #58595b;
+	
 
 }
 #front-content {
 	clear: both;
-    width: 100%;
-	padding: 0px 60px 0px 60px;
+    width: 99%;
+	padding: 0;
 	
 }
 #topNav {
-    background-color: #fff;	
+    background-color: #f7f7f8;	
+	border-top: 2px solid #58595b;
+	padding-bottom: 10px;
+}
+#topNav ul {
+	display: block;
+	/* margin: 0 2px -1px 2px; */
+	margin: 0;
+	padding: 5px 0 5px 0;
+	width: 100%;
+	float: left;
+	background-color: #f7f7f8;
+	list-style-type: none;
+	text-align: center
 }
 #topNav ul li a {
-	background-color: rgb(255, 255, 255);
+	background-color: #f7f7f8;
+	color: #58595b;
+	font-size:13px;
+	letter-spacing: 0.07em;
+	font-weight: 700;
+	text-decoration: none;
+	/* background-color: rgb(255, 255, 255);
 	background-image:linear-gradient(-90deg, rgb(129,130,134), rgb(94, 93, 91));
 	background-image:-webkit-gradient(linear, 50% 0%, 50% 100%, from(rgb(129,130,134)), to(rgb(94, 93, 91)));
 	background-image:-moz-linear-gradient(-90deg, rgb(129,130,134), rgb(94, 93, 91));
     filter:  progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#6f6e6d', endColorstr='#5e5d5b'); /* IE6 & IE7 */
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#6f6e6d', endColorstr='#5e5d5b')"; /* IE8 */
+  /*  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#6f6e6d', endColorstr='#5e5d5b')"; /* IE8 */ */
 }
 #topNav ul li a.active {
+	color: #58595b;
+	text-decoration: underline;
 	/*sivustokohtainen*/
-background-color: rgb(255, 255, 255);
+/* background-color: rgb(255, 255, 255);
 	background-image:linear-gradient(-90deg, rgb(239, 175, 13), rgb(255, 134, 0));
 	background-image:-webkit-gradient(linear, 50% 0%, 50% 100%, from(rgb(239, 175, 13)), to(rgb(255, 134, 0)));
 	background-image:-moz-linear-gradient(-90deg, rgb(239, 175, 13), rgb(255, 134, 0));
     filter:  progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#efaf0d', endColorstr='#ff8600'); /* IE6 & IE7 */
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#efaf0d', endColorstr='#ff8600')"; /* IE8 */
+   /* -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#efaf0d', endColorstr='#ff8600')"; /* IE8 */ */
 }
 #topNav ul li a:hover {
+	color: #f16465;
+	
 	/*sivustokohtainen*/
-    background-color: rgb(255, 255, 255);
+    /* background-color: rgb(255, 255, 255);
 	background-image:linear-gradient(-90deg, rgb(120, 120, 120), rgb(94, 93, 91));
 	background-image:-webkit-gradient(linear, 50% 0%, 50% 100%, from(rgb(120, 120, 120)), to(rgb(94, 93, 91)));
 	background-image:-moz-linear-gradient(-90deg, rgb(120, 120, 120), rgb(94, 93, 91));
     filter:  progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#6f6e6d', endColorstr='#5e5d5b'); /* IE6 & IE7 */
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#6f6e6d', endColorstr='#5e5d5b')"; /* IE8 */
+   /* -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#6f6e6d', endColorstr='#5e5d5b')"; /* IE8 */ */
 }
+
+#breadcrumb {
+	margin: 10px 20px 0px 20px;
+	font-size: 10px;
+    color: #58595b;
+	text-align: left;
+    clear:left;
+}
+#breadcrumb a  {
+	color: #58595b;
+	text-decoration: none;
+}
+#breadcrumb a:hover {
+/*	color: #31a6b7;*/
+	color: #58595b;
+	text-decoration: underline;
+}
+
 .ext_window {
 	text-align:left !important;
 }
@@ -455,7 +541,7 @@ ul#messages div.likebox.clicked a.dislikethumb:hover {
 	height:     100%;
 	width:      100%;
 	background: /*rgba( 255, 255, 255, .8 )*/ 
-				url('/img/loading_spinner_oranssi.gif') 
+				url('/img/ajax-loader.gif') 
 				50% 50% 
 				no-repeat;
 	/*opacity: 1.00;
