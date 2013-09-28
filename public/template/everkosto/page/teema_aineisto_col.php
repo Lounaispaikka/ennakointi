@@ -6,6 +6,9 @@ if ( $_SESSION['user_id']) {
 <script type="text/javascript" src="/js/lougis/lib/ennakointi.ui.jquery.js"></script>
 <script type="text/javascript" src="/js/lougis/lib/file.ui.jquery.js"></script>
 <script type="text/javascript" src="/js/lougis/lib/page.ui.jquery.js"></script>
+<script type="text/javascript" src="/js/lougis/lib/link.ui.jquery.js"></script>
+<script type="text/javascript" src="/js/lougis/lib/news.ui.jquery.js"></script>
+
 
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.0/jquery.validate.min.js"></script>
 
@@ -26,15 +29,8 @@ if ( $_SESSION['user_id']) {
 		<button id="addFile" class="ui-button teema_btn"><img src="/img/icons/16x16/package_add.png" > Lis&auml;&auml; tiedosto</button>
 
 <div id="addFileDialog" title="Lis&auml;&auml; tiedosto">
-	<!--<form action="" method="post" enctype="multipart/form-data" class="ui-widget" id="upfile">
-        <input type="file" name="f"><br>
-		<textarea name="description"></textarea>
-        <input type="submit" value="L&auml;het&auml;">
-    </form>-->
 	<form id="upfile" class="ui-widget"></form>
-	
-	
-    
+
     <div class="progress">
         <div class="bar"></div >
         <div class="percent"></div >
@@ -42,19 +38,20 @@ if ( $_SESSION['user_id']) {
     
     <div id="status"></div>
 </div>	
+<div id="addChartDialog_file" title="Lis&auml;&auml; tilasto">
+	<div id="chart_upload">
+		<p id="chartOhje" style="text-align: left;"></p>
+		<form id="chartform_upload" class="ui-widget"></form>
+	</div>
+</div>
 
 <div id="addChartDialog" title="Lis&auml;&auml; tilasto">
 	<ul>
-		<li><a href="#chart_upload">CSV-tiedosto</a></li>
 		<li><a href="#chart_table">Taulukko</a></li>
 		<li><a href="#chart_config">Asetukset</a></li>
 		<li><a href="#chart_preview">Esikatselu</a></li>
 	</ul>
 	
-	<div id="chart_upload">
-		<p id="chartOhje" style="text-align: left;"></p>
-		<form id="chartform_upload" class="ui-widget"></form>
-	</div>
 	
 	<div id="chart_table">
 		<div id="datagrid" class="handsontable"></div>
@@ -81,7 +78,7 @@ if ( $_SESSION['user_id']) {
 	<button id="linkkiBtn"></button>
 </div>
 -->
-<div id="addPageFormDialog" title="Lis&auml&auml; alasivu">
+<div id="addPageFormDialog" title="Lis&auml&auml">
 	<div id="cmsInfo" style="position:relative;">
 		<form id="cmsForm" class="ui-widget">
 		</form>
@@ -105,8 +102,19 @@ if ( $_SESSION['user_id']) {
 	</form>-->
 </div>
 
+<div id="editPageInfoDialog" title="Muokkaa sivun tietoja" >
+	<div id="cmsInfo" style="position:relative;">
+		<form id="cmsForm_info" class="ui-widget"></form>
+	</div>	
+</div>
+<div id="editPageContentDialog" title="Muokkaa sivun tietoja">
+	<div id="cmsContent">
+		<form id="cmsForm_content" class="ui-widget"></form>
+	</div>
+</div>
+
 <div id="formResponse">
-	<p>dadaa</p>
+	<p></p>
 </div>
 <? include('toimiala.php'); ?>
 <?

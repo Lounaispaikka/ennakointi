@@ -1,6 +1,6 @@
-/*
+Ôªø/*
 * 
-* FUNKTIO: Lis‰‰ uusi tilasto
+* FUNKTIO: Lis√§√§ uusi uusi tilasto
 *
 */
 function openAddChartDialog(parent_id){
@@ -31,28 +31,47 @@ function openAddChartDialog(parent_id){
 	});
 	
 	*/
+	//dialog width and height according to window size
+	var wWidth = $(window).width();
+    var dWidth = wWidth * 0.8;
+    var wHeight = $(window).height();
+    var dHeight = wHeight * 0.8;
 	
-	$('#addChartDialog').dialog({
+	$('#addChartDialog_file').dialog({
 		autoOpen: false,
 		modal: true,
-		width: 600
+		width: dWidth,
+		height: dHeight,
+		buttons: [
+			{
+				text: "Sulje",
+				click: function() {
+					$(this).dialog("close");
+				}
+				
+			},
+			{
+				text: "Lataa tiedosto",
+				click: function() {
+					$('#chartform_upload').submit();
+				}
+			}
+        ]
 	});
-	$('#addChartDialog').dialog('open');
+	$('#addChartDialog_file').dialog('open');
 	
-	newChart(parent_id);
+	uploadCsv(parent_id);
 	return false;
 }
 
-function newChart(parent_id) {
+function uploadCsv(parent_id) {
 // step 1
 	//Tiedoston lataus
-	$('#datagrid').empty();
+	
 	$('#chartOhje').empty();
 	$('#chartOhje').append('Valitse koneeltasi ladattava CSV-tiedosto ja klikkaa "Seuraava &raquo;"');
 	$('#chartform_upload').empty();
-	$('#chartform_table').empty();
-	$('#chartform_config').empty();
-	$('#chartform_preview').empty();
+	
 
 	$('#chartform_upload').dform({
 			"method" : "post",
@@ -60,29 +79,14 @@ function newChart(parent_id) {
 				[
 					{
 						"name" : "datafile",
-						"type" : "file"
-					},
-					
-					{
-						"type" : "submit",
-						"value" : "Seuraava",
-						"class": "next-btn"
-					},
-					{
-						"type" : "button",
-						"html" : "Peruuta",
-						"class": "cancel-btn"
+						"type" : "file",
+						"class" : "lomake"
 					}
 				]
 	});	
-	$(".cancel-btn").click(function() {
-		$('#addChartDialog').dialog('close');
-		
-	});
-	
 	
 	// bind form using 'ajaxForm' 
-    $('#chartform').ajaxForm({
+    $('#chartform_upload').ajaxForm({
 		success: 	callback1,
 		url:       "/run/lougis/charts/uploadData/" ,
         type:      "post", 
@@ -91,9 +95,9 @@ function newChart(parent_id) {
 	 
 	 // post-submit callback 
 	function callback1(responseText)  { 
-		createGrid(responseText.chart.data, responseText.chart.id);
-		console.log("fuck");
-		//jQuery('#addChartDialog').dialog('close');
+		createGrid(responseText.chart.data, responseText.chart.id, parent_id);
+		console.log("chup");
+		$('#addChartDialog_file').dialog('close');
 	}
 	
 	return false;
@@ -101,8 +105,74 @@ function newChart(parent_id) {
 
 // step 2
 	
-function createGrid(celldata, chart_id) {
-	console.log("createGrid");
+function createGrid(celldata, chart_id, parent_id) {
+	
+	//dialog width and height according to window size
+	var wWidth = $(window).width();
+    var dWidth = wWidth * 0.8;
+    var wHeight = $(window).height();
+    var dHeight = wHeight * 0.8;
+	
+	$('#datagrid').empty();
+	$('#chartform_table').empty();
+	$('#chartform_config').empty();
+	$('#chartform_preview').empty();
+	
+	$("#addChartDialog").tabs().dialog({
+		modal: true,
+		width: dWidth,
+		height: dHeight,
+		buttons: [
+			{
+				text: "Peruuta",
+				click: function() {
+					delChart(chart_id);
+					$(this).dialog("close");
+					//window.location.reload(); //fix because handsontable not loading again without reload
+				}
+				
+			},
+			{
+				text: "Tallenna",
+				click: function() {
+					var active = $(this).tabs( "option", "active" ); //get active tab
+					//save data from current tab
+					switch(active)
+					{
+						case 0:
+							console.log("taulukko");
+							saveGrid();
+							break;
+						case 1:
+							console.log("asetukset");
+							$("#chartform_config").submit();
+							break;
+						case 2:
+							console.log("esikatselu");
+							saveGrid();
+							$("#chartform_config").submit();
+							$(this).dialog("close");
+							break;
+					}
+				}
+			}
+        ],
+		open: function(){
+			$('.ui-dialog-titlebar').hide(); // hide the default dialog titlebar
+			$("#addChartDialog").tabs( "option", "disabled", [ 1, 2 ] );
+		},
+		close: function(){
+			$('.ui-dialog-titlebar').show(); // in case you have other ui-dialogs on the page, show the titlebar 
+		},		
+	}).parent().draggable({handle: ".ui-tabs-nav"}); // the ui-tabs element (#tabdlg) is the object parent, add these allows the tab to drag the dialog around with it
+	// stop the tabs being draggable (optional)
+	$('.ui-tabs-nav li').mousedown(function(e){
+    	e.stopPropagation();
+	});
+	
+	$('#addChartDialog').dialog('open');
+	
+		console.log("createGrid");
 		$('#chartOhje').append('Muokkaa taulukkoa tarvittaessa.');
 		
 		var cellArray = $.parseJSON(celldata);
@@ -137,29 +207,10 @@ function createGrid(celldata, chart_id) {
 		});
 		var tabledata = container.data('handsontable');
 		
-		
-		$('#chartform_table').dform({
-			"method" : "post",
-			"html" :
-				[
-					{
-						"type" : "submit",
-						"value" : "Tallenna",
-						"class": "next-btn"
-					},
-					{
-						"type" : "button",
-						"html" : "Peruuta",
-						"class": "cancel-btn"
-					}
-				]
-		});	
-		
-		
 		var savedChart = {};
 		
-		$('.next-btn').click(function () {
-			
+		//$('.next-btn').click(function () {
+		function saveGrid() {	
 			var datacells = tabledata.getData();
 
 			//first row to fields
@@ -189,9 +240,9 @@ function createGrid(celldata, chart_id) {
 			var jsonstring = JSON.stringify(savedChart);
 			var jsonpa = JSON.parse(jsonstring);
 			console.log("js",jsonpa);
-			//nyt fields samaan muotoon kuin alunperin, t‰h‰n korjaus jatkossa? tyyppien k‰sittely puuttuu, mutta tarvitaanko edes?
+			//nyt fields samaan muotoon kuin alunperin, t√§h√§n korjaus jatkossa? tyyppien k‰sittely puuttuu, mutta tarvitaanko edes?
 			$.ajax({
-				url: "/run/lougis/charts/updateDbData/", //t‰h‰n tallennusfunktio
+				url: "/run/lougis/charts/updateDbData/",
 				data: {
 					"chart_data": jsonpa,
 					"chart_id": chart_id
@@ -202,7 +253,8 @@ function createGrid(celldata, chart_id) {
 					console.log(res);
 					 if (res.success === true) {
 						console.log('Data saved');
-						configureChart(savedChart ,chart_id);
+						configureChart(savedChart ,chart_id, parent_id);
+						$("#addChartDialog").tabs( "enable" );
 					}
 					else {
 						console.log('Save error');
@@ -215,9 +267,9 @@ function createGrid(celldata, chart_id) {
 			
 			
 			return false;
-		});
+		}
 		
-		return false;
+	return false;
 }
 	//Perusti
 	//form
@@ -231,10 +283,8 @@ function createGrid(celldata, chart_id) {
 	x ja y akselin otsikot ja tyyppi (kategoria vai numeerinen)
 	*/
 	//Tilastokuvaajan luominen
-function configureChart(chartObj, chart_id) {
+function configureChart(chartObj, chart_id, parent_id) {
 	console.log(chartObj);
-	//pikafixin‰ extjs chart creator
-	
 	$('#chartform_config').dform({
 		"method" : "post",
 		"html" :
@@ -245,41 +295,39 @@ function configureChart(chartObj, chart_id) {
 					"value": chart_id
 				},
 				{
+					"type": "hidden",
+					"name": "chart[parent_id]",
+					"value": parent_id
+				},
+				{
 					"type": "text",
 					"name": "chart[title]",
-					"caption": "Tilaston otsikko"	
+					"caption": "Tilaston otsikko",
+					"class" : "lomake"
 				},
 				{
 					"type": "select",
 					"name": "chart[config][type]",
 					"caption": "Tyyppi",
 					"options": { 
-						"bar" : "Pylv‰s (vaaka)",
-						"column" : "Pylv‰s (pysty)",
-						"line" : "K‰yr‰",
+						"bar" : "Pylv√§s (vaaka)",
+						"column" : "Pylv√§s (pysty)",
+						"line" : "K√§yr√§",
 						"pie" : "Piirakka"
-					}
+					},
+					"class" : "lomake"
 				},
 				{
 					"type": "text",
 					"name": "chart[config][y_title]",
-					"caption": "Y-akselin otsikko"	
+					"caption": "Y-akselin otsikko"	,
+					"class" : "lomake"
 				},
 				{
 					"type": "text",
 					"name": "chart[config][x_title]",
-					"caption": "X-akselin otsikko"	
-				},
-				{
-					"type" : "submit",
-					"value" : "Tallenna",
-					"class": "next-btn",
-					"id": "saveHc"
-				},
-				{
-					"type" : "button",
-					"html" : "Peruuta",
-					"class": "cancel-btn"
+					"caption": "X-akselin otsikko"	,
+					"class" : "lomake"
 				}
 			]
 	});
@@ -297,7 +345,7 @@ function configureChart(chartObj, chart_id) {
 		dataType:  "json" 
 	}; 
 	// bind form using 'ajaxForm' 
-	$('#chartform').ajaxForm(options); 
+	$('#chartform_config').ajaxForm(options); 
 	 
 	// post-submit callback 
 	function showResponse(responseText)  { 
@@ -321,11 +369,10 @@ function configureChart(chartObj, chart_id) {
 
 }
 
+//create chart graph
+//both preview and template use this
 function createChartGraph(chart_id) {
-		
-	
-	
-	
+
 	//global options
 	
 	Highcharts.setOptions({
@@ -350,6 +397,9 @@ function createChartGraph(chart_id) {
 		title: {
 			text: ''
 		},
+		credits: {
+            enabled: false
+        },
 		xAxis: {
 			categories: [],
 			title: {
@@ -363,10 +413,10 @@ function createChartGraph(chart_id) {
 		},
 		series: []
 	};
-	
+
 	//get chart data
 	$.ajax({
-		url: "/run/lougis/charts/getHighchart/", //t‰h‰n tallennusfunktio
+		url: "/run/lougis/charts/getHighchart/",
 		data: {
 			"chart_id": chart_id
 			},
@@ -384,6 +434,7 @@ function createChartGraph(chart_id) {
 				console.log(res.chart);
 				//pie
 				if(configs.type == 'pie') {
+					console.log("piechart");
 					options.plotOptions = {};
 					options.plotOptions.pie = {};
 					options.plotOptions.pie.allowPointSelect = configs.plotOptions.pie.allowPointSelect;
@@ -403,9 +454,11 @@ function createChartGraph(chart_id) {
 				}
 				//bar, column or line
 				else {
+										console.log(res.chart);
+
 					options.xAxis.categories = res.chart.xAxis.categories;
 					options.xAxis.title.text = configs.x_title;
-					$.each(res.chart.pie_series, function(k,v) {
+					$.each(res.chart.series, function(k,v) {
 						options.series.push(res.chart.series[k]);
 					});
 						
@@ -420,6 +473,27 @@ function createChartGraph(chart_id) {
 		error: function () {
 			console.log('Save error. POST method is not allowed on GitHub Pages. Run this example on your own server to see the success message.');
 		}
+	});
+	
+
+	
+}
+
+//delete chart
+function delChart(chart_id) {
+	var req = $.ajax({
+		url: "/run/lougis/charts/deleteChart/",
+		data: {
+			"chart_id": chart_id
+			},
+		dataType: 'json',
+		type: 'POST'
+	})
+	.done(function (res) {
+		console.log(res.msg);
+	})
+	.fail(function (res) {
+		console.log(res.msg);
 	});
 	
 }
