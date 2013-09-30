@@ -337,8 +337,8 @@ class Charts extends \Lougis\abstracts\Frontend {
 			
 		try {
 			
-			$data = json_encode($_REQUEST['chart_data']);
-			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
+			$data = json_encode($_POST['chart_data']);
+			$Chart = new \Lougis_chart($_POST['chart_id']);
 			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
 			$Chart->updated_date = date(DATE_W3C);
 			$Chart->data_json = $data;
@@ -349,6 +349,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 			
 			$res = array(
 				"success" => true,
+				"chart" => $Chart
 				//"msg" => "Taulukko tallennettu."
 			);
 		
@@ -379,10 +380,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 				$Chart = new \Lougis_chart();
 				$Chart->setNextKey();
 			}
-			//$fila = implode("|", $_FILES['datafile']);
-		
-			//if ( !$Chart->addUploadedDatafile($_FILES['datafile']) ) throw new \Exception("Datatiedostoa ei voitu tallentaa palvelimelle.". $fila );
-			//if ( !$Chart->buildJsonFileFromCsv() ) throw new \Exception("Dataa ei voitu lukea");
+
 			if ( !$Chart->buildJsonDataFromCsv($_FILES['datafile']) ) throw new \Exception("Dataa ei voitu lukea");
 			$Chart->created_date = date(DATE_W3C);
 			$Chart->created_by = $User->id;
@@ -494,6 +492,28 @@ class Charts extends \Lougis\abstracts\Frontend {
 		}
 		$this->jsonOut($res);
 		
+	}
+	
+	public function getChartTitle() {
+		try {
+			
+			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
+			if ( empty($Chart->created_date) ) throw new \Exception("Tilastoa ei löytynyt!");
+			
+			$res = array(
+				"success" => true,
+				"title" => $Chart->title
+			);
+			
+		} catch(\Exception $e) {
+			
+			$res = array(
+				"success" => false,
+				"msg" => $e->getMessage()
+			);
+			
+		}
+		$this->jsonOut($res);
 	}
 	
 	//Delete chart (and cms_page)

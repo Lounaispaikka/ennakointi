@@ -13,6 +13,10 @@ if ( $_SESSION['user_id'] ) {
 	$ct->fetch();
 	if(isset($_GET['debug'])) print($ct->id.'-'.$ct->page_id);
 	
+	if($ct->id != null) {
+		$_SESSION['comment_topic_id'] = $ct->id;
+	}
+	
 	//if ( $ct->id != null ) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);
 	//$Rules = \Lougis_comment_msg::getRules();
 	
@@ -54,7 +58,7 @@ if ( $_SESSION['user_id'] ) {
 			
 		</div>
 		<? if ( $ct->id != null ) { ?>
-			<a id="newthread" onclick="showNewMsg(<?=$Pg->id?>, <?=$ct->id?>);" style="margin-top:15px;">Kommentoi</a>
+			<a id="newthread" onclick="showNewMsg(<?=$Pg->id?>, <?=$_SESSION['comment_topic_id']?>);" style="margin-top:15px;">Kommentoi</a>
 		<? } ?>
 	</div>
 	<div id="dialog-message" title="Viesti l&auml;hetetty!">

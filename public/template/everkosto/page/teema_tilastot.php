@@ -59,6 +59,9 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 	</ul>
 	
 	<div id="chart_container"></div>
+	<? if($Pg->page_type == 'chart') { 
+require_once(PATH_PUBLIC.'comments_frontend/kommentointi.php');
+} ?>
 </div>
 
 <script type="text/javascript">

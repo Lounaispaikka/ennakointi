@@ -120,11 +120,11 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
     }
     
 	//build highchart
-	public function buildHighchart(/* $chartdata */) {
+	public function buildTransposedHighchart(/* $chartdata */) {
 		
 		//get this->data_json data as array
 		$data_json = (array)json_decode($this->data_json, true);
-devlog($data_json["fields"], "e_hc");
+		devlog($data_json["fields"], "e_hc");
 		//transpose data_json
 		$arr = array();
 		$arr = $data_json["data"];
@@ -178,6 +178,51 @@ devlog($data_json["fields"], "e_hc");
 		}
 		
 			
+		return $highchart;
+		
+	}
+	
+	//build highchart
+	public function buildHighchart() {
+		
+		//get this->data_json data as array
+		$data_json = (array)json_decode($this->data_json, true);
+
+		$category = $data_json['category'];
+		$series = $data_json['series'];
+		
+		$category_name = array_shift($category);
+		
+		
+		//switch values to int, float or string if necessary
+		foreach ( $series as $k=>$serie ) {
+			foreach ( $serie as $key=>$val ) {
+				$val = trim($val); //remove line endings etc
+				switch(true) {
+					case ctype_digit($val): //if only int
+						$series[$k][$key] = (int)$val;
+						break;
+					case preg_match("/^(\d+(?:[\.\,]\d{2})?)$/", $val): //float with commas or dots
+						$series[$k][$key] = floatval(str_replace(',', '.', $val));
+						break;
+					default: //string value
+						$series[$k][$key] = $val;
+				}
+			}		
+		}
+		
+		//x-axis
+		$highchart["xAxis"]["categories"] = $category;
+		$highchart["xAxis"]["title"] = $category_name;
+		//series
+		for($i = 0; $i < count($series); $i++) {
+			$highchart["series"][$i]["name"] = $series[$i][0];
+			for($j = 1; $j < count($series[$i]); $j++) {
+				$highchart["series"][$i]["data"][$j-1] = $series[$i][$j];
+			}
+		}
+		
+		devlog($highchart, "e_hc");
 		return $highchart;
 		
 	}
@@ -513,7 +558,7 @@ devlog($data_json["fields"], "e_hc");
 	    
 	    
     }  
-    
+   /* transposed shit
 	public function buildJsonDataFromCsv($fileArray) {
 	    
 	    //use directly temp file, no need to save the file to server
@@ -619,11 +664,46 @@ devlog($data_json["fields"], "e_hc");
 			devlog($dataContent);
 		}
 		*/
-			
+			/*
 		//$jsonfile = $this->getFileJsonPath();
 		$json = array(
 			"fields" => $dataConfig,
 			"data" => $dataContent
+		);
+		
+		$encoded_json = json_encode($json);
+		
+		//json to db
+		$this->data_json = $encoded_json;
+		
+		//return file_put_contents($jsonfile, json_encode($json));
+	    return $encoded_json;
+	    
+    } 
+	*/
+	
+	//create json data from uploaded csv data
+	public function buildJsonDataFromCsv($fileArray) {
+	    
+	    //use directly temp file, no need to save the file to server
+		$fa = file($fileArray['tmp_name']);
+        
+		$firstRow = explode(';', $fa[0]);
+		
+		$dataContent = array();
+		$series = array();
+		//set all the rest rows to serie rows
+		for($i = 1;$i < count($fa); $i++) {
+			$serieRow = explode(';', $fa[$i]);
+			array_push($series, $serieRow);
+		}
+		$datatypes = array();
+		devlog($firstRow, "e_chdata");
+		devlog($series, "e_chdata");
+
+		$json = array(
+			"category" => $firstRow,
+			"series" => $series
 		);
 		
 		$encoded_json = json_encode($json);

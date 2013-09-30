@@ -69,6 +69,8 @@ class Comment extends \Lougis\abstracts\Frontend {
 					//$NewTopic->id = $cid->topic_id;
 					if ( !$NewTopic->save() ) throw new \Exception("2 Tekninen virhe uuden kommenttisivun luomisessa. Ota yhteyttä sivuston ylläpitoon");
 					$_SESSION['comments_id'] = $NewTopic->id;
+					$_SESSION['comment_topic_id'] = $NewTopic->id;
+					
 				
 				}
 		//	}

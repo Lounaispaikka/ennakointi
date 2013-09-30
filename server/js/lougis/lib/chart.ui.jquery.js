@@ -104,9 +104,225 @@ function uploadCsv(parent_id) {
 }
 
 // step 2
-	
 function createGrid(celldata, chart_id, parent_id) {
+	console.log(celldata);
+	//dialog width and height according to window size
+	var wWidth = $(window).width();
+    var dWidth = wWidth * 0.8;
+    var wHeight = $(window).height();
+    var dHeight = wHeight * 0.8;
 	
+	$('#datagrid').empty();
+	$('#chartform_table').empty();
+	$('#chartform_config').empty();
+	$('#chartform_preview').empty();
+	
+	$("#addChartDialog").tabs().dialog({
+		modal: true,
+		width: dWidth,
+		height: dHeight,
+		buttons: [
+			{
+				text: "Peruuta",
+				click: function() {
+					delChart(chart_id);
+					$(this).dialog("close");
+					container.handsontable("destroy");
+					//window.location.reload(); //fix because handsontable not loading again without reload
+				}
+				
+			},
+			{
+				text: "Tallenna",
+				
+				click: function() {
+					var active = $(this).tabs( "option", "active" ); //get active tab
+					//save data from current tab
+					switch(active)
+					{
+						case 0:
+							console.log("taulukko");
+							saveGrid();
+							break;
+						case 1:
+							console.log("asetukset");
+							$("#chartform_config").submit();
+							break;
+						case 2:
+							console.log("esikatselu");
+							saveGrid();
+							$("#chartform_config").submit();
+							$(this).dialog("close");
+							break;
+					}
+				}
+			}
+        ],
+		open: function(){
+			$('.ui-dialog-titlebar').hide(); // hide the default dialog titlebar
+			$("#addChartDialog").tabs( "option", "disabled", [ 1, 2 ] );
+		},
+		close: function(){
+			$('.ui-dialog-titlebar').show(); // in case you have other ui-dialogs on the page, show the titlebar 
+		},		
+	}).parent().draggable({handle: ".ui-tabs-nav"}); // the ui-tabs element (#tabdlg) is the object parent, add these allows the tab to drag the dialog around with it
+	// stop the tabs being draggable (optional)
+	$('.ui-tabs-nav li').mousedown(function(e){
+    	e.stopPropagation();
+	});
+	
+	//open dialog
+	$('#addChartDialog').dialog('open');
+	
+	/* //Add correct buttons to dialog
+	var tabdialog = $('#addChartDialog');
+	var active = tabdialog.tabs( "option", "active");
+
+	tabdialog.dialog("option", "buttons", {
+		"Peruuta": function() {
+					delChart(chart_id);
+					$(this).dialog("close");
+					container.handsontable("destroy");
+					//window.location.reload(); //fix because handsontable not loading again without reload
+		},
+		"Tallenna": function() {
+					var active = $(this).tabs( "option", "active" ); //get active tab
+					//save data from current tab
+					switch(active)
+					{
+						case 0:
+							console.log("taulukko");
+							saveGrid();
+							break;
+						case 1:
+							console.log("asetukset");
+							$("#chartform_config").submit();
+							break;
+						case 2:
+							console.log("esikatselu");
+							saveGrid();
+							$("#chartform_config").submit();
+							$(this).dialog("close");
+							break;
+					}
+		}	
+	});
+	 */
+	/*
+	buttons: [
+			{
+				text: "Peruuta",
+				click: function() {
+					delChart(chart_id);
+					$(this).dialog("close");
+					container.handsontable("destroy");
+					//window.location.reload(); //fix because handsontable not loading again without reload
+				}
+				
+			},
+			{
+				text: "Tallenna",
+				click: function() {
+					var active = $(this).tabs( "option", "active" ); //get active tab
+					//save data from current tab
+					switch(active)
+					{
+						case 0:
+							console.log("taulukko");
+							saveGrid();
+							break;
+						case 1:
+							console.log("asetukset");
+							$("#chartform_config").submit();
+							break;
+						case 2:
+							console.log("esikatselu");
+							saveGrid();
+							$("#chartform_config").submit();
+							$(this).dialog("close");
+							break;
+					}
+				}
+			}
+        ] */
+	
+	$('#chartOhje').append('Muokkaa taulukkoa tarvittaessa.');
+	
+	var cellArray = $.parseJSON(celldata);
+	var chart = [];
+	console.log(cellArray.category);
+	console.log(cellArray.series);
+
+	//push category to chart table 
+	chart.push(cellArray.category);
+	//push each serie to chart table
+	$.each(cellArray.series, function(index, obj) {
+		chart.push(obj);
+	});
+
+	
+	
+	var container = $("#datagrid");
+	container.handsontable({
+		data: chart,
+		minSpareRows: 1,
+		colHeaders: true,
+		contextMenu: true
+	});
+	var tabledata = container.data('handsontable');
+	
+	//save edited table
+	function saveGrid() {	
+		var datacells = tabledata.getData();
+		console.log(datacells);
+		var savedChart = {};
+		//category (x)
+		savedChart.category = datacells[0];
+		savedChart.series = [];
+		//series (y) rows minus last empty
+		for (var i = 1; i < datacells.length-1; i++) {
+			console.log(i);
+			row = datacells[i];
+			savedChart.series.push(row);
+		} 
+		console.log("sc", savedChart);
+
+		var jsonstring = JSON.stringify(savedChart);
+		var jsonpa = JSON.parse(jsonstring);
+		console.log("js",jsonpa);
+		//nyt fields samaan muotoon kuin alunperin, tähän korjaus jatkossa? tyyppien k崩ttely puuttuu, mutta tarvitaanko edes?
+		$.ajax({
+			url: "/run/lougis/charts/updateDbData/",
+			data: {
+				"chart_data": jsonpa,
+				"chart_id": chart_id
+				},
+			dataType: 'json',
+			type: 'POST',
+			success: function (res) {
+				console.log(res);
+				 if (res.success === true) {
+					console.log('Data saved', res);
+					configureChart(savedChart ,chart_id, parent_id, res.chart);
+					$("#addChartDialog").tabs( "enable" );
+				}
+				else {
+					console.log('Save error');
+				} 
+			},
+			error: function () {
+				console.log('Save error. POST method is not allowed on GitHub Pages. Run this example on your own server to see the success message.');
+			}
+		});
+		
+		
+		return false;
+	}
+		
+	return false;
+}	
+/* function createGrid(celldata, chart_id, parent_id) {
+	console.log(celldata);
 	//dialog width and height according to window size
 	var wWidth = $(window).width();
     var dWidth = wWidth * 0.8;
@@ -270,7 +486,7 @@ function createGrid(celldata, chart_id, parent_id) {
 		}
 		
 	return false;
-}
+} */
 	//Perusti
 	//form
 	/*
@@ -283,8 +499,22 @@ function createGrid(celldata, chart_id, parent_id) {
 	x ja y akselin otsikot ja tyyppi (kategoria vai numeerinen)
 	*/
 	//Tilastokuvaajan luominen
-function configureChart(chartObj, chart_id, parent_id) {
+function configureChart(chartObj, chart_id, parent_id, chart_db_object) {
 	console.log(chartObj);
+	var config = {};
+	var x_title;
+	var y_title;
+	var config = $.parseJSON(chart_db_object.config_json);
+	if (config === null) {
+		x_title = null;
+		y_title = null;
+	}
+	else {
+		x_title = config.x_title;
+		y_title = config.y_title;
+	}
+	console.log("config", config);
+	$('#chartform_config').empty();
 	$('#chartform_config').dform({
 		"method" : "post",
 		"html" :
@@ -303,17 +533,18 @@ function configureChart(chartObj, chart_id, parent_id) {
 					"type": "text",
 					"name": "chart[title]",
 					"caption": "Tilaston otsikko",
-					"class" : "lomake"
+					"class" : "lomake",
+					"value" : chart_db_object.title
 				},
 				{
 					"type": "select",
 					"name": "chart[config][type]",
 					"caption": "Tyyppi",
 					"options": { 
-						"bar" : "Pylväs (vaaka)",
 						"column" : "Pylväs (pysty)",
-						"line" : "Käyrä",
-						"pie" : "Piirakka"
+						"bar" : "Pylväs (vaaka)",
+						"line" : "Käyrä"/*,
+						"pie" : "Piirakka"*/
 					},
 					"class" : "lomake"
 				},
@@ -321,13 +552,15 @@ function configureChart(chartObj, chart_id, parent_id) {
 					"type": "text",
 					"name": "chart[config][y_title]",
 					"caption": "Y-akselin otsikko"	,
-					"class" : "lomake"
+					"class" : "lomake",
+					"value" : y_title
 				},
 				{
 					"type": "text",
 					"name": "chart[config][x_title]",
 					"caption": "X-akselin otsikko"	,
-					"class" : "lomake"
+					"class" : "lomake",
+					"value" : x_title
 				}
 			]
 	});
@@ -453,11 +686,16 @@ function createChartGraph(chart_id) {
 				
 				}
 				//bar, column or line
+				
+				//add type column to data_json [type, otsikko, luku, luku] ei tarvii sitte eriksee tehä näit
 				else {
 										console.log(res.chart);
 
 					options.xAxis.categories = res.chart.xAxis.categories;
-					options.xAxis.title.text = configs.x_title;
+					//options.xAxis.title.text = configs.x_title;
+					options.xAxis.title.text =  res.chart.xAxis.title;
+					console.log(configs.x_title);
+					if(configs.x_title != null) options.xAxis.title.text;
 					$.each(res.chart.series, function(k,v) {
 						options.series.push(res.chart.series[k]);
 					});
