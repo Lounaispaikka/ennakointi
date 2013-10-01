@@ -1,5 +1,6 @@
 <?
 if ( $_SESSION['user_id'] ) {
+	
 	global $Cms;
 	$Pg = $Cms->getPage();
 	
@@ -17,31 +18,39 @@ if ( $_SESSION['user_id'] ) {
 		$_SESSION['comment_topic_id'] = $ct->id;
 	}
 	
+
 	//if ( $ct->id != null ) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);
 	//$Rules = \Lougis_comment_msg::getRules();
 	
 	?>
 	<script>
-		
+
 		var request = $.ajax({
 			url: '/run/lougis/comment/getCommentsHtml/',
 			data: {
 				page_id: <?=$Pg->id?>
+				<? if($ct->id != null) { ?>,topic_id: <?=$ct->id?> <? } ?>
 			},
 			type: "POST"
 		});
 		request.done(function(response) {
 			$("#ajax_request_div").empty();
 			$("#ajax_request_div").append(response);
-			
 		});
-		
-		
 
 	</script>
+
 	<div id="comments">
-	
-	
+		<div id="ajax_request_div">
+		</div>
+		<div id="dialog-message" title="Viesti l&auml;hetetty!">
+			<p id="response">
+				<span class="ui-icon ui-icon-circle-check" style="float: left; margin: 0 7px 50px 0;"></span>
+				<span id="response_msg"></span>
+			</p>
+		</div>
+	</div>
+	<? /*
 		<h2>Keskustelu</h2>
 		<?
 	if ( $ct->id == null ) { ?>
@@ -58,7 +67,7 @@ if ( $_SESSION['user_id'] ) {
 			
 		</div>
 		<? if ( $ct->id != null ) { ?>
-			<a id="newthread" onclick="showNewMsg(<?=$Pg->id?>, <?=$_SESSION['comment_topic_id']?>);" style="margin-top:15px;">Kommentoi</a>
+			<a id="newthread" onclick="showNewMsg(<?=$Pg->id?>, <?=$ct->id?>);" style="margin-top:15px;">Kommentoi</a>
 		<? } ?>
 	</div>
 	<div id="dialog-message" title="Viesti l&auml;hetetty!">
@@ -67,6 +76,7 @@ if ( $_SESSION['user_id'] ) {
 			<span id="response_msg"></span>
 		</p>
 	</div>
+	*/ ?>
 	<? 
 	/*
 	$Co = new \Lougis\utility\Compiler("comments-ui-extjs", "js");
@@ -94,4 +104,5 @@ if ( $_SESSION['user_id'] ) {
 	*/ ?>
 <?
 }
+
 ?>

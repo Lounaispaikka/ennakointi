@@ -112,7 +112,7 @@ function closeReplyBox( /*ParentMsgId*/ ) {
 	return false;
 	
 } */
-//jos topic sivuun jo tehty
+//create new message if topic already made
 function showNewMsg(this_page, topic_id) {	
 	$("#kommentti_form").empty();
 	if (typeof topic_id == 'undefined') topic_id = null;
@@ -127,7 +127,7 @@ function showNewMsg(this_page, topic_id) {
 	
 }
 
-//jos ei topicia viel‰, k‰ytet‰‰n t‰t‰
+//create new topic and message
 function showNewTopic(this_page) {	
 	$("#kommentti_form").empty();
 	if (typeof this_page == 'undefined') this_page = null;
