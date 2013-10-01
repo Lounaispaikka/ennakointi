@@ -4,7 +4,7 @@
 			<!--<li><a href="#">Aluetietopalvelu</a></li>-->
 			<li><a href="http://paikkatietokeskus.lounaispaikka.fi">Lounaispaikka</a></li>
 			<li><a href="http://ymparisto.lounaispaikka.fi">Ymp&auml;rist&ouml; Nyt</a></li>
-			<li><a href="http://demo.ennakointi.lounaispaikka.fi" style="font-weight:bold;">Ennakointi</a></li>
+			<li><a href="/" style="font-weight:bold;">Horisontti</a></li>
 			<li><a href="http://www.lounaispaikka.fi">Kartat</a></li>
  		</ul>
 
