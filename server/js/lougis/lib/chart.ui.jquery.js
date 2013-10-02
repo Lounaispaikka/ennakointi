@@ -545,6 +545,7 @@ function configureChart(chartObj, chart_id, parent_id, chart_db_object) {
 						"bar" : "Pylväs (vaaka)",
 						"line" : "Käyrä"/*,
 						"pie" : "Piirakka"*/
+						,"stacked" : "Pinottu pylväs"
 					},
 					"class" : "lomake"
 				},
@@ -644,6 +645,9 @@ function createChartGraph(chart_id) {
 				text: ''
 			}
 		},
+		legend: {
+			adjustChartSize: true
+		},
 		series: []
 	};
 
@@ -685,8 +689,38 @@ function createChartGraph(chart_id) {
 					options.series.push(obj);
 				
 				}
-				//bar, column or line
+				else if(configs.type == 'stacked') {
+					console.log("stackedcolumnchart");
+					//set type to column
+					options.chart.type = "column";
+					
+					options.plotOptions = {};
+					options.plotOptions.column = {};
+					options.plotOptions.column.stacking = 'normal';
+					options.plotOptions.column.datalabels = {};
+					options.plotOptions.column.datalabels.enabled = true;
+					options.plotOptions.column.datalabels.color = "(Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'";
+					options.yAxis.stackLabels = {};
+					
+					options.yAxis.stackLabels.style = {};
+					options.yAxis.stackLabels.style.enabled = true;
+					options.yAxis.stackLabels.style.fontWeight = 'bold';
+					options.yAxis.stackLabels.style.color = "(Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'gray'";
+					options.xAxis.categories = res.chart.xAxis.categories;
+					//options.xAxis.title.text = configs.x_title;
+					options.xAxis.title.text =  res.chart.xAxis.title;
+					console.log(configs.x_title);
+					if(configs.x_title != null) options.xAxis.title.text;
+					$.each(res.chart.series, function(k,v) {
+						options.series.push(res.chart.series[k]);
+					});
+					
+					
+					
+				}
 				
+				//bar, column or line
+			
 				//add type column to data_json [type, otsikko, luku, luku] ei tarvii sitte eriksee tehä näit
 				else {
 										console.log(res.chart);

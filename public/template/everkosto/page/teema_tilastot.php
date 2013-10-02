@@ -27,6 +27,7 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 ?>
 <? if($Pg->page_type === "chart" && $Chart->id != null) { ?>
 	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="/js/lougis/lib/adapt-chart-to-legend.js"></script>
 	<script type="text/javascript" src="/js/lougis/lib/chart.ui.jquery.js"></script>
 	<script type="text/javascript" >
 		$(function() {

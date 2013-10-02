@@ -372,6 +372,11 @@ class Charts extends \Lougis\abstracts\Frontend {
 		
 		try {
 			
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception("K√§ytt√§j√§n tunnistaminen");
+			
 			//if ( $_FILES['datafile']['type'] != 'text/csv' ) throw new \Exception("Virheellinen tiedostotyyppi! Tiedoston tulee olla CSV-tiedosto (tiedostop‰‰te .csv)");
 			unset($_SESSION['new_chart_id']); //v‰liaikainen testaamiseen
 			if ( isset($_SESSION['new_chart_id']) ) {
