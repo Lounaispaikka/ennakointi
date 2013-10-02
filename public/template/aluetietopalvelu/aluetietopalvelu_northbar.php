@@ -9,11 +9,15 @@
  		</ul>
 
 		<!-- Login Starts Here -->
+		<? //user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+		?>
             <div id="loginContainer">
                 <a href="#" id="loginButton"><span><? if(!isset($_SESSION['user_id'])) echo 'Kirjaudu'; else echo 'Asetukset'; ?> </span> <em></em></a>
                 <div style="clear:both"></div>
                 <div id="loginBox">
-					<? if (!isset($_SESSION['user_id'])) { ?>
+					<? if (!$SessionUser->isLogged()) { ?>
                     <form id="loginForm" method="post">
 					
                         <fieldset id="body">

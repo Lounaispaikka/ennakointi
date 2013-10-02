@@ -55,6 +55,7 @@ class Lougis_user extends \Lougis\DB_DataObject_Wrapper
 		return false;
 	
 	}
+	
 	/*
 	public function isAdminLogged() {
 	
