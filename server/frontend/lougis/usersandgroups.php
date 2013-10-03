@@ -174,12 +174,14 @@ class Usersandgroups extends \Lougis\abstracts\Frontend {
     }
     
     public function logoutUser() {
-    
+		
+		global $Session;
+		$Session->logoutUser();
 		session_destroy();
 		unset($_SESSION['user_id']);
 		unset($_SESSION['site_id']);
 		unset($_SESSION['admin_login']);
-		header('Location: /hallinta/?logout');
+		header('Location: /');
 	
     }
     

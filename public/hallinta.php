@@ -7,12 +7,15 @@ global $Site, $Session;
 //handle site
 
 $Session = new \Lougis_session();
+
+//if user is not admin destroy mtf
+if ($Session->admin_session != 't')  exit('Käyttäjältä puuttuu hallinta-oikeus');
+if ( !isset($_SESSION['user_id']) ) exit('Käyttäjältä puuttuu hallinta-oikeus');
 $_SESSION['site_id'] = 'everkosto';
 $_SESSION['lang_id'] = 'fi';
 
 $Site = new \Lougis_site( $_SESSION['site_id'] );
 
-if ( !isset($_SESSION['user_id']) ) header('Location: /');
 
 //if ( !isset($_SESSION['user_id']) ) header('Location: /#login-box');
 //$Co = new \Lougis\utility\Compiler("hallinta", "js");

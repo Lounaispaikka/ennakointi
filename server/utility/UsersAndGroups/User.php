@@ -99,7 +99,7 @@ class User extends \Lougis\abstracts\Utility {
         $User->find(true);
         if(!empty($User->id)) {
         	if ( !isset($Session->lifetime) || empty($Session->lifetime) ) throw new \Exception("Unable to login. Session data missing");
-        	$Session->loginUser( $User->id, true ); //loginUser(user_id, session_admin)
+        	$Session->loginUser( $User->id, false ); 
             
 			//päästää sisään admin-sivulle
 			$AdminUser = new \Lougis_user();
@@ -114,8 +114,15 @@ class User extends \Lougis\abstracts\Utility {
 								WHERE lougis."user"."id" = '.$User->id.'
 								AND lougis."group".is_admin = true
 							;');
-			if($AdminUser->fetch()) return true;
-			else return false;
+			if($AdminUser->fetch()) { 
+				devlog($AdminUser, "e_user");
+				$Session->loginUser( $User->id, true ); 
+				return true; 
+			}
+			else {
+				$Session->loginUser( $User->id, false ); 
+				return true;
+			}
         }
         return false;
     }

@@ -20,10 +20,12 @@ require_once(PATH_SERVER.'utility/UsersAndGroups/User.php');
 if(isset($_POST['email']) && isset($_POST['password'])) {
     $user = new \Lougis\utility\User();
     $success = $user->login($_POST['email'], $_POST['password']);
+	devlog($success, "e_user");
     if(!$success) {
     	$errMsg = "Kirjautuminen ep&auml;onnistui, <br/ >ole hyv&auml; ja yrit&auml; uudelleen.";
-    } else {
-    	switch($redir) {
+	}
+ /*   } else {
+    	 switch($redir) {
 			case 'admin':
 				$_SESSION['admin_login'] = true;
 				header('Location: /hallinta/');
@@ -31,7 +33,7 @@ if(isset($_POST['email']) && isset($_POST['password'])) {
     		default:
     			$_SESSION['admin_login'] = false;
 				break;
-    	}
-    }
+    	} */
+    
 }
 ?>

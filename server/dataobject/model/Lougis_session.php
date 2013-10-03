@@ -20,7 +20,7 @@ class Lougis_session extends \Lougis\DB_Session_Wrapper
     public $user_agent;                      // varchar(-1)  
     public $session_data;                    // varchar(-1)  
     public $user_id;                         // int4(4)  
-    public $admin_session;                   // bool(1)  not_null default_false
+    public $admin_session;                   // bool(1)  
 
     /* Static get */
     function staticGet($k,$v=NULL) { return DB_DataObject::staticGet('Lougis_session',$k,$v); }
@@ -50,12 +50,20 @@ class Lougis_session extends \Lougis\DB_Session_Wrapper
 	    return false;
 	}
 	
+	public function isAdmin() {
+		if ( !empty($this->user_id) && empty($this->ended) && $this->admin_session ) return true;
+		return false;
+	}
+	
 	public function loginUser( $userId, $admin_session = false ) {
 	
 		$this->user_id = $userId;
 		$_SESSION['user_id'] = $this->user_id;
-		if( $admin_session ) $this->admin_session = true;
-		return $this->save();
+		if( $admin_session == true) $this->admin_session = true;
+		else $this->admin_session = false;
+		if(!$this->save()) return false;
+		devlog($this, "e_user");
+		return true;
 	
 	}
 	
