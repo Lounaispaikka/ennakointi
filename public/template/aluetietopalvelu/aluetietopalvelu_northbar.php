@@ -53,7 +53,7 @@
 								<p><? echo $Uinfo_array[0]["email"];?></p>
 							</fieldset>
 							<fieldset>
-								<p><a href="/hallinta/" class="linkJs">Avaa sis&auml;ll&ouml;nhallinta</a></p>
+								<!--<p><a href="/hallinta/" class="linkJs">Avaa sis&auml;ll&ouml;nhallinta</a></p>-->
 								<p><a href="javascript:void(0)" class="linkJs" id="openToimiala">Muokkaa toimialoja</a></p>
 							</fieldset>
 							<!--<fieldset>

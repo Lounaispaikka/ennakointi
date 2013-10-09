@@ -59,10 +59,8 @@ $CmsCom = new \Lougis\utility\CmsComment();
 						</div>
 					</div>
 					
-					<script type="text/javascript" src="/js/lougis/lib/ennakointi.ui.jquery.js"></script>
 					
 					<!--<script type="text/javascript" src="/js/NicEdit/nicEdit.js"></script>-->
-					<script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script>
 					<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.0/jquery.validate.min.js"></script>
 					<script type="text/javascript">
 						jQuery(function() {	
