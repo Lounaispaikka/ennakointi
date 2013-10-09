@@ -259,6 +259,10 @@ div#editPageFormDialog form label,
 	display:block;
 }
 
+.ui-dform-label{
+	text-align:left !important;
+}
+
 div#addPageFormDialog  form input,
 div#editPageFormDialog form input,
 #editToimiala form input,
@@ -650,12 +654,12 @@ table#comment_topics tr:nth-child(odd).topic_row {
 /*Toimiala templaten css*/
 .list-h3 { padding: 10px 0 10px 5px; margin: 0; font-size: 14px; font-weight: 700; }
 .list-with-heading { display:block; float:left; margin: 0 15px 0 15px;}
-#sortable1, #sortable2 { list-style-type: none; margin: 0; padding: 0 ; float: left; margin-right: 2px; border: 1px solid; min-width: 350px; min-height: 29px; background-color: #fff;}
-#sortable1 li, #sortable2 li { margin: 0 2px 0 2px; padding: 2px 2px 2px 2px; font-size: 1.2em; width: 100%; min-height: 24px; }
+#sortable1, #sortable2 { list-style-type: none; margin: 0; padding: 0 ; float: left; margin-right: 2px; border: 1px solid; min-width: 350px; min-height: 29px; max-width:350px; background-color: #fff;}
+#sortable1 li, #sortable2 li { margin: 0 2px 0 2px; padding: 2px 2px 2px 2px; font-size: 1.2em; width: 96%; min-height: 24px; }
 #sortable1 li:hover, #sortable2 li:hover {cursor: pointer; border: 2px solid;}
-.userlist_name { font-size: 14px; color: #000; margin: 0 3px 0 3px}
-.userlist_org {font-size: 12px; color: #000;margin: 0 3px 0 3px}
-.userlist_email {font-size: 12px; color: blue; margin: 0 3px 0 3px}
+.userlist_name { font-size: 12px; color: #000; margin: 0 3px 0 3px; font-weight: 700; }
+.userlist_org {font-size: 11px; color: #000;margin: 0 3px 0 3px;display:block; clear:both; font-weight: 400;}
+.userlist_email {font-size: 11px; color: blue; margin: 0 3px 0 3px; font-weight: 400;}
 #cms_content {height: 300px; min-width: 350px;}
 #editToimiala { display:none;}
 #editTeema { display:none;}

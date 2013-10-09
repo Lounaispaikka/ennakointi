@@ -12,6 +12,7 @@ body, .x-body {
     padding: 0;
     text-align: center;
 	background-color: #fff;
+	font-size: 12px;
  
 }
 /*img {
@@ -425,33 +426,22 @@ span.clr {
 }
 
 #footer {
-	float: left;
+	display: block;
 	clear: both;
-	overflow: hidden;
-	left: 50%;
-	margin: 20px 0 0 0;
-	padding: 15px 0 10px 0;
+	float: left;
 	width: 100%;
-	font-size: 12px;
-	text-align: center;
-	background: url('/img/tiles/sq_white_40p.png');
+	margin: 30px auto;
+	overflow: hidden;
 }
 #footer #partners {
-	display: block;
-	position: relative;
-	float: left;
-	left: 50%;
-	list-style-type: none;
-	margin: 10px auto;
-	padding: 0 0 20px 0;
-	text-align: center;
-	height: 60px;
+	height: 50px;
+	margin: 0 auto;
 }
 #partners li {
-	float: left;
-	position: relative;
-	margin: 0 10px;
-	right: 50%;
+	display: inline;
+	list-style-type: none;
+	padding: 0 20px 0 20px;
+
 }
 
 
