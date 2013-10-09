@@ -16,17 +16,20 @@ if($Pg->page_type == "teema_tiedostot") {
 			from lougis.cms_page, lougis.file
 			where cms_page.parent_id = ".$Page->id."
 			and cms_page.page_type = 'file'
-			and cms_page.id = file.page_id;";
+			and cms_page.file_id = file.id;";
 	$FilePage->query($sql);
 	while($FilePage->fetch() ) {
 		$FilePages[] = clone($FilePage);
 	}
 }
 else {
-	$file = new \Lougis_file();
+	/*$file = new \Lougis_file();
 	$file->page_id = $Pg->id;
 	$file->find();
-	$file->fetch();
+	$file->fetch();*/
+	$file = new \Lougis_file();
+	$file->id = $Pg->file_id;
+	$file->find(true);
 }
 require_once(PATH_TEMPLATE.'everkosto/include_header.php'); 
 ?>

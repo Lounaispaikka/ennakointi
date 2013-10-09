@@ -1,6 +1,5 @@
 <?php
 namespace Lougis\frontend\lougis;
-
 require_once(PATH_SERVER.'abstracts/Frontend.php');
 require_once(PATH_PEAR_HTTP.'Upload.php');
 use PEAR;
@@ -19,7 +18,11 @@ class File_upload extends \HTTP_Upload {
 		$file = $upload->getFiles("f");
 		devlog($file, "e_fileupload");
 		try {
-			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.');
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			
 			//Sallitut tiedostotyypit
 			$exts = array("pdf","doc","docx","csv","xls","xlsx","txt","ppt","pptx","odt","ods","odp","gif","jpg","png");
 			//Tiedosto
@@ -41,16 +44,28 @@ class File_upload extends \HTTP_Upload {
 			} elseif ($file->isError()) {
 				throw new \Exception($file->errorMsg()); 
 			}
+	
+			//Tietokanta
+			$File = new \Lougis_file();
 			
+			$File->original_name = $file->getProp('real');
+			$File->file_name = $file->getProp('name');
+			$File->form_name = $file->getProp('form_name');
+			$File->file_ext =$file->getProp('ext');
+			$File->file_size = $file->getProp('size');
+			$File->description =  $_REQUEST['description'];
+			//$File->created_date = date(DATE_W3C);
+			$File->created_by = $_SESSION['user_id'];
+			//$File->page_id = $page->id; //old version
+			$msg .= "\n ja tiedot tallennettu tietokantaan.";
+			if ( !$File->save() ) throw new \Exception('Tiedoston tallennus tietokantaa ep&auml;onnistui: '.$File->_lastError);
 			
-			 //Sivun luonti
-			
+			//Sivun luonti	
 			//hae oikea parent page
 			$parent = new \Lougis_cms_page();
 			$parent->parent_id = $_REQUEST['parent_id'];
 			$parent->page_type = "teema_tiedostot";
-			$parent->find();
-			$parent->fetch();
+			$parent->find(true);
 			
 			//luo cms_page
 			$page = new \Lougis_cms_page();
@@ -66,6 +81,7 @@ class File_upload extends \HTTP_Upload {
 			$page->restricted_access = true;
 			$page->page_type = 'file';
 			$page->parent_id = $parent->id;
+			$page->file_id = $File->id;
 			//if($_REQUEST['news']['parent_id'] > 0) $page->parent_id = $_REQUEST['news']['parent_id'];
 			/*if($_REQUEST['news']['page_id'] < 1)*/ $page->setNextSeqNum(); //jos uusi niin annettaan seqnum
 			if ( !$page->save() ) throw new \Exception("Sivun tallennus epäonnistui.");
@@ -86,21 +102,6 @@ class File_upload extends \HTTP_Upload {
 				if(!$permission->fetch()) { $permission->insert(); }
 			}
 			
-			//Tietokanta
-			$File = new \Lougis_file();
-			
-			$File->original_name = $file->getProp('real');
-			$File->file_name = $file->getProp('name');
-			$File->form_name = $file->getProp('form_name');
-			$File->file_ext =$file->getProp('ext');
-			$File->file_size = $file->getProp('size');
-			$File->description =  $_REQUEST['description'];
-			//$File->created_date = date(DATE_W3C);
-			$File->created_by = $_SESSION['user_id'];
-			$File->page_id = $page->id;
-			$msg .= "\n ja tiedot tallennettu tietokantaan.";
-			if ( !$File->save() ) throw new \Exception('Tiedoston tallennus tietokantaa ep&auml;onnistui: '.$File->_lastError);
-			
 			$res = array(
 				"success" => true,
 				"msg" => $msg
@@ -118,9 +119,13 @@ class File_upload extends \HTTP_Upload {
 	}
 	
 	public function deleteFile() {
-		global $Site;
+		
 		try {
-			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.');
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			
 			$file_id = (int)$_POST['file_id'];
 			$page_id = (int)$_POST['page_id'];
 			
@@ -129,11 +134,17 @@ class File_upload extends \HTTP_Upload {
 			if ( $page_id != null) {
 				$page = new \Lougis_cms_page($page_id);
 				if ( !$page->delete() ) throw new \Exception('Tiedostosivun poistaminen epäonnistui: '.$page->_lastError);
-			}
-			else {
 				$file = new \Lougis_file($file_id);
-				if ( !$file->delete() ) throw new \Exception('Tiedoston poistaminen epäonnistui: '.$file->_lastError);
+				if($file->delete()) {
+					//delete file also
+					unlink(PATH_UPFILES.$file->file_name);
+				}
 			}
+		/* 	else { */
+				
+				//if ( !$file->delete() ) throw new \Exception('Tiedoston poistaminen epäonnistui: '.$file->_lastError);
+			
+		/* 	} */
 			//poista tiedosto
 			
 			$res = array(
