@@ -103,7 +103,7 @@ function newNews(parent_id) {
 				},
 				{
 					"name" : "news[source]",
-					"caption" : "L&auml;hde",
+					"caption" : "Lähdelinkki",
 					"type" : "text",
 					"value" : "http://"/* ,
 					"validate" : {
@@ -116,7 +116,7 @@ function newNews(parent_id) {
 				},
 				{
 					"name" : "news[source_url]",
-					"caption" : "L&auml;hdelinkki",
+					"caption" : "Lähde",
 					"type" : "text"/* ,
 					"validate" : {
 						"required": true,
@@ -176,13 +176,13 @@ function newNews(parent_id) {
 }
 
 //delete news+page
-function delNews(newsPageId, parentId) {
+function delNews(newsPageId, newsId) {
 	$.ajax({
 		url: "/run/lougis/news/deleteNews/",
 		type: "POST",
 		data: {
 			page_id: newsPageId,
-			//news_id: newsId
+			news_id: newsId
 		}
 	}).done(function(res) {
 		console.log(res.msg);

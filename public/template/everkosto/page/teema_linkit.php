@@ -10,7 +10,13 @@ $Parent = $Cms->findCurrentPageTopParent( );
 $uutinen_sivu = new \Lougis_cms_page();
 //$uutinen_sivu->parent_id = $Pg->id;
 //$uutinen_sivu->find();
-$sql = 'select cms_page."id", cms_page."title", news.title as news_title, news.page_id as page_id, news."id" as news_id from lougis.cms_page inner join lougis.news on news.page_id = cms_page."id" where parent_id = '.$Pg->id;
+//$sql = 'select cms_page."id", cms_page."title", news.title as news_title, news.page_id as page_id, news."id" as news_id from lougis.cms_page inner join lougis.news on news.page_id = cms_page."id" where parent_id = '.$Pg->id;
+$sql = "select cms_page.id, cms_page.title, news.title as news_title, news.id as news_id
+		from lougis.cms_page
+		inner join lougis.news on news.id = cms_page.news_id
+		where cms_page.page_type = 'news'
+		and cms_page.parent_id = ".$Pg->id."
+		and news.news_type = 'linkki';";
 $uutinen_sivu->query($sql);
 $uutiset = array();
 while ($uutinen_sivu->fetch()) {
@@ -18,10 +24,12 @@ while ($uutinen_sivu->fetch()) {
 }
 
 //yksittäisen uutisen sivu
-$tama_uutinen = new \Lougis_news();
-$tama_uutinen->page_id = $Pg->id;
-$tama_uutinen->find();
-$tama_uutinen->fetch();
+if($Pg->news_id != null) {
+	$tama_uutinen = new \Lougis_news();
+	$tama_uutinen->id = $Pg->news_id;
+	$tama_uutinen->find(true);
+}
+
 
 
 require_once(PATH_TEMPLATE.'everkosto/include_header.php'); 
@@ -39,7 +47,7 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 	<? //uutisetusivu ?>
 	<ul>
 	<? foreach($uutiset as $uutinen) { ?>
-		<li id="<?=$uutinen->id?>"><div id="<?=$uutinen->news_id?>"><a href="../<?=$uutinen->id?>/" ><?=$uutinen->title?></a> </li> 
+		<li id="<?=$uutinen->id?>"><div id="<?=$uutinen->id?>"><a href="../<?=$uutinen->id?>/" ><?=$uutinen->title?></a> </li> 
 	<? } ?>
 	</ul>
 	<? //uutissivu ?>
@@ -59,8 +67,9 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 	</div>
 	<? } ?>
 		
-<? if ($tama_uutinen->id !=null ) require_once(PATH_PUBLIC.'comments_frontend/kommentointi.php'); ?>	
+<? if ($tama_uutinen->id != null ) require_once(PATH_PUBLIC.'comments_frontend/kommentointi.php'); ?>	
 </div>
+<? if ($tama_uutinen->id != null) { ?>
 <script type="text/javascript" src="/js/lougis/lib/link.ui.jquery.js"></script>
 <script type="text/javascript">
 	$(function() {
@@ -68,7 +77,7 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 		$('#delLink').click(function(){
 			var del = window.confirm("Oletko varma, että haluat poistaa linkin?");
 			if(del == true) {
-				delLink(<?=$Pg->id?>, <?=$Pg->parent_id?>);
+				delLink(<?=$Pg->id?>, <?=$Pg->news_id?>);
 				return false;
 			} else {
 				return false;
@@ -84,6 +93,6 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 	
 </script>
 
-
+<? } ?>
 
 <? require_once(PATH_TEMPLATE.'everkosto/include_footer.php'); ?>

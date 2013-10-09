@@ -143,7 +143,7 @@ class News extends \Lougis\abstracts\Frontend {
 			$News->content = $_REQUEST['news_content'];
 			if ( !isset($_REQUEST['news']['published']) && $News->N == 1 ) $News->published = false;
 			
-			if ( strlen($News->title) < 5 || strlen($News->title) > 250 ) throw new \Exception("Tiedotteen otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
+			//if ( strlen($News->title) < 5 || strlen($News->title) > 250 ) throw new \Exception("Tiedotteen otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
 			if ( !$News->save() ) throw new \Exception('Tiedotteen tallentaminen epäonnistui: '.$News->_lastError->userinfo);
 			if ( !$News->setPages( json_decode($_REQUEST['news_pages']) ) ) throw new \Exception('Tiedotteen linkkien tallennus epäonnistui: '.$Pg->_lastError);
 			$res = array(
@@ -170,27 +170,49 @@ class News extends \Lougis\abstracts\Frontend {
 		global $Site, $User;
 		
 		try {
-			devlog($_REQUEST, "e_news");
-			devlog($_REQUEST['news']['parent_id'], "e_news");
-			devlog($_REQUEST['parent_id'], "e_news");
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
 			
 			
-			if ( strlen($_REQUEST['news']['title']) < 5 || strlen($_REQUEST['news']['title']) > 250 ) throw new \Exception("Tiedotteen otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
+			//if ( strlen($_POST['news']['title']) < 5 || strlen($_POST['news']['title']) > 250 ) throw new \Exception("Tiedotteen otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
+			
+			if ( isset($_POST['news_id']) && !empty($_POST['news_id']) ) {
+				$News = new \Lougis_news($_POST['news_id']);
+				if ( empty($News->title) ) throw new \Exception("Tiedotetta ei voitu ladata!");
+				$msg = "Tiedote tallennettu";
+			} else {
+				$News = new \Lougis_news();
+				$msg = "Uusi tiedote tallennettu";
+				$News->site_id = $Site->id;
+				$News->lang_id = 'fi';
+				$News->created_date = date(DATE_W3C);
+				$News->created_by = $User->id;
+				$News->news_type = 'uutinen';
+				$News->seqnum = 0;
+				\Lougis_news::growSeqnums();
+			}
+			$News->setFrom($_POST['news']);
+			if ( empty($News->created_date) ) $News->created_date = date(DATE_W3C);
+			if ( !isset($_POST['news']['published']) && $News->N == 1 ) $News->published = false;
+			
+			//if ( strlen($News->title) < 5 || strlen($News->title) > 250 ) throw new \Exception("Tiedotteen otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
+			if ( !$News->save() ) throw new \Exception('Tiedotteen tallentaminen epäonnistui: '.$News->_lastError->userinfo);
+			//if ( !$News->setPages( json_decode($_POST['news_pages']) ) ) throw new \Exception('Tiedotteen linkkien tallennus epäonnistui: '.$Pg->_lastError);
 			
 			//hae oikea parent page
 			$parent = new \Lougis_cms_page();
-			$parent->parent_id = $_REQUEST['news']['parent_id'];
+			$parent->parent_id = $_POST['news']['parent_id'];
 			$parent->page_type = "teema_uutiset";
-			$parent->find();
-			$parent->fetch();
-			devlog($parent, "e_news");
+			$parent->find(true);
 			
 			//luo cms_page
 			$page = new \Lougis_cms_page();
 			$page->site_id = 'everkosto';
 			$page->lang_id = 'fi';
-			$page->title = $_REQUEST['news']['title'];
-			$page->nav_name = $_REQUEST['news']['title'];
+			$page->title = $_POST['news']['title'];
+			$page->nav_name = $_POST['news']['title'];
 			$page->created_by = $_SESSION['user_id'];
 			$page->created_date = date(DATE_W3C);
 			$page->published = true;
@@ -198,9 +220,10 @@ class News extends \Lougis\abstracts\Frontend {
 			$page->visible = true;
 			$page->restricted_access = true;
 			$page->page_type = 'news';
+			$page->news_id = $News->id;
 			$page->parent_id = $parent->id;
-			//if($_REQUEST['news']['parent_id'] > 0) $page->parent_id = $_REQUEST['news']['parent_id'];
-			if($_REQUEST['news']['page_id'] < 1) $page->setNextSeqNum(); //jos uusi niin annettaan seqnum
+			//if($_POST['news']['parent_id'] > 0) $page->parent_id = $_POST['news']['parent_id'];
+			if($_POST['news']['page_id'] < 1) $page->setNextSeqNum(); //jos uusi niin annettaan seqnum
 			if ( !$page->save() ) throw new \Exception("Sivun tallennus epäonnistui.");
 			$PgArray = $page->toArray();
 			
@@ -219,28 +242,7 @@ class News extends \Lougis\abstracts\Frontend {
 				if(!$permission->fetch()) { $permission->insert(); }
 			}
 			
-			if ( isset($_REQUEST['news_id']) && !empty($_REQUEST['news_id']) ) {
-				$News = new \Lougis_news($_REQUEST['news_id']);
-				if ( empty($News->title) ) throw new \Exception("Tiedotetta ei voitu ladata!");
-				$msg = "Tiedote tallennettu";
-			} else {
-				$News = new \Lougis_news();
-				$msg = "Uusi tiedote tallennettu";
-				$News->site_id = $Site->id;
-				$News->lang_id = 'fi';
-				$News->created_date = date(DATE_W3C);
-				$News->created_by = $User->id;
-				$News->seqnum = 0;
-				\Lougis_news::growSeqnums();
-			}
-			$News->setFrom($_REQUEST['news']);
-			if ( empty($News->created_date) ) $News->created_date = date(DATE_W3C);
-			$News->page_id = $PgArray['id'];
-			if ( !isset($_REQUEST['news']['published']) && $News->N == 1 ) $News->published = false;
 			
-			//if ( strlen($News->title) < 5 || strlen($News->title) > 250 ) throw new \Exception("Tiedotteen otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
-			if ( !$News->save() ) throw new \Exception('Tiedotteen tallentaminen epäonnistui: '.$News->_lastError->userinfo);
-			//if ( !$News->setPages( json_decode($_REQUEST['news_pages']) ) ) throw new \Exception('Tiedotteen linkkien tallennus epäonnistui: '.$Pg->_lastError);
 			
 			$res = array(
 				"success" => true,
@@ -265,12 +267,40 @@ class News extends \Lougis\abstracts\Frontend {
 		global $Site, $User;
 		
 		try {
+		
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
 			
-			if ( strlen($_REQUEST['news']['title']) < 5 || strlen($_REQUEST['news']['title']) > 250 ) throw new \Exception("Tiedotteen otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
+		//	if ( strlen($_POST['news']['title']) < 5 || strlen($_POST['news']['title']) > 250 ) throw new \Exception("Tiedotteen otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
+			
+			if ( isset($_POST['news_id']) && !empty($_POST['news_id']) ) {
+				$News = new \Lougis_news($_POST['news_id']);
+				if ( empty($News->title) ) throw new \Exception("Linkkiä ei voitu ladata!");
+				$msg = "Linkki tallennettu";
+			} else {
+				$News = new \Lougis_news();
+				$msg = "Uusi linkki tallennettu";
+				$News->site_id = $Site->id;
+				$News->lang_id = 'fi';
+				$News->created_date = date(DATE_W3C);
+				$News->created_by = $User->id;
+				$News->news_type = 'linkki';
+				$News->seqnum = 0;
+				\Lougis_news::growSeqnums();
+			}
+			$News->setFrom($_POST['news']);
+			if ( empty($News->created_date) ) $News->created_date = date(DATE_W3C);
+			if ( !isset($_POST['news']['published']) && $News->N == 1 ) $News->published = false;
+			
+			if ( strlen($News->title) < 5 || strlen($News->title) > 250 ) throw new \Exception("Linkin otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
+			if ( !$News->save() ) throw new \Exception('Linkin tallentaminen epäonnistui: '.$News->_lastError->userinfo);
+			//if ( !$News->setPages( json_decode($_POST['news_pages']) ) ) throw new \Exception('Tiedotteen linkkien tallennus epäonnistui: '.$Pg->_lastError);
 			
 			//hae oikea parent page
 			$parent = new \Lougis_cms_page();
-			$parent->parent_id = $_REQUEST['news']['parent_id'];
+			$parent->parent_id = $_POST['news']['parent_id'];
 			$parent->page_type = "teema_linkit";
 			$parent->find();
 			$parent->fetch();
@@ -279,8 +309,8 @@ class News extends \Lougis\abstracts\Frontend {
 			$page = new \Lougis_cms_page();
 			$page->site_id = 'everkosto';
 			$page->lang_id = 'fi';
-			$page->title = $_REQUEST['news']['title'];
-			$page->nav_name = $_REQUEST['news']['title'];
+			$page->title = $_POST['news']['title'];
+			$page->nav_name = $_POST['news']['title'];
 			$page->created_by = $_SESSION['user_id'];
 			$page->created_date = date(DATE_W3C);
 			$page->published = true;
@@ -288,9 +318,10 @@ class News extends \Lougis\abstracts\Frontend {
 			$page->visible = true;
 			$page->restricted_access = true;
 			$page->page_type = 'news';
+			$page->news_id = $News->id;
 			if($parent->id != null) $page->parent_id = $parent->id;
-			//if($_REQUEST['news']['parent_id'] > 0) $page->parent_id = $_REQUEST['news']['parent_id'];
-			if($_REQUEST['news']['page_id'] < 1) $page->setNextSeqNum(); //jos uusi niin annettaan seqnum
+			//if($_POST['news']['parent_id'] > 0) $page->parent_id = $_POST['news']['parent_id'];
+			if($_POST['news']['page_id'] < 1) $page->setNextSeqNum(); //jos uusi niin annettaan seqnum
 			if ( !$page->save() ) throw new \Exception("Sivun tallennus epäonnistui.");
 			$PgArray = $page->toArray();
 			
@@ -310,29 +341,6 @@ class News extends \Lougis\abstracts\Frontend {
 				if(!$permission->fetch()) { $permission->insert(); }
 			}
 			
-			if ( isset($_REQUEST['news_id']) && !empty($_REQUEST['news_id']) ) {
-				$News = new \Lougis_news($_REQUEST['news_id']);
-				if ( empty($News->title) ) throw new \Exception("Linkkiä ei voitu ladata!");
-				$msg = "Linkki tallennettu";
-			} else {
-				$News = new \Lougis_news();
-				$msg = "Uusi linkki tallennettu";
-				$News->site_id = $Site->id;
-				$News->lang_id = 'fi';
-				$News->created_date = date(DATE_W3C);
-				$News->created_by = $User->id;
-				$News->news_type = 'linkki';
-				$News->seqnum = 0;
-				\Lougis_news::growSeqnums();
-			}
-			$News->setFrom($_REQUEST['news']);
-			if ( empty($News->created_date) ) $News->created_date = date(DATE_W3C);
-			$News->page_id = $PgArray['id'];
-			if ( !isset($_REQUEST['news']['published']) && $News->N == 1 ) $News->published = false;
-			
-			if ( strlen($News->title) < 5 || strlen($News->title) > 250 ) throw new \Exception("Linkin otsikko tulee olla vähintään 5 merkkiä ja maksimissaan 250.");
-			if ( !$News->save() ) throw new \Exception('Linkin tallentaminen epäonnistui: '.$News->_lastError->userinfo);
-			//if ( !$News->setPages( json_decode($_REQUEST['news_pages']) ) ) throw new \Exception('Tiedotteen linkkien tallennus epäonnistui: '.$Pg->_lastError);
 			
 			$res = array(
 				"success" => true,
@@ -357,19 +365,24 @@ class News extends \Lougis\abstracts\Frontend {
 		
 		global $Site;
 		try {
-			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.');
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			
 			$page_id = (int)$_POST['page_id'];
+			$news_id = (int)$_POST['news_id'];
 			if ( $page_id != null) {
 				$page = new \Lougis_cms_page($page_id);
 				if ( !$page->delete() ) throw new \Exception('Tiedotesivun poistaminen epäonnistui: '.$page->_lastError);
 			}
-			else {
-				$News = new \Lougis_news($_REQUEST['news_id']);
-				if ( empty($News->title) ) throw new \Exception('Tiedotteen poistaminen epäonnistui: Tiedotetta ei voitu ladata!');
-				if ( $News->site_id != $Site->id ) throw new \Exception('Tiedotteen poistaminen epäonnistui: Virheellinen sivusto!');
-				
-				if ( !$News->delete() ) throw new \Exception('Tiedotteen poistaminen epäonnistui: '.$News->_lastError);
-			}
+			
+			$News = new \Lougis_news($news_id);
+			if ( empty($News->title) ) throw new \Exception('Tiedotteen poistaminen epäonnistui: Tiedotetta ei voitu ladata!');
+			if ( $News->site_id != $Site->id ) throw new \Exception('Tiedotteen poistaminen epäonnistui: Virheellinen sivusto!');
+			devlog($News, "e_news");
+			//if ( !$News->delete() ) throw new \Exception('Tiedotteen poistaminen epäonnistui: '.$News->_lastError);
+			$News->delete(); //ei tarvitse if:iä koska exceptionia ei tarvitse antaa vaikkei poistuis (db for.key restrict)
 			$res = array(
 				"success" => true,
 				"msg" => "Tiedote poistettu onnistuneesti!"
