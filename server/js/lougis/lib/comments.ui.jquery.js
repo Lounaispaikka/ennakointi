@@ -113,13 +113,13 @@ function closeReplyBox( /*ParentMsgId*/ ) {
 	
 } */
 //create new message if topic already made
-function showNewMsg(this_page, topic_id) {	
+function showNewMsg(this_page, topic_id, not_page = false) {	
 	$("#kommentti_form").empty();
 	if (typeof topic_id == 'undefined') topic_id = null;
 	if (typeof this_page == 'undefined') this_page = null;
 	var replyTo = null;
 	
-	createMessageForm('newcommentform', this_page, replyTo, topic_id );
+	createMessageForm('newcommentform', this_page, replyTo, topic_id, not_page );
 	//show and animate new comment msgbox
 	$(".replybox").hide();
 	$("#newcomment").show();
@@ -179,7 +179,7 @@ function cancelMsgEdit() {
 	return false;
 }
 
-function createMessageForm( targetId, this_page, replyTo, topic_id ) {
+function createMessageForm( targetId, this_page, replyTo, topic_id, not_page ) {
 	
 	disableLinks();
 	
@@ -298,22 +298,39 @@ function createMessageForm( targetId, this_page, replyTo, topic_id ) {
 				}
 			});
 		}
-		
-		
-		//ajax reload page comments
-		var request = $.ajax({
-			url: '/run/lougis/comment/getCommentsHtml/',
-			data: {
-				page_id: this_page
-			},
-			type: "POST"
-		});
-		request.done(function(response) {
-			$("#ajax_request_div").empty();
-			$("#ajax_request_div").append(response);
-			
-		});
-		
+		console.log("notpage", not_page);
+		if(not_page == false) {
+			//ajax reload page comments
+			var request = $.ajax({
+				url: '/run/lougis/comment/getCommentsHtml/',
+				data: {
+					page_id: this_page
+				},
+				type: "POST"
+			});
+			request.done(function(response) {
+				$("#ajax_request_div").empty();
+				$("#ajax_request_div").append(response);
+				
+			});
+		}
+		else {
+			/*//ajax reload page comments
+			var request = $.ajax({
+				url: '/run/lougis/comment/getCommentsHtmlKeskustelu/',
+				data: {
+					page_id: this_page
+				},
+				type: "POST"
+			});
+			request.done(function(response) {
+				$("#ajax_request_div").empty();
+				$("#ajax_request_div").append(response);
+				
+			})*/;
+			//quick fix reload page
+			location.reload();
+		}
 		enableLinks();
 		console.log(responseText);
 	

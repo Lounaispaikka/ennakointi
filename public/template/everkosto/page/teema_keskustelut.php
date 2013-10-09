@@ -2,9 +2,6 @@
 require_once(PATH_TEMPLATE.'everkosto/include_header.php'); 
 require_once(PATH_SERVER.'utility/LouGIS/Compiler.php');
 
-require_once(PATH_PUBLIC.'phorum/common.php');
-require_once(PATH_PUBLIC.'phorum/include/format_functions.php');
-
 global $Site, $Cms;
 
 $Class = 'col2';
@@ -33,9 +30,9 @@ if(isset($_GET['tid'])) {
 <script>
 		
 		var request = $.ajax({
-			url: '/run/lougis/comment/getCommentsHtml/',
+			url: '/run/lougis/comment/getCommentsHtmlKeskustelu/',
 			data: {
-				page_id: <?=$Pg->id?>,
+				//page_id: <?=$Pg->id?>,
 				topic_id: <?=$topic_id?>
 			},
 			type: "POST"
@@ -55,6 +52,7 @@ if(isset($_GET['tid'])) {
 //teeman etusivu eli mitkä keskustelut haetaan
 
 ?>
+<script type="text/javascript" src="/js/lougis/lib/comments.ui.jquery.js"></script>
 <script type="text/javascript" src="/js/jqueryPlugins/jquery_tablesorter/jquery.tablesorter.min.js"></script> 
 <div id="breadcrumb"><? $Cms->outputBreadcrumb() ?></div>
 <? if ( $LeftCol ) { ?>
@@ -88,7 +86,7 @@ if(isset($_GET['tid'])) {
 			</tr>
 		</thead>
 		<tbody id="topics_body">
-	<? $CommentTopics = $CmsCom->getTopics($Pg->parent_id); ?>
+	<? $CommentTopics = $CmsCom->getTopics($Pg->parent_id);?>
 	<? foreach($CommentTopics as $Topic) { ?>
 			<tr id="<?=$Topic->topicid?>" class="topic_row">
 				<td class="topic_topic">
@@ -107,98 +105,15 @@ if(isset($_GET['tid'])) {
 		</tbody>
 	</table>
 	
-	<p class="comment_add_link" onclick="showNewMsg('<?=$Pg->id?>')";>Aloita uusi keskustelu</p>
+	<!--<p class="comment_add_link" onclick="showNewMsg('<?=$Pg->id?>')";>Aloita uusi keskustelu</p>-->
 
-	<div id="newcomment" class="replybox" style="display:none;">
-			<img id="closenewmsg" src="/img/close.png" alt="" title="Sulje" onclick="hideNewMsg();" />
-			<h2>Uusi viesti</h2>
-			<div id="newcommentform"></div>
-	</div>
 <? } else {?>
 	<a href="#" onclick="javascript:window.history.back(-1);return false;">N&auml;yt&auml; kaikki keskustelut</a>
 <? } ?>
-	<div id="ajax_request_div"></div>
-<? /*if ( count($Comments) > 0 ) { ?>
-	<? $topic_title = new \Lougis_comment_topic($_GET['tid']);
-		echo '<h2>'.$topic_title->title.'</h2>';
-	?>
-	<ul id="messages">
-	<? foreach($Comments as $Cm) { ?>
-		<li id="cm<?=$Cm->id?>"><a name="cm<?=$Cm->id?>"></a>
-			<?
-			$clicked = in_array($Cm->id, $_SESSION['rated_comments']);
-			?>
-			<div id="lbox<?=$Cm->id?>" class="likebox<?=(($clicked) ? ' clicked' : '' )?>">
-				<a class="likethumb" onclick="<?=(($clicked) ? '' : 'likeComment('.$Cm->id.');' )?>" title="Äänestä viestiä (+)">
-					<img src="/img/thumbup.png" alt="" /> <span><?=$Cm->likes?></span>
-				</a>
-				<a class="dislikethumb" onclick="<?=(($clicked) ? '' : 'dislikeComment('.$Cm->id.');' )?>" title="Äänestä viestiä (-)">
-					<img src="/img/thumbdown.png" alt="" /> <span><?=$Cm->dislikes?></span>
-				</a>
-			</div>
-			<p><?=nl2br($Cm->msg)?></p>
-			<span class="author">"<?=$Cm->getUsername()?>" kirjoitti <?=date('d.m.Y H:i:s', strtotime($Cm->date_created))?></span>
-			<a class="replythread" onclick="showReplyBox(<?=$Cm->id?>);">Vastaa</a>
-			<div id="replybox<?=$Cm->id?>" class="replybox"></div>
-			<? if ( count($Cm->replys) > 0 ) { ?>
-			<ul class="replys">
-			<? foreach($Cm->replys as $Reply) { ?>
-				<li><a name="cm<?=$Reply->id?>"></a>
-					<?
-					$clicked = in_array($Reply->id, $_SESSION['rated_comments']);
-					?>
-					<div id="lbox<?=$Reply->id?>" class="likebox<?=(($clicked) ? ' clicked' : '' )?>">
-						<a class="likethumb" onclick="<?=(($clicked) ? '' : 'likeComment('.$Reply->id.');' )?>" title="Äänestä viestiä (+)">
-							<img src="/img/thumbup.png" alt="" /> <span><?=$Reply->likes?></span>
-						</a>
-						<a class="dislikethumb" onclick="<?=(($clicked) ? '' : 'dislikeComment('.$Reply->id.');' )?>" title="Äänestä viestiä (-)">
-							<img src="/img/thumbdown.png" alt="" /> <span><?=$Reply->dislikes?></span>
-						</a>
-					</div>
-					<p><?=nl2br($Reply->msg)?></p>
-					<span class="author">"<?=$Reply->getUsername()?>" kirjoitti <?=date('d.m.Y H:i:s', strtotime($Reply->date_created))?></span>
-				</li>
-			<? } ?>
-			</ul>
-			<? } ?>
-		</li>
-	<? } ?> 
-	</ul>
-	<? }?>
-	<? if($_GET['tid'] > 0){ ?> 
-	<div id="kirjoita">
-		<a id="newthread" onclick="showNewMsg('<?=$Pg->id?>', null, <?=$_GET['tid']?>);" >Uusi viesti</a>
-	</div>
-	<? } ?> 
-	<? /*<div id="accordion">
-		
-		<h3 class="topic_title" id="<?=$Topic->topicid?>"><?=$Topic->title?> </h3>
-		<div id="div_<?=$Topic->topicid?>">
-		<!--	<a href="/fi/<?=$Topic->comment_place?>/" > Linkki alkuper&auml;iseen keskusteluun </a> -->			
-			<ul id="messages"></ul>
-		</div>
-		
-		<? }}  ?> 
-	</div> <? */?>
-
-<? /*
-<div id="social">
-
-	<div id="email">
-	<a href="mailto:?Subject=<?=$Site->title?> - <?=$Pg->title?>&Body=<?=$Pg->getPageFullUrl()?>">Sähköposti</a>
+	<div id="comments">
+		<div id="ajax_request_div"></div>
 	</div>
 
-	<div id="fb">
-	<iframe src="//www.facebook.com/plugins/like.php?href=<?=urlencode($Pg->getPageFullUrl())?>&amp;locale=fi_FI&amp;layout=button_count&amp;show_faces=false&amp;width=125&amp;action=recommend&amp;colorscheme=light&amp;height=20" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:125px; height:21px;" allowTransparency="true"></iframe>
-	</div>
-	
-	<div id="twitter">
-	<a href="https://twitter.com/share" class="twitter-share-button" data-lang="fi" data-hashtags="ymparistonyt">Twiittaa</a>
-	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-	</div>
-	
-</div>
-*/ ?>
 </div>
 <script>
 

@@ -364,6 +364,98 @@ class Comment extends \Lougis\abstracts\Frontend {
 		
 	}
 	
+		//creates comments html for the html page
+	public function getCommentsHtmlKeskustelu() {
+		$this->debug_to_console($_SESSION['comment_topic_id']);
+		//comments on 'keskustelut'-template
+		if($_POST['topic_id'] && !$_POST['page_id']) {
+			$topic_id = (int)$_POST['topic_id'];
+			$ct = new \Lougis_comment_topic($topic_id);	
+		}
+		//comments on page
+		else {
+			$page_id = (int)$_POST['page_id'];
+			$ct = new \Lougis_comment_topic();
+			$ct->page_id = $page_id;
+			$ct->find();
+			$ct->fetch();
+		}
+		
+		if ( $ct->id != null ) {$this->debug_to_console($_SESSION['comment_topic_id']); $Comments = \Lougis_comment_msg::getAllForTopic($ct->id); $this->debug_to_console($ct->id); }
+		else { unset($_SESSION['comment_topic_id']); $this->debug_to_console($_SESSION['comment_topic_id']); } 
+?>
+		<h2>Keskustelu</h2>
+		<?
+		if ( $ct->id == null ) { ?>
+			<a id="newthread" onclick="showNewTopic(<?=$page_id?>);">Kommentoi</a>
+		<? } ?>
+			
+				<? if ( count($Comments) > 0 ) { ?>
+				
+					<table id="messages">
+					<? foreach($Comments as $Cm) { ?>
+						<tr>
+							<td class="message_info">
+								<p><span class="author"><?=$Cm->getUsername()?></span></p>
+								<p><span class="author"><?=date('d.m.Y H:i:s', strtotime($Cm->date_created))?></span></p>
+							</td>
+							<td class="message_msg">
+								<h1 class="msg_topic"><?=$Cm->title?></h1>
+								<p><?=nl2br($Cm->msg)?></p>
+								<? /* if($_SESSION['user_id'] === $Cm->user_id) { ?>
+								<button id="del_<?=$Cm->id?>" class="del_comment_btn">Poista viesti</button>
+								<? } */?>
+							</td>
+			<? //poistetaan vastaus mahdollisuus, ts. kaikki viestit menevät yhdelle tasolle
+			/*
+							<td>
+								<a class="replythread" onclick="showReplyBox(<?=$page_id?>, <?=$Cm->id?>);">Vastaa</a>
+								<div id="replybox<?=$Cm->id?>" class="replybox">
+							</td>
+			*/ ?>
+						</tr>
+					<? if ( count($Cm->replys) > 0 ) { ?>
+						<? foreach($Cm->replys as $Reply) { ?>
+						<tr class="replys">
+							<td>
+								<p><span class="author"><?=$Cm->getUsername()?></span></p>
+								<p><span class="author"><?=date('d.m.Y H:i:s', strtotime($Cm->date_created))?></span></p>
+							</td>
+							<td>
+								<h1 class="msg_topic">VS: <?=$Cm->title?></h1>
+								<p><?=nl2br($Reply->msg)?></p>
+							</td>
+			<? /*
+							<td>
+							</td>
+			*/?>
+							</tr>
+						<? 		} 
+							}
+						}?>
+					</table>
+
+			<?		} ?>
+			</div>
+			<div id="newcomment" class="msgform">
+				<img id="closenewmsg" src="/img/close.png" alt="" title="Sulje" onclick="cancelMsgEdit();" />
+				<h2>Uusi viesti</h2>
+				<div id="newcommentform">
+						<form id="kommentti_form" class="ui-widget"></form>
+				</div>
+				
+			</div>
+			<? if ( $ct->id != null ) { ?>
+				<a id="newthread" onclick="showNewMsg(null, <?=$ct->id?>, true);" style="margin-top:15px;">Kommentoi</a>
+			<? } ?>
+
+		
+		<?
+
+		
+		
+	}
+	
 	public function getTopicMsgs ( ) {
 		try {
 			$topicId = pg_escape_string($_REQUEST['topic']);
