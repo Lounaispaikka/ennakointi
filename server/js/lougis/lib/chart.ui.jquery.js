@@ -259,15 +259,37 @@ function createGrid(celldata, chart_id, parent_id) {
 	$.each(cellArray.series, function(index, obj) {
 		chart.push(obj);
 	});
-
 	
+	//render first row
+	function firstRowRenderer(instance, td, row, col, prop, value, cellProperties) {
+		Handsontable.TextCell.renderer.apply(this, arguments);
+		td.style.fontWeight = 'bold';
+		td.style.background = '#cfe5ce';
+	}
+	//render first col
+	function firstColRenderer(instance, td, row, col, prop, value, cellProperties) {
+		Handsontable.TextCell.renderer.apply(this, arguments);
+		td.style.fontWeight = 'bold';
+		td.style.background = '#ffffe5';
+	}
 	
 	var container = $("#datagrid");
 	container.handsontable({
 		data: chart,
 		minSpareRows: 1,
 		colHeaders: true,
-		contextMenu: true
+		contextMenu: true,
+		rowHeaders: true,
+		cells: function (row, col, prop) {
+			var cellProperties = {};
+			if (col === 0) {
+				cellProperties.renderer = firstColRenderer;
+			}
+			if (row === 0) {
+				cellProperties.renderer = firstRowRenderer;
+			}
+			return cellProperties;
+		}
 	});
 	var tabledata = container.data('handsontable');
 	
@@ -548,6 +570,20 @@ function configureChart(chartObj, chart_id, parent_id, chart_db_object) {
 						,"stacked" : "Pinottu pylväs"
 					},
 					"class" : "lomake"
+				},
+				{
+					"type": "textarea",
+					"name": "chart[description]",
+					"caption": "Kuvaus"	,
+					"class" : "lomake",
+					"value" : chart_db_object.description
+				},
+				{
+					"type": "text",
+					"name": "chart[short_description]",
+					"caption": "Lähde",
+					"class" : "lomake",
+					"value" : chart_db_object.short_description
 				},
 				{
 					"type": "text",

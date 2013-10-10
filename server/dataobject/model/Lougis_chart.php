@@ -39,7 +39,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
     
     public $chartConfigString;
     
-    public function delete() {
+   /* public function delete() {
 	    
 	    if ( !empty($this->created_date) && !empty($this->id) ) {
 		    $path = $this->getChartFolder();
@@ -47,7 +47,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    }
 	    return parent::delete();
 	    
-    }
+    }*/
     
     public function toChartArray( $Data = true, $Config = true, $Request = false ) {
 	    
@@ -698,8 +698,6 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 			array_push($series, $serieRow);
 		}
 		$datatypes = array();
-		devlog($firstRow, "e_chdata");
-		devlog($series, "e_chdata");
 
 		$json = array(
 			"category" => $firstRow,

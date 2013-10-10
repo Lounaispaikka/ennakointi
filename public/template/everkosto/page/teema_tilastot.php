@@ -8,10 +8,14 @@ $Class = "col2"; //class ulkoasulle eli col2 = kaksi palstaa
 $Parent = $Cms->findCurrentPageTopParent( );
 
 //add if else
-$Chart = new \Lougis_chart();
+/*$Chart = new \Lougis_chart();
 $Chart->page_id = $Pg->id;
 $Chart->find();
-$Chart->fetch();
+$Chart->fetch();*/
+
+$Chart = new \Lougis_chart();
+$Chart->id = $Pg->chart_id;
+$Chart->find(true);
 
 //charts for frontpage
 $child_charts_pages = new \Lougis_cms_page();
