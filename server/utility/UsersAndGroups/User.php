@@ -126,6 +126,6 @@ class User extends \Lougis\abstracts\Utility {
         }
         return false;
     }
-
+	
 }
 ?>

@@ -71,9 +71,10 @@ class CMS extends \Lougis\abstracts\Frontend {
 	public function savePageContent() {
 		
 		try {
-			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
-			
-			devlog($_POST, 'saveteema');
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
 			
 			$Pg = $this->_getPageInfo( $_POST['page_id'] );
 			$Co = $this->_getPageContent( $Pg->id, $Pg->lang_id );
@@ -112,7 +113,11 @@ class CMS extends \Lougis\abstracts\Frontend {
 		
 		try {
 		
-			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			
 			if ( $_POST['cms_page']['title'] == '' ) throw new \Exception('Otsikko puuttuu.'); 
 			$Pg = new \Lougis_cms_page($_POST['cms_page']['page_id']);
 			if ( empty($Pg->created_date) ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: Sivua ei voitu ladata!');
@@ -156,7 +161,10 @@ class CMS extends \Lougis\abstracts\Frontend {
 	public function saveTeema() {
 		
 		try {
-			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
 		
 			devlog($_POST, 'saveteema');
 			$Pg = new \Lougis_cms_page($_POST['page_id']);
@@ -212,11 +220,18 @@ class CMS extends \Lougis\abstracts\Frontend {
 		$this->jsonOut($res);
 		
 	}
-	
+	/**
+	* create cms_pages for teema. basic teema page, tilastot, keskustelut, tiedostot, uutiset, linkit.
+	* add also permissions
+	**/
 	public function createNewTeema() {
 		
 		try {
-			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			
 			//sivu cms_page
 			$Pg = new \Lougis_cms_page();
 			$Pg->setFrom($_POST['cms_page']);
@@ -448,10 +463,149 @@ class CMS extends \Lougis\abstracts\Frontend {
 	
 	}
 	
+	/**
+	* copy cms_page to tietopankki
+	* params: page_id
+	* 
+	**/
+	public function copyPageToTietopankki() {
+		
+		try {
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			
+			
+			//validate params
+			$page_id = (int)$_REQUEST['page_id'];
+			
+			//get original page to object
+			$OriginalPage = new \Lougis_cms_page($page_id);
+			
+			//create array from object fields
+			$PageAsArray = $OriginalPage->toArray();
+		
+			//unset id and parent id
+			unset($PageAsArray['id']);
+			unset($PageAsArray['parent_id']);
+			
+			//unset all nulls
+			foreach($PageAsArray as $key=>$value) {
+				if($value== null) unset($PageAsArray[$key]);
+			}
+		
+			//create new page object and set data from array
+			$CopyPage = new \Lougis_cms_page();
+			$CopyPage->setFrom($PageAsArray);
+			$CopyPage->parent_id = 3;
+			$CopyPage->restricted_access = false;
+			if ( !$CopyPage->save() ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: '.$CopyPage->id);
+			
+			$res = array(
+				"success" => true,
+				"msg" => "Sivu lisätty tietopankkiin",
+				"page_id" => $CopyPage->id
+			);
+		
+		} catch(\Exception $e) {
+
+			$res = array(
+				"success" => false,
+				"msg" => $e->getMessage()
+			);
+			
+		}
+		
+		$this->jsonOut($res);
+			
+	}
+	/**
+	* copy cms_page from tietopankki to teema
+	* params: page_id, new_parent_id
+	* 
+	**/
+	public function copyPageFromTietopankki() {
+		
+		try {
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			
+			
+			//validate params
+			if($_REQUEST['new_parent_id'] != null) $new_parent_id = (int)$_REQUEST['new_parent_id'];
+			$page_id = (int)$_REQUEST['page_id'];
+			
+			//get original page to object
+			$OriginalPage = new \Lougis_cms_page($page_id);
+			
+			//get new parent page to object
+			$NewParentPage = new \Lougis_cms_page($new_parent_id);
+			
+			//create array from object fields
+			$PageAsArray = $OriginalPage->toArray();
+		
+			//unset id and parent id
+			unset($PageAsArray['id']);
+			unset($PageAsArray['parent_id']);
+			
+			//unset all nulls
+			foreach($PageAsArray as $key=>$value) {
+				if($value== null) unset($PageAsArray[$key]);
+			}
+		
+			//create new page object and set data from array
+			$CopyPage = new \Lougis_cms_page();
+			$CopyPage->setFrom($PageAsArray);
+			if($new_parent_id == null) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: parent_id is missing');
+			$CopyPage->parent_id = $NewParentPage->id;
+			$CopyPage->restricted_access = $NewParentPage->restricted_access; //same restriction as parent
+			if ( !$CopyPage->save() ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: '.$CopyPage->_lastError);
+			
+			//set permissions
+			$GroupPerm = new \Lougis_group_permission();
+			$GroupPerm->page_id = $NewParentPage->id;
+			$GroupPerm->find(true);
+			if( $GroupPerm->group_id != null) {
+				$NewPerm = new \Lougis_group_permission();
+				$NewPerm->page_id = $CopyPage->id;
+				$NewPerm->group_id = $GroupPerm->group_id;
+				if ( !$NewPerm->save() ) throw new \Exception('Sivun tietojen tallentaminen epäonnistui: '.$NewPerm->_lastError);
+			}
+				
+			$res = array(
+				"success" => true,
+				"msg" => "Sivu lisätty tietopankkiin",
+				"page_id" => $CopyPage->id
+			);
+		
+		} catch(\Exception $e) {
+
+			$res = array(
+				"success" => false,
+				"msg" => $e->getMessage()
+			);
+			
+		}
+		
+		$this->jsonOut($res);
+			
+	}
+	
+	/**
+	* create cms_page in hallinta-panel
+	*
+	**/
 	public function createNewPage() {
 		
 		try {
-			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			
 			//kommentit comment_topic
 			/* $Topic = new \Lougis_comment_topic();
 			$Topic->active = true;
@@ -632,7 +786,11 @@ class CMS extends \Lougis\abstracts\Frontend {
 	public function deletePage() {
 		
 		try {
-			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.'); 
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			
 			$Pg = new \Lougis_cms_page($_POST['page_id']);
 			
 			//only creator and admin can delete
@@ -674,7 +832,11 @@ class CMS extends \Lougis\abstracts\Frontend {
 	public function deleteToimiala() {
 		
 		try {
-			if ( !isset($_SESSION['user_id']) ) throw new \Exception('Tunnistautuminen epäonnistui.');  //kuuluu oikeaan käyttäjäryhmään
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			
 			$Pg = new \Lougis_cms_page($_POST['page_id']);
 			if ( empty($Pg->created_date) ) throw new \Exception('Sivun poistaminen epäonnistui: Sivua ei voitu ladata!');
 			//if ( $Pg->created_by !== $_SESSION['user_id'] ) throw new \Exception('Sivun poistaminen epäonnistui: Puuttuvat käyttöoikeudet!');
@@ -852,18 +1014,33 @@ class CMS extends \Lougis\abstracts\Frontend {
 		
 	}
 	
+	//returns toimiala pages to toimiala.ui.jquery.js openToimialaDialog() function
 	public function getToimialaPages() {
+		
+		global $User;
+		//pages which user has permission
+		$permission_array = $User->hasPermissionToPages($User->id);
 		
 		$Pg = new \Lougis_cms_page();
 		$Pg->page_type = "toimiala";
 		$Pg->find();
 		//lisää vielä käyttäjälle sallitut toimialat eli hae permissionit
+		
 		$Pages = array();
 		while( $Pg->fetch() ) {
+			if (in_array($Pg->id, $permission_array))
 			$Pages[] = clone($Pg);		
 		}	
 		$this->jsonOut( $Pages );
 		
+	}
+	
+	public function getTietopankkiPage() {
+		$Pg = new \Lougis_cms_page();
+		$Pg->template = "tietopankki.php";
+		$Pg->find(true);
+		
+		$this->jsonOut( $Pg->id );
 	}
 	
 	private function _menuTreeData() {

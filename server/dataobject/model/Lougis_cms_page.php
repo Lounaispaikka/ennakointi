@@ -31,7 +31,10 @@ class Lougis_cms_page extends \Lougis\DB_DataObject_Wrapper
     public $extra1;                          // text(-1)  
     public $extra2;                          // text(-1)  
     public $restricted_access;               // bool(1)  not_null default_true
-    public $comments_id;                     // int4(4)  
+    public $chart_id;                        // int4(4)  
+    public $file_id;                         // int4(4)  
+    public $news_id;                         // int4(4)  
+    public $tietopankki;                     // bool(1)  
 
     /* Static get */
     function staticGet($k,$v=NULL) { return DB_DataObject::staticGet('Lougis_cms_page',$k,$v); }

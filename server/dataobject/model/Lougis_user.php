@@ -64,6 +64,22 @@ class Lougis_user extends \Lougis\DB_DataObject_Wrapper
 	
 	}*/
 	
+	public function hasPermissionToPages( $user_id ) {
+		$user_id = (int)$user_id;
+		$permitted_pages = array();
+		$UserPerms = new \Lougis_group_user();
+		$sql = "select group_user.user_id as user_id, group_user.group_id as group_id, group_permission.page_id as page_id
+				from lougis.group_user
+				inner join lougis.group_permission
+				on lougis.group_permission.group_id = lougis.group_user.group_id
+				where group_user.user_id = ".$user_id.";";
+		$UserPerms->query($sql);
+		while($UserPerms->fetch()) {
+            $permitted_pages[] = $UserPerms->page_id;
+        }
+		return $permitted_pages;
+	}
+	
     public function getFullname() {
     	
     	return $this->firstname.' '.$this->lastname;

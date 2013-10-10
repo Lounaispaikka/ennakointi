@@ -81,11 +81,18 @@ function editToimiala(pageId) {
 		});
 		req.done(function(xhr) {
 			//console.log("xhr-success", xhr);
+			var s1_height = 0;
 			$.each(xhr, function(i, item) {
 				var li = $('<li class=\"ui-state-default\" id=\"'+ item.id + '\"></li>');
 				$("#sortable1").append(li);
-				$(li).html("<span class=\"userlist_name\">" + item.firstname + " " + item.lastname +"</span>" +  "<span class=\"userlist_org\">" + item.organization + "</span>" + "<span class=\"userlist_email\">" + item.email + "</span>");
+				$(li).html("<span class=\"userlist_name\">" + item.firstname + " " + item.lastname +"</span>" + "<span class=\"userlist_email\">" + item.email + "</span>" +  "<span class=\"userlist_org\">" + item.organization + "</span>" );
+				s1_height += 35;
 			});
+			//set sortable2 height same as sortable1
+			
+			console.log(s1_height);
+			$("#sortable2").css( "height", s1_height );
+			$("#sortable1").css( "height", s1_height );
 		});
 		req.fail(function(xhr) {
 			//console.log("xhr-fail", xhr);
@@ -104,8 +111,8 @@ function editToimiala(pageId) {
 			//console.log("xhr-success", xhr);
 			$.each(xhr, function(i, item) {
 				var li = $('<li class=\"ui-state-default\" id=\"'+ item.id + '\"></li>');
-				$("#sortable2").append(li);
-				$(li).html("<span class=\"userlist_name\">" + item.firstname + " " + item.lastname +"</span>" +  "<span class=\"userlist_org\">" + item.organization + "</span>" + "<span class=\"userlist_email\">" + item.email + "</span>");
+				$("#sortable2").append(li);	
+				$(li).html("<span class=\"userlist_name\">" + item.firstname + " " + item.lastname +"</span>" + "<span class=\"userlist_email\">" + item.email + "</span>" +  "<span class=\"userlist_org\">" + item.organization + "</span>");
 				
 			});
 		});
@@ -470,8 +477,9 @@ function editToimiala(pageId) {
 
 	// post-submit callback 
 	function showResponse(responseText)  { 
-		//$( "#response_msg" ).empty();
-		$( "#response_msg" ).append(responseText.msg); //poistettu käytöstä kunnes jokaisen tabin tallennus on erikseen.
+		$( "#response_msg" ).empty();
+		$( "#response_msg" ).append("Toimialan tiedot tallennettu!"); //poistettu käytöstä kunnes jokaisen tabin tallennus on erikseen.
+		//$( "#response_msg" ).append(responseText.msg); //poistettu käytöstä kunnes jokaisen tabin tallennus on erikseen.
 		//$( "#response_msg" ).append("Jatka toimialan tietojen muokkausta tai lopeta muokkaus.");
 		$( "#dialog-message" ).dialog({
 			modal: true,
