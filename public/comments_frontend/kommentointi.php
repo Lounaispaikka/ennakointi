@@ -23,22 +23,7 @@ if ( $_SESSION['user_id'] ) {
 	//$Rules = \Lougis_comment_msg::getRules();
 	
 	?>
-	<script>
 
-		var request = $.ajax({
-			url: '/run/lougis/comment/getCommentsHtml/',
-			data: {
-				page_id: <?=$Pg->id?>
-				<? if($ct->id != null) { ?>,topic_id: <?=$ct->id?> <? } ?>
-			},
-			type: "POST"
-		});
-		request.done(function(response) {
-			$("#ajax_request_div").empty();
-			$("#ajax_request_div").append(response);
-		});
-
-	</script>
 
 	<div id="comments">
 		<div id="ajax_request_div">
@@ -50,6 +35,7 @@ if ( $_SESSION['user_id'] ) {
 			</p>
 		</div>
 	</div>
+		
 	<? /*
 		<h2>Keskustelu</h2>
 		<?
@@ -89,6 +75,22 @@ if ( $_SESSION['user_id'] ) {
 	?>
 	<!--<script type="text/javascript" src="/js/lougis/lib/comments.ui.extjs.js"></script>-->
 	<script type="text/javascript" src="/js/lougis/lib/comments.ui.jquery.js"></script>
+	<script type="text/javascript">
+
+		var request = $.ajax({
+			url: '/run/lougis/comment/getCommentsHtml/',
+			data: {
+				page_id: <?=$Pg->id?>
+				<? if($ct->id != null) { ?>,topic_id: <?=$ct->id?> <? } ?>
+			},
+			type: "POST"
+		});
+		request.done(function(response) {
+			$("#ajax_request_div").empty();
+			$("#ajax_request_div").append(response);
+		});
+	
+	</script>
 	<? /*
 	<script type="text/javascript">
 		$(function() {	

@@ -102,7 +102,7 @@ function newNews(parent_id) {
 					"type" : "hidden"
 				},
 				{
-					"name" : "news[source]",
+					"name" : "news[source_url]",
 					"caption" : "Lähdelinkki",
 					"type" : "text",
 					"value" : "http://"/* ,
@@ -115,7 +115,7 @@ function newNews(parent_id) {
 					} */
 				},
 				{
-					"name" : "news[source_url]",
+					"name" : "news[source]",
 					"caption" : "Lähde",
 					"type" : "text"/* ,
 					"validate" : {

@@ -113,8 +113,9 @@ function closeReplyBox( /*ParentMsgId*/ ) {
 	
 } */
 //create new message if topic already made
-function showNewMsg(this_page, topic_id, not_page = false) {	
+function showNewMsg(this_page, topic_id, not_page) {	
 	$("#kommentti_form").empty();
+	if (typeof not_page == 'undefined') not_page = false;
 	if (typeof topic_id == 'undefined') topic_id = null;
 	if (typeof this_page == 'undefined') this_page = null;
 	var replyTo = null;

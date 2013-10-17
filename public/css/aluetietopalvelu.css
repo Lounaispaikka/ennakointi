@@ -322,7 +322,7 @@ span.clr {
 }
 #leftCol ul li a.active {
 	display:block;
-        color: rgb(143, 187, 66);
+        color: #a5a79b;
 	text-decoration: none;
 }
 #leftCol ul ul {

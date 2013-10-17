@@ -42,7 +42,6 @@ $CmsCom = new \Lougis\utility\CmsComment();
                 ?>
 				<script type="text/javascript" src="/js/jqueryPlugins/jquery.dform-1.0.1.js"></script>
 				<script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script> 
-				<script type="text/javascript" src="/js/lougis/lib/ennakointi.ui.jquery.js"></script>
 				<script type="text/javascript" src="/js/lougis/lib/file.ui.jquery.js"></script>
 				<script type="text/javascript" src="/js/lougis/lib/page.ui.jquery.js"></script>
 				<script type="text/javascript" src="/js/lougis/lib/link.ui.jquery.js"></script>

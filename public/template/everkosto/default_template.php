@@ -2,9 +2,6 @@
 require_once(PATH_TEMPLATE.'everkosto/include_header.php'); 
 require_once(PATH_SERVER.'utility/LouGIS/Compiler.php');
 
-require_once(PATH_PUBLIC.'phorum/common.php');
-require_once(PATH_PUBLIC.'phorum/include/format_functions.php');
-
 global $Site, $Cms;
 
 $Class = null;
@@ -88,7 +85,7 @@ $TavoitteetPrinted = false;
 
 
 <div id="content" class="<?=$Class?>">
-{PAGE_CONTENT}
+<!--{PAGE_CONTENT}-->
 <?
 /*if ( !$TavoitteetPrinted && ( $Pg->page_type == 'strategia'  ) ) {
 	echo '[AUTOMAATTINEN_YLEMMAT_TAVOITTEET]';
@@ -142,12 +139,13 @@ if ( $Pg->page_type == 'teema_aineisto' && $_SESSION['user_id']) {
 <?  //if user is creator of page or admin
 	if ( $_SESSION['user_id'] === $Pg->created_by) { ?>
 	<div id="editTools" style="float:right;">
-		<a href="javascript:void(0)" id="editPageInfo" class="linkJs"><img src="/img/icons/16x16/document_prepare.png" >Muokkaa tietoja</a>
+		<!--<a href="javascript:void(0)" id="editPageInfo" class="linkJs"><img src="/img/icons/16x16/document_prepare.png" >Muokkaa tietoja</a>-->
 		<a href="javascript:void(0)" id="editPageContent" class="linkJs"><img src="/img/icons/16x16/page_white_edit.png" >Muokkaa sis&auml;lt&ouml;&auml;</a>
 		<a href="javascript:void(0)" id="delPage" class="linkJs"><img src="/img/icons/16x16/delete.png" >Poista</a>
 
 	</div>
 <? } ?>
+	<h1><?=$Pg->title?></h1>
 	<div id="pageContent" style="margin-left:15px;margin-top:20px;">{PAGE_CONTENT}</div>
 	<div id="formResponse">
 		<p></p>

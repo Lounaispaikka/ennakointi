@@ -26,6 +26,10 @@ if(isset($_GET['tid'])) {
 
 
 //if($ct->id != null) $Comments = \Lougis_comment_msg::getAllForTopic($ct->id);*/
+
+//count comments by topic
+
+
 ?>
 <script>
 		
@@ -81,7 +85,7 @@ if(isset($_GET['tid'])) {
 		<thead>
 			<tr>
 				<th>Aihe</th>
-				<th>Viestej&auml;</th>
+		<!--		<th>Viestej&auml;</th>-->
 				<th>Viimeisin viesti</th>
 			</tr>
 		</thead>
@@ -92,9 +96,9 @@ if(isset($_GET['tid'])) {
 				<td class="topic_topic">
 					<a href="?tid=<?=$Topic->topicid?>"><? if($Topic->page_id != $Pg->id || $Topic->ctitle == null) {echo $Topic->title;} else { echo $Topic->ctitle; } ?> </a>
 				</td>
-				<td class="topic_details">
+				<!--<td class="topic_details">
 					
-				</td>
+				</td>-->
 					
 				<td class="topic_last">
 					

@@ -69,7 +69,7 @@ function uploadCsv(parent_id) {
 	//Tiedoston lataus
 	
 	$('#chartOhje').empty();
-	$('#chartOhje').append('Valitse koneeltasi ladattava CSV-tiedosto ja klikkaa "Seuraava &raquo;"');
+	$('#chartOhje').append('Valitse koneeltasi ladattava CSV-tiedosto ja klikkaa "Lataa tiedosto"');
 	$('#chartform_upload').empty();
 	
 
@@ -125,15 +125,25 @@ function createGrid(celldata, chart_id, parent_id) {
 			{
 				text: "Peruuta",
 				click: function() {
-					delChart(chart_id);
-					$(this).dialog("close");
-					container.handsontable("destroy");
+					var r=confirm("Luotu tilasto poistetaan, jos peruutat!")
+					if (r==true)
+					  {
+						delChart(chart_id);
+						$(this).dialog("close");
+						container.handsontable("destroy");
+					  }
+					else
+					  {
+					  return false;
+					  }
+					
+					
 					//window.location.reload(); //fix because handsontable not loading again without reload
 				}
 				
 			},
 			{
-				text: "Tallenna",
+				text: "Seuraava",
 				
 				click: function() {
 					var active = $(this).tabs( "option", "active" ); //get active tab
@@ -143,10 +153,13 @@ function createGrid(celldata, chart_id, parent_id) {
 						case 0:
 							console.log("taulukko");
 							saveGrid();
+							$(this).tabs( "enable" );
+							$(this).tabs( "option", "active", 1 );
 							break;
 						case 1:
 							console.log("asetukset");
 							$("#chartform_config").submit();
+							$(this).tabs( "option", "active", 2 );
 							break;
 						case 2:
 							console.log("esikatselu");
@@ -326,7 +339,7 @@ function createGrid(celldata, chart_id, parent_id) {
 				 if (res.success === true) {
 					console.log('Data saved', res);
 					configureChart(savedChart ,chart_id, parent_id, res.chart);
-					$("#addChartDialog").tabs( "enable" );
+					//$("#addChartDialog").tabs( "enable" );
 				}
 				else {
 					console.log('Save error');
@@ -520,7 +533,7 @@ function createGrid(celldata, chart_id, parent_id) {
 	sarakeotsikot: x vai y-akseli
 	x ja y akselin otsikot ja tyyppi (kategoria vai numeerinen)
 	*/
-	//Tilastokuvaajan luominen
+	//Tilastoasetukset
 function configureChart(chartObj, chart_id, parent_id, chart_db_object) {
 	console.log(chartObj);
 	var config = {};

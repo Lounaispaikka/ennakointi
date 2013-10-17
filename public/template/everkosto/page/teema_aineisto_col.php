@@ -17,7 +17,7 @@ if ( $_SESSION['user_id']) {
 <script type="text/javascript" src="/js/handsontable/dist/jquery.handsontable.full.js"></script>
 <link rel="stylesheet" media="screen" href="http://handsontable.com/dist/jquery.handsontable.full.css">
 <script src="http://code.highcharts.com/highcharts.js"></script>
-<script src="/js/lougis/lib/adapt-chart-to-legend.js""></script>
+<script src="/js/lougis/lib/adapt-chart-to-legend.js"></script>
 <script type="text/javascript" src="/js/lougis/lib/chart.ui.jquery.js"></script>
 <div id="formResponse">
 	<p></p>

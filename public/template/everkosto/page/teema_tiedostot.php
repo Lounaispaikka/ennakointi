@@ -12,11 +12,25 @@ $pages = $Pg->getParentPages();
 if($Pg->page_type == "teema_tiedostot") {
 	$FilePages = array();
 	$FilePage = new \Lougis_cms_page();
-	$sql = "select cms_page.id as pid, cms_page.title as title, file.created_date as created_date, file.description as description
+	/*$sql = "select cms_page.id as pid, cms_page.title as title, file.created_date as created_date, file.description as description
 			from lougis.cms_page, lougis.file
 			where cms_page.parent_id = ".$Page->id."
 			and cms_page.page_type = 'file'
-			and cms_page.file_id = file.id;";
+			and cms_page.file_id = file.id;"; */
+	$sql = "SELECT
+			lougis.cms_page.id as pid,
+			lougis.cms_page.title,
+			lougis.file.description as description,
+			lougis.file.created_date as created_date,
+			lougis.user.firstname,
+			lougis.user.lastname
+			FROM
+			lougis.cms_page
+			INNER JOIN lougis.file ON lougis.file.id = lougis.cms_page.file_id
+			INNER JOIN lougis.user ON lougis.cms_page.created_by = lougis.user.id
+			WHERE
+			lougis.cms_page.page_type = 'file' AND
+			lougis.cms_page.parent_id = ".$Pg->id.";";
 	$FilePage->query($sql);
 	while($FilePage->fetch() ) {
 		$FilePages[] = clone($FilePage);
@@ -46,24 +60,27 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 
 <? 
 //tiedostojen etusivu
-if ($Pg->page_type == "teema_tiedostot") { ?>
+if ($Pg->page_type == "teema_tiedostot" && count($FilePages) > 0) { ?>
 	<table id="comment_topics">
 		<thead>
 			<tr>
 				<th>Tiedosto</th>
-				<th>Latausaika</th>
+				<th>Lisääjä</th>
+				<th>Pvm</th>
 			</tr>
 		</thead>
 		<tbody>
 	<? foreach($FilePages as $page) { ?>
 			<tr class="topic_row">
 				<td class="topic_topic"><a href="../<?=$page->pid?>"><?=$page->title?></a></td>
-				<td class="topic_last"><?=date('d.m.Y H:i:s', strtotime($page->created_date))?></td>
+				<td class="topic_last"><? echo $page->firstname. " " .$page->lastname;?></td>
+				<td class="topic_last"><?=date('d.m.Y', strtotime($page->created_date))?></td>
 			</tr>
 	<? } ?>
 		</tbody>
 	</table>
-<? } else {?>
+<? } 
+if ($Pg->page_type == 'file') {?>
 
 <? //yksittäisen tiedoston sivu ?>
 	<?  //if user is creator of page or admin

@@ -17,13 +17,34 @@ $Chart = new \Lougis_chart();
 $Chart->id = $Pg->chart_id;
 $Chart->find(true);
 
-//charts for frontpage
+/*//charts for frontpage
 $child_charts_pages = new \Lougis_cms_page();
 $child_charts_pages->parent_id = $Pg->id;
 $child_charts_pages->find();
 $chparr = array();
 while ($child_charts_pages->fetch()) {
 	$chparr[] = clone($child_charts_pages);
+}*/
+if($Pg->page_type == "teema_tilastot") {
+	$FilePages = array();
+	$FilePage = new \Lougis_cms_page();
+	$sql = "SELECT
+			lougis.cms_page.id as pid,
+			lougis.cms_page.title,
+			lougis.chart.created_date as created_date,
+			lougis.user.firstname,
+			lougis.user.lastname
+			FROM
+			lougis.cms_page
+			INNER JOIN lougis.chart ON lougis.chart.id = lougis.cms_page.chart_id
+			INNER JOIN lougis.user ON lougis.cms_page.created_by = lougis.user.id
+			WHERE
+			lougis.cms_page.page_type = 'chart' AND
+			lougis.cms_page.parent_id = ".$Pg->id.";";
+	$FilePage->query($sql);
+	while($FilePage->fetch() ) {
+		$FilePages[] = clone($FilePage);
+	}
 }
 
 require_once(PATH_TEMPLATE.'everkosto/include_header.php'); 
@@ -56,12 +77,26 @@ require_once(PATH_TEMPLATE.'everkosto/include_header.php');
 		<? } ?>
 <div id="content" class="<?=$Class?>">
 	<h1><?=$Pg->title?></h1>
-	<? //chart frontpage ?>
-	<ul>
-	<? foreach($chparr as $ch) { ?>
-		<li id="<?=$ch->id?>"><div id="<?=$ch->id?>"><a href="../<?=$ch->id?>/" ><?=$ch->title?></a> </li> 
+<?	if ($Pg->page_type == "teema_tilastot" && count($FilePages) > 0) { ?>
+	<table id="comment_topics">
+		<thead>
+			<tr>
+				<th>Tilasto</th>
+				<th>Lisääjä</th>
+				<th>Pvm</th>
+			</tr>
+		</thead>
+		<tbody>
+	<? foreach($FilePages as $page) { ?>
+			<tr class="topic_row">
+				<td class="topic_topic"><a href="../<?=$page->pid?>"><?=$page->title?></a></td>
+				<td class="topic_last"><? echo $page->firstname. " " .$page->lastname;?></td>
+				<td class="topic_last"><?=date('d.m.Y', strtotime($page->created_date))?></td>
+			</tr>
 	<? } ?>
-	</ul>
+		</tbody>
+	</table>
+<? } ?>
 	
 	<div id="chart_container"></div>
 	<? if($Pg->page_type == 'chart') { 

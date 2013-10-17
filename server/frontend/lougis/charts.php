@@ -8,97 +8,13 @@ class Charts extends \Lougis\abstracts\Frontend {
 	public function __construct() {
 	
 	}
-	
-	public function getChartsJson() {
-	
-		global $Site;
-		
-		try {
-			/*
-			$ChartPages = array();
-			$Pg = new \Lougis_cms_page(); //all charts are sub of pages
-			$Pg->page_type = 'chart'; //pages where type is chart
-			$Pg->orderBy("title");
-			$Pg->find();
-			while( $Pg->fetch() ) {
-				$ChartPages[] = array(
-					"text" => $Pg->title,
-					"leaf" => true,
-					"expanded" => false,
-					"chart_id" => intval($Pg->id)
-				);
-			}
-			$res = $ChartPages;
-			*/
-			$Charts = array();
-			$Ch = new \Lougis_chart();
-			$Ch->orderBy("title");
-			$Ch->whereAdd("title IS NOT NULL");
-			$Ch->find();
-			while( $Ch->fetch() ) {
-				$Charts[] = array(
-					"text" => $Ch->title,
-					"leaf" => true,
-					"expanded" => false,
-					"chart_id" => intval($Ch->id)
-				);
-			}
-			$res = $Charts;
-			
-		} catch(\Exception $e) {
-			
-			$res = array(
-				"success" => false,
-				"msg" => $e->getMessage()
-			);
-			
-		}
-		$this->jsonOut($res);
-	
-	}
-        //Indikaattorisivun käyttöön indikaattorina julkaistavat tilastot
-        public function getPublishedChartsJson() {
-	
-		global $Site;
-		
-		try {
-			
-			
-			$Charts = array();
-			$Ch = new \Lougis_chart();
-			$Ch->orderBy("title");
-			$Ch->whereAdd("title IS NOT NULL");
-                        $Ch->whereAdd("published IS TRUE");
-			$Ch->find();
-			while( $Ch->fetch() ) {                            
-				$Charts[] = array(
-					"text" => $Ch->title,
-					"leaf" => true,
-					"expanded" => false,
-					"chart_id" => intval($Ch->id),
-				);
-			}
-			$res = $Charts;
-			
-		} catch(\Exception $e) {
-			
-			$res = array(
-				"success" => false,
-				"msg" => $e->getMessage()
-			);
-			
-		}
-		$this->jsonOut($res);
-	
-	}
         
-       
 	public function buildIframeCode() {
 		
 		try {
 			
 			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
-			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
+			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttÃ¤ yllÃ¤pitoon.");
 			
 			$code = $Chart->getIframeCode($_REQUEST['width'], $_REQUEST['height']);
 			
@@ -119,23 +35,72 @@ class Charts extends \Lougis\abstracts\Frontend {
 		
 	}
 	
-	public function saveChartConfig() {
+	public function uploadData() {
+	
+		global $Site, $User;
 		
 		try {
+			//user auth
+			$SessionUser = new \Lougis_session();
+			$SessionUser->get($_SESSION['user_id']);
+			if(!$SessionUser->isLogged()) throw new \Exception("KÃƒâ‚¬yttÃƒâ‚¬jÃƒâ‚¬n tunnistaminen");
 			
-			$ChartData = $_REQUEST['chart'];
+			if ( $_FILES['datafile']['type'] != 'text/csv' ) throw new \Exception("Virheellinen tiedostotyyppi! Tiedoston tulee olla CSV-tiedosto (tiedostopÃ¤Ã¤te .csv)");
+			unset($_SESSION['new_chart_id']); //vÃ¤liaikainen testaamiseen
+			if ( isset($_SESSION['new_chart_id']) ) {
+				$Chart = new \Lougis_chart($_SESSION['new_chart_id']);
+			} else {
+				$Chart = new \Lougis_chart();
+				$Chart->setNextKey();
+			}
+
+			if ( !$Chart->buildJsonDataFromCsv($_FILES['datafile']) ) throw new \Exception("Dataa ei voitu lukea");
+			$Chart->created_date = date(DATE_W3C);
+			$Chart->created_by = $User->id;
+			if ( !$Chart->save() ) throw new \Exception("Virhe tilastoa luotaessa. Tilastoa ei voitu tallentaa.");
 			
-			$Chart = new \Lougis_chart($ChartData['id']);
-			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
-			$Msg = ( $_REQUEST['save'] == 'true' ) ? "Kaavio tallennettu." : null;
-			$ChartConf = $Chart->buildExtJsonChart($ChartData);
-			if ( $_REQUEST['save'] == 'true' ) $Chart->saveChartConfig($ChartConf, $_REQUEST);
+			$_SESSION['new_chart_id'] = $Chart->id;
 			
 			$res = array(
 				"success" => true,
-				"msg" => $Msg,
-				"conf" => $ChartConf
+				"chart" => $Chart->dbToChartArray()
 			);
+			
+		} catch(\Exception $e) {
+			
+			$res = array(
+				"success" => false,
+				"msg" => $e->getMessage()
+			);
+			
+		}
+		$this->jsonHtmlOut($res);
+	
+	}
+	
+	
+	//update data to database from jquery chart editor. 
+	public function updateDbData() {
+		
+			
+		try {
+			
+			$data = json_encode($_POST['chart_data']);
+			$Chart = new \Lougis_chart($_POST['chart_id']);
+			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttÃ¤ yllÃ¤pitoon.");
+			$Chart->updated_date = date(DATE_W3C);
+			$Chart->data_json = $data;
+			
+			if ( count($data) == 0 ) throw new \Exception("Taulukko on tyhjÃ¤. TyhjÃ¤Ã¤ taulukkoa ei voi tallentaa");
+			
+			if ( !$Chart->save() ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttÃ¤ yllÃ¤pitoon.");
+			
+			$res = array(
+				"success" => true,
+				"chart" => $Chart
+				//"msg" => "Taulukko tallennettu."
+			);
+		
 			
 		} catch(\Exception $e) {
 			
@@ -156,12 +121,12 @@ class Charts extends \Lougis\abstracts\Frontend {
 			//user auth
 			$SessionUser = new \Lougis_session();
 			$SessionUser->get($_SESSION['user_id']);
-			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epÃ¤onnistui.');
 			
 			$ChartData = $_REQUEST['chart'];
 			
 			$Chart = new \Lougis_chart($ChartData['id']);
-			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
+			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttÃ¤ yllÃ¤pitoon.");
 			$Chart->title = $ChartData['title'];
 			
 			//config array
@@ -178,7 +143,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 			}
 			
 			$Chart->config_json = json_encode($config);
-			if ( !$Chart->save() ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttä ylläpitoon.");
+			if ( !$Chart->save() ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttÃ¤ yllÃ¤pitoon.");
 			$ChartData['page_id'] = $Chart->page_id;
 			$ChartData['chart_id'] = $Chart->id;
 			//create cms_page
@@ -215,7 +180,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
 			$ChartGraph = $Chart->buildHighchart();
 			$ChartConf = $Chart->config_json;
-			//käsittele config_json json muodosta käytettävksi
+			
 			
 			$res = array(
 				"success" => true,
@@ -231,38 +196,6 @@ class Charts extends \Lougis\abstracts\Frontend {
 			
 		}
 		$this->jsonOut($res);
-	}
-	
-	public function updateData() {
-		
-		
-		try {
-
-			
-			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
-			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
-			$Chart->updated_date = date(DATE_W3C);
-			$data = json_decode($_REQUEST['data']);
-			if ( count($data) == 0 ) throw new \Exception("Taulukko on tyhjä. Tyhjää taulukkoa ei voi tallentaa");
-			//json file päivitys
-			if ( !$Chart->updateData( $data ) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttä ylläpitoon.");
-			//tietokantaan päivitys
-			if ( !$Chart->save() ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttä ylläpitoon.");
-			$res = array(
-				"success" => true,
-				"msg" => "Taulukko tallennettu."
-			);
-			
-		} catch(\Exception $e) {
-			
-			$res = array(
-				"success" => false,
-				"msg" => $e->getMessage()
-			);
-			
-		}
-		$this->jsonOut($res);
-		
 	}
 	
 	//Create cms page for chart
@@ -283,7 +216,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 			if($page->id != null) {
 				$page->title = $chartData['title'];
 				$page->nav_name = $chartData['title'];
-				if ( !$page->save() ) throw new \Exception("Sivun tallennus epäonnistui.");
+				if ( !$page->save() ) throw new \Exception("Sivun tallennus epÃ¤onnistui.");
 			}
 			else {
 				//create new cms_page
@@ -302,7 +235,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 				$page->chart_id = $chartData['chart_id'];
 				if($parent->id != null) $page->parent_id = $parent->id;
 				$page->setNextSeqNum(); //jos uusi niin annettaan seqnum
-				if ( !$page->save() ) throw new \Exception("Sivun tallennus epäonnistui.");
+				if ( !$page->save() ) throw new \Exception("Sivun tallennus epÃ¤onnistui.");
 			}
 			
 			$PgArray = $page->toArray();
@@ -312,7 +245,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 				$pa = $page->getParentIdArray(); //sivun sukupolvet id arrayna
 				
 				$group = new \Lougis_group();
-				$group->page_id = $pa[2]; //arrayn indeksissä 2 on oikea parent, eli tämän toimialan id.
+				$group->page_id = $pa[2]; //arrayn indeksissÃ¤ 2 on oikea parent, eli tÃ¤mÃ¤n toimialan id.
 				$group->find();
 				$group->fetch();
 				$permission = new \Lougis_group_permission();
@@ -325,7 +258,7 @@ class Charts extends \Lougis\abstracts\Frontend {
 			/* //update chart page_id
 			$Chart = new \Lougis_chart($chartData['id']);
 			$Chart->page_id = $page->id;
-			if ( !$Chart->save() ) throw new \Exception("Tilaston tallennus epäonnistui."); */
+			if ( !$Chart->save() ) throw new \Exception("Tilaston tallennus epÃ¤onnistui."); */
 			
 			
 		} catch(\Exception $e) {
@@ -337,283 +270,37 @@ class Charts extends \Lougis\abstracts\Frontend {
 		
 	}
 	
-	
-	//update data to database from jquery chart editor. 
-	public function updateDbData() {
-		
-			
-		try {
-			
-			$data = json_encode($_POST['chart_data']);
-			$Chart = new \Lougis_chart($_POST['chart_id']);
-			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
-			$Chart->updated_date = date(DATE_W3C);
-			$Chart->data_json = $data;
-			
-			if ( count($data) == 0 ) throw new \Exception("Taulukko on tyhjä. Tyhjää taulukkoa ei voi tallentaa");
-			
-			if ( !$Chart->save() ) throw new \Exception("Tekninen virhe! Taulukkoa ei voitu tallentaa. Ota yhteyttä ylläpitoon.");
-			
-			$res = array(
-				"success" => true,
-				"chart" => $Chart
-				//"msg" => "Taulukko tallennettu."
-			);
-		
-			
-		} catch(\Exception $e) {
-			
-			$res = array(
-				"success" => false,
-				"msg" => $e->getMessage()
-			);
-			
-		}
-		$this->jsonOut($res);
-		
-	}
-	
-	public function uploadData() {
-	
-		global $Site, $User;
-		
-		try {
-			
-			//user auth
-			$SessionUser = new \Lougis_session();
-			$SessionUser->get($_SESSION['user_id']);
-			if(!$SessionUser->isLogged()) throw new \Exception("KÃ¤yttÃ¤jÃ¤n tunnistaminen");
-			
-			//if ( $_FILES['datafile']['type'] != 'text/csv' ) throw new \Exception("Virheellinen tiedostotyyppi! Tiedoston tulee olla CSV-tiedosto (tiedostopääte .csv)");
-			unset($_SESSION['new_chart_id']); //väliaikainen testaamiseen
-			if ( isset($_SESSION['new_chart_id']) ) {
-				$Chart = new \Lougis_chart($_SESSION['new_chart_id']);
-			} else {
-				$Chart = new \Lougis_chart();
-				$Chart->setNextKey();
-			}
-
-			if ( !$Chart->buildJsonDataFromCsv($_FILES['datafile']) ) throw new \Exception("Dataa ei voitu lukea");
-			$Chart->created_date = date(DATE_W3C);
-			$Chart->created_by = $User->id;
-			if ( !$Chart->save() ) throw new \Exception("Virhe tilastoa luotaessa. Tilastoa ei voitu tallentaa.");
-			
-			$_SESSION['new_chart_id'] = $Chart->id;
-			
-			$res = array(
-				"success" => true,
-				"chart" => $Chart->dbToChartArray()
-			);
-			
-		} catch(\Exception $e) {
-			
-			$res = array(
-				"success" => false,
-				"msg" => $e->getMessage()
-			);
-			
-		}
-		$this->jsonHtmlOut($res);
-	
-	}
-	
-	/* public function uploadData() {
-	
-		global $Site, $User;
-		
-		try {
-			
-			//if ( $_FILES['datafile']['type'] != 'text/csv' ) throw new \Exception("Virheellinen tiedostotyyppi! Tiedoston tulee olla CSV-tiedosto (tiedostopääte .csv)");
-			//unset($_SESSION['new_chart_id']);
-			if ( isset($_SESSION['new_chart_id']) ) {
-				$Chart = new \Lougis_chart($_SESSION['new_chart_id']);
-			} else {
-				$Chart = new \Lougis_chart();
-				$Chart->setNextKey();
-			}
-			if ( !$Chart->addUploadedDatafile($_FILES['datafile']) ) throw new \Exception("Datatiedostoa ei voitu tallentaa palvelimelle.");
-			if ( !$Chart->buildJsonFileFromCsv() ) throw new \Exception("Dataa ei voitu lukea");
-			$Chart->created_date = date(DATE_W3C);
-			$Chart->created_by = $User->id;
-			if ( !$Chart->save() ) throw new \Exception("Tilastoa ei voitu tallentaa");
-			
-			$_SESSION['new_chart_id'] = $Chart->id;
-			
-			$res = array(
-				"success" => true,
-				"chart" => $Chart->toChartArray()
-			);
-			
-		} catch(\Exception $e) {
-			
-			$res = array(
-				"success" => false,
-				"msg" => $e->getMessage()
-			);
-			
-		}
-		$this->jsonHtmlOut($res);
-	
-	} */
-	
-	public function getChartObj() {
-                global $Site, $User;
-                
-                try {
-			
-			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
-			if ( empty($Chart->created_date) ) throw new \Exception("Tilastoa ei löytynyt!");
-			
-			$res = array(
-				"success" => true,
-				//"chart" => $Chart->toChartArray(true, true, true)
-			);
-			
-		} catch(\Exception $e) {
-			
-			$res = array(
-				"success" => false,
-				"msg" => $e->getMessage()
-			);
-			
-		}
-		$this->jsonOut($res);
-                
-        }
-	public function getChartInfo() {
-		
-		global $Site, $User;
-		
-		try {
-			
-			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
-			if ( empty($Chart->created_date) ) throw new \Exception("Tilastoa ei löytynyt!");
-			
-			$res = array(
-				"success" => true,
-				"chart" => $Chart->toChartArray(true, true, true)
-			);
-			
-		} catch(\Exception $e) {
-			
-			$res = array(
-				"success" => false,
-				"msg" => $e->getMessage()
-			);
-			
-		}
-		$this->jsonOut($res);
-		
-	}
-	
-	public function getChartTitle() {
-		try {
-			
-			$Chart = new \Lougis_chart($_REQUEST['chart_id']);
-			if ( empty($Chart->created_date) ) throw new \Exception("Tilastoa ei löytynyt!");
-			
-			$res = array(
-				"success" => true,
-				"title" => $Chart->title
-			);
-			
-		} catch(\Exception $e) {
-			
-			$res = array(
-				"success" => false,
-				"msg" => $e->getMessage()
-			);
-			
-		}
-		$this->jsonOut($res);
-	}
-	
 	//Delete chart (and cms_page)
 	public function deleteChart() {
-		
+		$res = array(
+			"success" => false,
+			"msg" => "Delete function not in use"
+		);
+		$this->jsonOut($res);
+		return 0;
 		try {
 			//user auth
 			$SessionUser = new \Lougis_session();
 			$SessionUser->get($_SESSION['user_id']);
-			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epäonnistui.');
+			if(!$SessionUser->isLogged()) throw new \Exception('Tunnistautuminen epÃ¤onnistui.');
 
 			$chart_id = (int)$_POST['chart_id'];
 			$Chart = new \Lougis_chart($chart_id);
-			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Tilastoa ei voitu ladata. Ota yhteyttä ylläpitoon.");
+			if ( empty($Chart->created_date) ) throw new \Exception("Tekninen virhe! Tilastoa ei voitu ladata. Ota yhteyttÃ¤ yllÃ¤pitoon.");
 	
 			$Pg = new \Lougis_cms_page();
 			$Pg->chart_id = $chart_id;
 			$Pg->find(true);
 			if( $Pg->id != null) {
-				if ( empty($Pg->created_date) ) throw new \Exception('Sivun poistaminen epäonnistui: Sivua ei voitu ladata!');
-				if ( $Pg->site_id != $_SESSION['site_id'] ) throw new \Exception('Sivun poistaminen epäonnistui: Virheellinen sivusto!');
-				if ( !$Pg->delete() ) throw new \Exception('Sivun poistaminen epäonnistui: '.$Pg->_lastError);
+				if ( empty($Pg->created_date) ) throw new \Exception('Sivun poistaminen epÃ¤onnistui: Sivua ei voitu ladata!');
+				if ( $Pg->site_id != $_SESSION['site_id'] ) throw new \Exception('Sivun poistaminen epÃ¤onnistui: Virheellinen sivusto!');
+				if ( !$Pg->delete() ) throw new \Exception('Sivun poistaminen epÃ¤onnistui: '.$Pg->_lastError);
 			}
 			$Chart->delete(); //try to delete chart also. If chart belongs to many pages then delete is restricted
 			
 			$res = array(
 				"success" => true,
 				"msg" => 'Tilasto "'.$Chart->title.'" poistettu.'
-			);
-			
-		} catch(\Exception $e) {
-			
-			$res = array(
-				"success" => false,
-				"msg" => $e->getMessage()
-			);
-			
-		}
-		$this->jsonOut($res);
-		
-	}
-	
-	public function saveChartInfo() {
-		
-		global $Site, $User;
-		
-		try {
-			
-			//page
-			$PgArray = array();
-		
-			if($_REQUEST['chart']['page_id'] > 0) $Pg = new \Lougis_cms_page($_REQUEST['chart']['page_id']);
-			else $Pg = new \Lougis_cms_page();	
-			$Pg->site_id = 'everkosto';
-			$Pg->lang_id = 'fi';
-			$Pg->title = $_REQUEST['chart']['title'];
-			$Pg->nav_name = $_REQUEST['chart']['title'];
-			$Pg->created_by = $_SESSION['user_id'];
-			$Pg->created_date = date(DATE_W3C);
-			$Pg->template = 'indikaattorit_uusi.php';
-			$Pg->published = true;
-			$Pg->visible = true;
-			$Pg->restricted_access = false;
-			$Pg->page_type = 'chart';
-			if($_REQUEST['chart']['parent_id'] > 0) $Pg->parent_id = $_REQUEST['chart']['parent_id'];
-			if($_REQUEST['chart']['page_id'] < 1) $Pg->setNextSeqNum(); //jos uusi niin annettaan seqnum
-			if ( !$Pg->save() ) throw new \Exception("Sivun tallennus epäonnistui.");
-			$PgArray = $Pg->toArray();
-			
-			if($_REQUEST['chart']['page_id'] > 0) devlog($_REQUEST['chart']);
-			
-			//chart
-			$Chart = new \Lougis_chart($_REQUEST['chart']['id']);
-			if ( empty($Chart->created_date) ) throw new \Exception("Tilaston avaus epäonnistui.");
-			$Chart->setFrom($_REQUEST['chart']);
-			$Chart->page_id = $PgArray['id']; //page_id of created or updated page
-			$Chart->updated_date = date(DATE_W3C);
-			if ( empty($Chart->title) ) throw new \Exception("Tilaston otsikko on pakollinen!");
-			if ( !$Chart->updateJsonFileFields($_REQUEST['fields']) ) throw new \Exception("Tilastotiedon tallennus epäonnistui!");
-			if ( !$Chart->save() ) throw new \Exception("Tilaston tallennus epäonnistui.");
-			
-			if ( isset($_SESSION['new_chart_id']) ) unset($_SESSION['new_chart_id']);
-		
-			
-			$res = array(
-				"success" => true,
-				"msg" => "Tilaston perustiedot tallennettu",
-				"chart" => $Chart->toChartArray()
 			);
 			
 		} catch(\Exception $e) {

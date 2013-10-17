@@ -39,6 +39,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
     
     public $chartConfigString;
     
+	//extjs
    /* public function delete() {
 	    
 	    if ( !empty($this->created_date) && !empty($this->id) ) {
@@ -48,7 +49,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    return parent::delete();
 	    
     }*/
-    
+    //extjs
     public function toChartArray( $Data = true, $Config = true, $Request = false ) {
 	    
 	    $Ar = $this->toArray();
@@ -58,8 +59,8 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    return $Ar;
 	    
     }
-	
-	 public function dbToChartArray( $Data = true, $Config = true, $Request = false ) {
+	//highchart
+	public function dbToChartArray( $Data = true, $Config = true, $Request = false ) {
 	    
 	    $Ar = $this->toArray();
 	    if ( $Data ) $Ar['data'] = $this->data_json;
@@ -68,7 +69,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    return $Ar;
 	    
     }
-    
+    //extjs
     public function getChartFolder() {
     	
     	$path = PATH_CHARTS.$this->id.'/';
@@ -76,36 +77,38 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
     	return $path;
     
     }
+	//extjs
     public function getDownloadFolder() {
     	
     	$path = '../../chart_csv/'.$this->id.'/';
     	return $path;
     
     }
-    
+    //extjs
     public function getChartConfigPath() {
 	    return $this->getChartFolder().'chart.json';
     }
-    
+    //extjs
     public function getChartConfigRequestPath() {
 	    return $this->getChartFolder().'chart-request.json';
     }
-    
+    //extjs
     public function getFileOriginalPath() {
 	    return $this->getChartFolder().'original.csv';
     }
-    
+    //extjs
     public function getFileCsvPath() {
 	    return $this->getChartFolder().'data.csv';
     }
+	//extjs
     public function getDownloadCsvPath() {
 	    return $this->getDownloadFolder().'data.csv';
     }
-    
+    //extjs
     public function getFileJsonPath() {
 	    return $this->getChartFolder().'data.json';
     }
-    
+    //exjts -> to be used in highchart also
     public function getIframeCode($Width = 500, $Height = 300) {
 	    
 	    $url = $this->getIframeUrl($Width, $Height);
@@ -113,13 +116,14 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    return $iframeCode;
 	    
     }
+	//exjts -> to be used in highchart also
     public function getIframeUrl($Width = 500, $Height = 300) {
 	    
 	    return 'http://'.$_SERVER['HTTP_HOST'].'/tilastot/iframe/?id='.$this->id.'&w='.$Width.'&h='.$Height;
 	    
     }
     
-	//build highchart
+	//build highchart (not in use atm)
 	public function buildTransposedHighchart(/* $chartdata */) {
 		
 		//get this->data_json data as array
@@ -227,7 +231,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 		
 	}
 	
-	
+	//extjs
     public function buildExtJsonChart( $chartData ) {
 	    
 	    $ext = array(
@@ -303,7 +307,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    return $ext;
 	    
     }
-    
+    //extjs
     public function getSerieFieldTitles( $chartFields, $serieFields ) {
 	    
 	    if ( is_array($serieFields) ) {
@@ -331,7 +335,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    return $serieFields;
 	    
     }
-    
+    //extjs
     public function saveChartConfig( $ExtConfig, $configRequest = null ) {
 	    
 	    if ( !empty($configRequest) ) {
@@ -354,14 +358,14 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 		return file_put_contents($jsonfile, json_encode($ExtConfig));
 		
     }
-    
+    //extjs
     public function getChartConfig() {
 	    
 	    if ( empty($this->chartConfig) ) $this->chartConfig = json_decode($this->getChartConfigJsonString());
 	    return $this->chartConfig;
 	    
     }
-    
+    //extjs
     public function getChartConfigRequest() {
 	    
 	    $reqfile = $this->getChartConfigRequestPath();
@@ -373,7 +377,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	   	return $rar;
 	   	
     }
-    
+    //extjs
     private function loopObjectToRequest( $obj, $preName = null ) {
 	    
 	    global $rar;
@@ -393,7 +397,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    return $rar;
 	    
     }
-    
+    //extjs
     public function getChartConfigJsonString() {
 	    
 	    if ( empty($this->chartConfigString) ) {
@@ -403,7 +407,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    return $this->chartConfigString;
 	    
     }
-     
+    //extjs
     public function addUploadedDatafile( $fileArray ) {
 		
     	$original = $this->getFileOriginalPath();
@@ -420,14 +424,14 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 		
     
     }
-  
+    //extjs
     public function getChartJsonData() {
 	    
 	    if ( empty($this->jsonData) ) $this->jsonData = json_decode($this->getChartJsonDataString());
 	    return $this->jsonData;
 	    
     }
-    
+    //extjs
     public function getChartJsonDataString() {
 	    
 	    if ( empty($this->jsonDataString) ) {
@@ -436,7 +440,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    }
 	    return $this->jsonDataString;
     }
-    
+    //extjs
     public function getChartFields() {
 	    
 		$json = $this->getChartJsonData();
@@ -444,7 +448,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    
     }
     
-    
+    //extjs
     public function updateData( $dataArray ) {
 	    
 	    $jsonfile = $this->getFileJsonPath();
@@ -453,7 +457,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 		return file_put_contents($jsonfile, json_encode($json));
 	    
     }
-    
+    //extjs
     public function updateJsonFileFields( $fieldsArray ) {
 	    
 	    $jsonfile = $this->getFileJsonPath();
@@ -462,7 +466,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 		return file_put_contents($jsonfile, json_encode($json));
 	    
     }
-	
+	//extjs
 	public function buildJsonFileFromCsv(  ) {
 		
 		 
@@ -558,131 +562,8 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
 	    
 	    
     }  
-   /* transposed shit
-	public function buildJsonDataFromCsv($fileArray) {
-	    
-	    //use directly temp file, no need to save the file to server
-		$fa = file($fileArray['tmp_name']);
-        
-		$headers = explode(';', $fa[0]);
-		$firstdata = explode(';', $fa[1]);
-		
-		$datatypes = array();
-		devlog($firstdata);
-		
-	// 27.3.2013 vg
-	//T‰m‰ pit‰isi tehd‰ uudestaan. Nyt k‰y vain ensimm‰isen rivin l‰pi. Pit‰isi tiet‰‰ onko jollain rivill‰ float tms vaikka ekalla olisikin int tai tyhj‰
-		foreach($firstdata as $cell) {
-			$data = trim($cell);
-			if ( strpos($data, ',') !== false ) $data = str_replace(',', '.', $data);
-			switch(true) {
-				//jos solu on tyhj‰. 27.3.2013 vg
-				case $data == '';
-					$datatypes[] = 'float';
-				break;
-				case is_numeric($data):
-                    if ( strpos($data, '.') !== false ) {
-						$datatypes[] = 'float';
-					} else {
-						$datatypes[] = 'int';
-					}        
-				break;
-				case isDate($data):
-					$datatypes[] = 'datetime';
-				break;	
-				default:
-					$datatypes[] = 'string';
-				break;
-			}
-		}
-				//devlog($datatypes);
-		
-		$dataConfig = array();
-		for($i = 0;$i < count($headers); $i++) {
-			//Pist‰‰ arvauksena "vuosi". 27.3.2013 vg
-			if( ($i == 0) && $headers[$i] == '') $headers[$i] = 'Vuosi';
-			$dataConfig[] = array(
-				"name" => trim(utf8_encode($headers[$i])),
-				"type" => $datatypes[$i],
-				"dataindex" => "c".$i
-			);
-		}
-		
-		$dataContent = array();
-		for($i = 1;$i < count($fa); $i++) {
-			$rawRow = explode(';', $fa[$i]);
-            $rawRow = array_map('trim', $rawRow);
-			$dataRow = array();
-			foreach($datatypes as $index => $type) {
-				switch($type) {
-					case 'string':
-						array_push($dataRow, strval($rawRow[$index]));
-					break;
-					case 'int':
-						array_push($dataRow, $rawRow[$index]);
-					break;
-                    case 'float':
-						$floatval = ( strpos($rawRow[$index], ',') !== false ) ? str_replace(',', '.', $rawRow[$index]) : $rawRow[$index];
-						array_push($dataRow, floatval($floatval));
-					break;
-					case 'datetime':
-						array_push($dataRow, strtotime($rawRow[$index]));
-					break;
-					default:
-						array_push($dataRow, strval($rawRow[$index]));
-					break;
-				}
-			}
-			array_push($dataContent, $dataRow);
-		} 
-		/*
-		$dataContent = array();
-		//all rows
-		for($i = 1;$i < count($fa); $i++) {
-			$rawRow = explode(';', $fa[$i]);
-            $rawRow = array_map('trim', $rawRow);
-			$dataRow = array();
-			$datatypes = array();
-			//each row
-			foreach($rawRow as $cellData) {
-				switch(true) {
-					case is_int($cellData):
-						array_push($dataRow, intval($cellData));
-						break;
-					case is_float($cellData):
-						array_push($dataRow, floatval($cellData));
-						break;
-					case isDate($cellData):
-						array_push($dataRow, strtotime($cellData));
-						break;
-					default:
-						array_push($dataRow, strval($cellData));
-						break;
-				}
-			}
-			array_push($dataContent, $dataRow);
-			devlog($dataContent);
-		}
-		*/
-			/*
-		//$jsonfile = $this->getFileJsonPath();
-		$json = array(
-			"fields" => $dataConfig,
-			"data" => $dataContent
-		);
-		
-		$encoded_json = json_encode($json);
-		
-		//json to db
-		$this->data_json = $encoded_json;
-		
-		//return file_put_contents($jsonfile, json_encode($json));
-	    return $encoded_json;
-	    
-    } 
-	*/
-	
-	//create json data from uploaded csv data
+   
+	//highchart: create json data from uploaded csv data
 	public function buildJsonDataFromCsv($fileArray) {
 	    
 	    //use directly temp file, no need to save the file to server
@@ -715,6 +596,7 @@ class Lougis_chart extends \Lougis\DB_DataObject_Wrapper
     } 
 	
 	/*
+	* highchart
 	* Requires utility/parsecsv/parsecsv.lib.php -class
 	*
 	* Outputs csv file from chart data
